@@ -6,6 +6,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
 
+import firebase from 'firebase';
+
 @Component({
   templateUrl: 'app.html'
 })
@@ -16,7 +18,18 @@ export class MyApp {
 
   pages: Array<{title: string, component: any}>;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
+  constructor(public platform: Platform, public statusBar: StatusBar
+    , public splashScreen: SplashScreen) {
+    // Initialize Firebase
+    firebase.initializeApp({
+      apiKey: "AIzaSyAHDEjrqVFI0ko98ShvPVxoTLVYmxLokoo",
+      authDomain: "kof-club.firebaseapp.com",
+      databaseURL: "https://kof-club.firebaseio.com",
+      projectId: "kof-club",
+      storageBucket: "kof-club.appspot.com",
+      messagingSenderId: "696218730032"
+    });
+
     this.initializeApp();
 
     // used for an example of ngFor and navigation

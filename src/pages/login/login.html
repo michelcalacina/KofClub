@@ -1,0 +1,33 @@
+<ion-content padding>
+  <h2>Autenticação</h2>
+  <form [formGroup]="loginForm" (submit)="loginUser()" novalidate>
+    <ion-item>
+      <ion-label stacked>E-mail</ion-label>
+      <ion-input #email formControlName="email" type="email" (change)="elementChanged(email)"
+        placeholder="Digite seu e-mail"
+        [class.invalid]="!loginForm.controls.email.valid && (emailChanged || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!loginForm.controls.email.valid  && (emailChanged || submitAttempt)">
+      <p>Por favor insira um e-mail válido.</p>
+    </ion-item>
+    <ion-item>
+      <ion-label stacked>Senha</ion-label>
+      <ion-input #password formControlName="password" type="password" (change)="elementChanged(password)"
+        placeholder="Digite sua senha"
+        [class.invalid]="!loginForm.controls.password.valid && (passwordChanged || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!loginForm.controls.password.valid  && (passwordChanged || submitAttempt)">
+      <p>A senha precisa ter 6 no mínimo 6 caracteres</p>
+    </ion-item>
+    <button ion-button block type="submit">
+      Enviar
+    </button>
+  </form>
+
+  <button ion-button block clear (click)="register()">
+    Criar conta
+  </button>
+  <button ion-button block clear (click)="resetPwd()">
+    Esqueci a senha
+  </button>
+</ion-content>

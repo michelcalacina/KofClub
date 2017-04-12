@@ -13,9 +13,35 @@ import firebase from 'firebase';
 @Injectable()
 export class FirebaseService {
   public db: any;
+  public fireAuth: any;
+  public userData: any;
 
   constructor(public http: Http) {
     console.log('Hello FirebaseService Provider');
-    this.db = firebase.database().ref('/Users');
+    this.db = firebase.database().ref('users');
+    this.fireAuth = firebase.auth();
+    this.userData = firebase.database().ref('userData');
+  }
+
+  login(email: string, password: string): any {
+    return this.fireAuth.signInWithEmailAndPassword(email, password);
+  }
+
+  register(email: string, password: string): any {
+    return this.fireAuth.createUserWithEmailAndPassword(email, password)
+    .then(
+      (newUser) => {
+        alert(JSON.stringify(newUser));
+        this.userData.child(newUser.uid).set({email:email});
+      }
+    )
+  }
+
+  resetPasswor(email: string): any {
+    return this.fireAuth.sendPassworResetEmail(email);
+  }
+
+  logout(): any {
+    return this.fireAuth.signOut();
   }
 }

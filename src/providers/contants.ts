@@ -1,0 +1,1 @@
+export let MAX_ALLOWED_CREATE_CLUBS_BY_USER = 2;

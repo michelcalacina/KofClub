@@ -8,11 +8,28 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class UserClubs {
 
+  clubs: Array<any> = new Array;
+
   constructor(public navCtrl: NavController, public navParams: NavParams) {
+    this.mockAddFakeClubs();
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad UserClubs');
+  // Only for teste purpose.
+  private mockAddFakeClubs() {
+      this.clubs.push({
+        thumbnail: "img/thumbnail-totoro.png"
+      , title: "Kolonia fighters"
+      , description: "Clube de jogadores da colônia antônio aleixo"
+    })
+    this.clubs.push({
+        thumbnail: "img/thumbnail-totoro.png"
+      , title: "John fighters"
+      , description: "Clube de jogadores da colônia antônio aleixo"
+      })
+  }
+
+  addClub() {
+    
   }
 
 }

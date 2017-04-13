@@ -2,9 +2,6 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { FirebaseService } from '../../providers/firebase-service';
-import { HomePage } from '../home/home';
-import { RegisterPage } from '../register/register';
-import { ResetpwdPage } from '../resetpwd/resetpwd';
 
 @IonicPage()
 @Component({
@@ -39,7 +36,7 @@ export class Login {
     this.navCtrl.push('RegisterPage');
   }
 
-  ResetpwdPage() {
+  resetPassword() {
     this.navCtrl.push('ResetpwdPage');
   }
 

@@ -14,7 +14,6 @@ export class HomePage {
   users: any;
   
   constructor(public navCtrl: NavController, private firebaseService: FirebaseService) {
-    //this.loadInitialUsers();
     firebase.auth().onAuthStateChanged(function(user){
       if (!user) {
         navCtrl.setRoot('Login');
@@ -22,10 +21,8 @@ export class HomePage {
     });
   }
 
-  private loadInitialUsers() {
-    this.firebaseService.db.on('value', function(snapshot) {
-      console.log(snapshot.key + " -- " + JSON.stringify(snapshot.val()) );
-    })
+  logout() {
+    this.firebaseService.logout();
   }
 
 }

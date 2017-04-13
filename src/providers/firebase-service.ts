@@ -27,17 +27,17 @@ export class FirebaseService {
     return this.fireAuth.signInWithEmailAndPassword(email, password);
   }
 
-  register(email: string, password: string): any {
+  register(email: string, password: string, name: string): any {
     return this.fireAuth.createUserWithEmailAndPassword(email, password)
     .then(
       (newUser) => {
         alert(JSON.stringify(newUser));
-        this.userData.child(newUser.uid).set({email:email});
+        this.userData.child(newUser.uid).set({name: name, email: email});
       }
     )
   }
 
-  resetPasswor(email: string): any {
+  resetPassword(email: string): any {
     return this.fireAuth.sendPassworResetEmail(email);
   }
 

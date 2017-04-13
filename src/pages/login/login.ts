@@ -33,11 +33,11 @@ export class Login {
   }
 
   register() {
-    this.navCtrl.push('RegisterPage');
+    this.navCtrl.push('Register');
   }
 
   resetPassword() {
-    this.navCtrl.push('ResetpwdPage');
+    this.navCtrl.push('Resetpwd');
   }
 
   loginUser() {
@@ -51,7 +51,7 @@ export class Login {
       this.loginForm.value.email,
       this.loginForm.value.password
     ).then( FirebaseService => {
-      this.navCtrl.setRoot('HomePage');
+      this.navCtrl.setRoot('Home');
     }, error => {
       this.loading.dismiss().then( () => {
         let alert = this.alertCtrl.create({

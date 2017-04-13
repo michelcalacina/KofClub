@@ -4,23 +4,16 @@ import 'rxjs/add/operator/map';
 
 import firebase from 'firebase';
 
-/*
-  Generated class for the FirebaseService provider.
-
-  See https://angular.io/docs/ts/latest/guide/dependency-injection.html
-  for more info on providers and Angular 2 DI.
-*/
 @Injectable()
 export class FirebaseService {
   public db: any;
   public fireAuth: any;
-  public userData: any;
+  public users: any;
 
   constructor(public http: Http) {
     console.log('Hello FirebaseService Provider');
-    this.db = firebase.database().ref('users');
     this.fireAuth = firebase.auth();
-    this.userData = firebase.database().ref('userData');
+    this.users = firebase.database().ref('users');
   }
 
   login(email: string, password: string): any {
@@ -31,8 +24,7 @@ export class FirebaseService {
     return this.fireAuth.createUserWithEmailAndPassword(email, password)
     .then(
       (newUser) => {
-        alert(JSON.stringify(newUser));
-        this.userData.child(newUser.uid).set({name: name, email: email});
+        this.users.child(newUser.uid).set({name: name, email: email});
       }
     )
   }

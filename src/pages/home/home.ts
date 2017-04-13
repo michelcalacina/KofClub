@@ -9,7 +9,7 @@ import firebase from 'firebase';
   selector: 'page-home',
   templateUrl: 'home.html',
 })
-export class HomePage {
+export class Home {
   
   users: any;
   

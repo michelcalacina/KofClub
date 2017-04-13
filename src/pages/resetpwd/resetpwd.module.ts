@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { ResetpwdPage } from './resetpwd';
+import { Resetpwd } from './resetpwd';
 
 @NgModule({
   declarations: [
-    ResetpwdPage,
+    Resetpwd,
   ],
   imports: [
-    IonicPageModule.forChild(ResetpwdPage),
+    IonicPageModule.forChild(Resetpwd),
   ],
   exports: [
-    ResetpwdPage
+    Resetpwd
   ]
 })
 export class ResetpwdModule {}

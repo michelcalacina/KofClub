@@ -1,33 +1,12 @@
 <ion-header>
-
   <ion-navbar>
-    <ion-title>Criar conta KoF Club</ion-title>
+    <ion-title>Cadastrar</ion-title>
   </ion-navbar>
-
 </ion-header>
 
-
 <ion-content padding>
-  <h2>Cadastro</h2>
   <form [formGroup]="registerForm" (submit)="register()" novalidate>
-    <ion-item>
-      <ion-label stacked>Email</ion-label>
-      <ion-input #email formControlName="email" type="email" (change)="elementChanged(email)"
-        placeholder="Endereço de email"
-        [class.invalid]="!registerForm.controls.email.valid && (emailChanged || submitAttempt)"></ion-input>
-    </ion-item>
-    <ion-item class="error-message" *ngIf="!registerForm.controls.email.valid  && (emailChanged || submitAttempt)">
-      <p>Por favor digite um email válido.</p>
-    </ion-item>
-    <ion-item>
-      <ion-label stacked>Senha</ion-label>
-      <ion-input #password formControlName="password" type="password" (change)="elementChanged(password)"
-        placeholder="Senha de acesso"
-        [class.invalid]="!registerForm.controls.password.valid && (passwordChanged || submitAttempt)"></ion-input>
-    </ion-item>
-    <ion-item class="error-message" *ngIf="!registerForm.controls.password.valid  && (passwordChanged || submitAttempt)">
-      <p>A senha precisar ter no mínimo 6 caracteres.</p>
-    </ion-item>
+    <!-- Name -->
     <ion-item>
       <ion-label stacked>Nome</ion-label>
       <ion-input #fullname formControlName="fullname" type="text" (change)="elementChanged(fullname)"
@@ -37,8 +16,28 @@
     <ion-item class="error-message" *ngIf="!registerForm.controls.fullname.valid  && (fullnameChanged || submitAttempt)">
       <p>Seu nome não pode estar em branco.</p>
     </ion-item>
-    <button ion-button block type="submit">
-      Cadastrar
-    </button>
+    <!-- Email -->
+    <ion-item>
+      <ion-label stacked>Email</ion-label>
+      <ion-input #email formControlName="email" type="email" (change)="elementChanged(email)"
+        placeholder="Endereço de email"
+        [class.invalid]="!registerForm.controls.email.valid && (emailChanged || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!registerForm.controls.email.valid  && (emailChanged || submitAttempt)">
+      <p>Por favor digite um email válido.</p>
+    </ion-item>
+    <!-- Password -->
+    <ion-item>
+      <ion-label stacked>Senha</ion-label>
+      <ion-input #password formControlName="password" type="password" (change)="elementChanged(password)"
+        placeholder="Senha de acesso"
+        [class.invalid]="!registerForm.controls.password.valid && (passwordChanged || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!registerForm.controls.password.valid  && (passwordChanged || submitAttempt)">
+      <p>A senha precisar ter no mínimo 6 caracteres.</p>
+    </ion-item>
   </form>
+  <button ion-button block bottom type="submit">
+      Cadastrar
+  </button>
 </ion-content>

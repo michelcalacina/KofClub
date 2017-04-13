@@ -8,7 +8,7 @@ import { FirebaseService } from '../../providers/firebase-service';
   selector: 'page-register',
   templateUrl: 'register.html',
 })
-export class RegisterPage {
+export class Register {
 
   public registerForm;
   emailChanged: boolean = false;
@@ -45,7 +45,7 @@ export class RegisterPage {
     , this.registerForm.value.password
     , this.registerForm.value.fullname
     ).then( authService => {
-      this.navCtrl.setRoot('HomePage');
+      this.navCtrl.setRoot('Home');
     }, error => {
       this.loading.dismiss().then( () => {
         let alert = this.alertCtrl.create({

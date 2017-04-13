@@ -8,7 +8,7 @@ import { FirebaseService } from '../../providers/firebase-service';
   selector: 'page-resetpwd',
   templateUrl: 'resetpwd.html',
 })
-export class ResetpwdPage {
+export class Resetpwd {
 
   public resetpwdForm;
   emailChanged: boolean = false;
@@ -35,7 +35,7 @@ export class ResetpwdPage {
       return;
     }
     this.firebaseService.resetPassword(this.resetpwdForm.value.email).then( authService => {
-      this.navCtrl.setRoot('HomePage');
+      this.navCtrl.setRoot('Home');
     }, error => {
       this.loading.dismiss().then( () => {
         let alert = this.alertCtrl.create({

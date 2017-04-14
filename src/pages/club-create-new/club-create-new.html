@@ -1,0 +1,38 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Criar KoF Club</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form [formGroup]="registerForm" (submit)="createClub()" novalidate>
+    <!-- Name -->
+    <ion-item>
+      <ion-label stacked>Nome</ion-label>
+      <ion-input #fullname formControlName="name" type="text" (change)="elementChanged(email)"
+        [class.invalid]="!registerForm.controls.name.valid && (nameChanged || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!registerForm.controls.name.valid  && (nameChanged || submitAttempt)">
+      <p>O nome do clube não pode estar em branco.</p>
+    </ion-item>
+    <!-- Description -->
+    <ion-item>
+      <ion-label stacked>Descrição</ion-label>
+      <ion-input #email formControlName="description" type="text" (change)="elementChanged(email)"
+        [class.invalid]="!registerForm.controls.description.valid && (descriptionChanged || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!registerForm.controls.description.valid  && (descriptionChanged || submitAttempt)">
+      <p>Por favor digite uma descrição válida.</p>
+    </ion-item>
+  </form>
+  <img src={{takenPicturePreview}}>
+  <button ion-button icon-only (click)="takePicture()">
+    <ion-icon name="reverse-camera"></ion-icon>
+  </button>
+  <button ion-button block bottom type="submit">
+      Cadastrar
+  </button>
+</ion-content>

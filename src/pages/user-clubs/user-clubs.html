@@ -7,7 +7,7 @@
 <ion-content padding>
   
   <ion-list>
-    <ion-item *ngFor="let club of clubs">
+    <ion-item *ngFor="let club of clubs" (click)="openClub(club)" >
       <ion-thumbnail item-left>
         <img src={{club.thumbnail}}>
       </ion-thumbnail>
@@ -17,7 +17,7 @@
   </ion-list>
   
   <ion-fab right bottom>
-    <button ion-fab (click)="addClub">
+    <button ion-fab (click)="createClub()">
      <ion-icon name="add"></ion-icon>
     </button>
  </ion-fab>

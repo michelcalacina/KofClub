@@ -6,14 +6,23 @@ import firebase from 'firebase';
 
 @Injectable()
 export class FirebaseService {
-  public db: any;
+  // Authentication
   public fireAuth: any;
+  
+  // DataBase
   public users: any;
+  public clubs: any;
+
+  // Storage
+  public clubImageThumbnail: any;
 
   constructor(public http: Http) {
     console.log('Hello FirebaseService Provider');
     this.fireAuth = firebase.auth();
     this.users = firebase.database().ref('users');
+    this.clubs = firebase.database().ref('clubs');
+
+    this.clubImageThumbnail = firebase.storage().ref('/clubs-thumbnail/');
   }
 
   login(email: string, password: string): any {
@@ -35,5 +44,10 @@ export class FirebaseService {
 
   logout(): any {
     return this.fireAuth.signOut();
+  }
+
+  createClub(name: string, description: string
+  , image: any): any {
+    return ;
   }
 }

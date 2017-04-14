@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
+import { ClubModel } from '../../model/club-model';
+
 @IonicPage()
 @Component({
   selector: 'page-user-clubs',
@@ -16,20 +18,26 @@ export class UserClubs {
 
   // Only for teste purpose.
   private mockAddFakeClubs() {
-      this.clubs.push({
-        thumbnail: "img/thumbnail-totoro.png"
-      , title: "Kolonia fighters"
-      , description: "Clube de jogadores da colônia antônio aleixo"
-    })
-    this.clubs.push({
-        thumbnail: "img/thumbnail-totoro.png"
-      , title: "John fighters"
-      , description: "Clube de jogadores da colônia antônio aleixo"
-      })
+    let club1 = new ClubModel(
+        "Kolonia fighters"
+        , "Clube de jogadores da colônia antônio aleixo"
+        , "assets/img/club-colonia.png");
+    
+    let club2 = new ClubModel(
+        "John fighters"
+        , "Clube de jogadores da colônia antônio aleixo"
+        , "assets/img/club-colonia.png");
+    
+    this.clubs.push(club1);
+    this.clubs.push(club2);
   }
 
-  addClub() {
-    
+  createClub() {
+    this.navCtrl.push('ClubCreateNew');
+  }
+
+  openClub(club) {
+    this.navCtrl.push('ClubHome', {"club": club});
   }
 
 }

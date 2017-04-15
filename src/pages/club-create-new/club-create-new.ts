@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { FirebaseService } from '../../providers/firebase-service';
+import { CameraService } from '../../providers/camera-service';
 
 @IonicPage()
 @Component({
@@ -10,46 +11,91 @@ import { FirebaseService } from '../../providers/firebase-service';
 })
 export class ClubCreateNew {
 
-  public registerForm;
+  public createClubForm;
   loading: any;
   submitAttempt: boolean = false;
-  public image: any;
   nameChanged: boolean = false;
   descriptionChanged: boolean = false;
-  takenPicturePreview: any;
+  isPictureTaken: boolean = false;
+  pictureTaken: any;
+  
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
-  , public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  , public alertCtrl: AlertController, public loadingCtrl: LoadingController
+  , public cameraService: CameraService) {
     
-    this.registerForm = formBuilder.group({
+    this.createClubForm = formBuilder.group({
       name: ['', Validators.required]
       , description: ['', Validators.required]
     });
-    
-    this.takenPicturePreview = "assets/img/default-placeholder-picture.png";
   }
 
-  elementChanged(input){
+  elementChanged(input) {
     let field = input.inputControl.name;
     this[field + "Changed"] = true;
   }
 
-  takePicture() {
-    // TODO 
+  takePictureGallery() {
+    this.cameraService.getPicture(false).then( (imageData) => {
+      this.loading.dismiss().then( () => {
+        //this.pictureTaken = 'data:image/png;base64,' + imageData;
+        this.pictureTaken = imageData;
+        this.isPictureTaken = true;
+      });
+    }, (err) => {
+      this.loading.dismiss();
+    });
+
+    this.loading = this.loadingCtrl.create({
+      dismissOnPageChange: true,
+    });
+    this.loading.present(); 
   }
   
+  takePictureCamera() {
+    this.cameraService.getPicture(true).then((imageData)=>{
+      this.loading.dismiss().then( () => {
+        //this.pictureTaken = 'data:image/png;base64,' + imageData;
+        this.pictureTaken = imageData;
+        this.isPictureTaken = true;
+      });
+    }, (err) => {
+      this.loading.dismiss();
+    });
+
+    this.loading = this.loadingCtrl.create({
+      dismissOnPageChange: true,
+    });
+    this.loading.present(); 
+  }
+
+  removeTakenPicture() {
+    this.isPictureTaken = false;
+    this.pictureTaken = null;
+  }
+
   createClub() {
+    alert("create club");
     this.submitAttempt = true;
 
-    if (!this.registerForm.valid){
+    if (!this.createClubForm.valid){
       return;
     }
     this.firebaseService.createClub(
-    this.registerForm.value.name
-    , this.registerForm.value.description
-    , this.image
-    ).then( authService => {
+    this.createClubForm.value.name
+    , this.createClubForm.value.description
+    , this.pictureTaken
+    ).then( resource => {
+      let alert = this.alertCtrl.create({
+          message: "Criado com sucesso",
+          buttons: [
+            {
+              text: "Ok",
+            }
+          ]
+        });
+        alert.present();
       this.navCtrl.getPrevious();
     }, error => {
       this.loading.dismiss().then( () => {
@@ -70,6 +116,10 @@ export class ClubCreateNew {
       dismissOnPageChange: true,
     });
     this.loading.present();
+  }
+
+  webFile(file) {
+    1 + 3;
   }
 
 }

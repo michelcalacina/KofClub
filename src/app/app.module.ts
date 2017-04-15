@@ -9,6 +9,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { HttpModule } from '@angular/http';
 import { FirebaseService } from '../providers/firebase-service';
+import { CameraService } from '../providers/camera-service';
+import { Camera, CameraOptions } from '@ionic-native/camera';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,9 @@ import { FirebaseService } from '../providers/firebase-service';
   providers: [
     StatusBar,
     SplashScreen,
+    Camera,
     FirebaseService,
+    CameraService,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

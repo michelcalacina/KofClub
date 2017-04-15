@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
+import { FilePath } from 'ionic/native';
 
 import firebase from 'firebase';
 
@@ -14,7 +15,7 @@ export class FirebaseService {
   public clubs: any;
 
   // Storage
-  public clubImageThumbnail: any;
+  public storage: any;
 
   constructor(public http: Http) {
     console.log('Hello FirebaseService Provider');
@@ -22,7 +23,7 @@ export class FirebaseService {
     this.users = firebase.database().ref('users');
     this.clubs = firebase.database().ref('clubs');
 
-    this.clubImageThumbnail = firebase.storage().ref('/clubs-thumbnail/');
+    this.storage = firebase.storage();
   }
 
   login(email: string, password: string): any {
@@ -47,7 +48,36 @@ export class FirebaseService {
   }
 
   createClub(name: string, description: string
-  , image: any): any {
-    return ;
+  , fileNativePath: any): any {
+    alert("firebase create club");
+    this.uploadFile(fileNativePath).then((res) => {
+      alert(JSON.stringify(res));
+    }, (err) => {
+      alert(JSON.stringify(err));
+    });
+
+    return;
+  }
+
+  private uploadFile (fileNativePath): any {
+    alert(fileNativePath);
+    //FilePath.resolveLocalFileSystemURL(fileNativePath)
+    // Not working fix this, need discover how create file.
+    (<any>window).resolveLocalFileSystemURL(fileNativePath), (res) => {
+      alert('first res')
+      res.file((resFile) => {
+        alert('resFile')
+        let reader = new FileReader();
+        reader.readAsArrayBuffer(resFile);
+        reader.onloadend = (evt: any) => {
+          alert("evt "+evt);
+          let imgBlob = new Blob([evt.target.result], {type: 'image/png'});
+          let fileStorage = this.storage.child("clubs-logo");
+          return fileStorage.put(imgBlob);
+        }
+      })
+    }, (err) => {
+      alert("erro no resolveLocal..." + err);  
+    }
   }
 }

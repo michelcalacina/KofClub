@@ -6,43 +6,28 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 @Injectable()
 export class CameraService {
 
-  constructor(private camera: Camera) {
+  constructor(public camera: Camera) {
     
   }
 
-  getPictureFromLibrary(): any {
+  // Return a promisse with the image data or error.
+  getPicture(isFromCamera: boolean): any {
     let options: CameraOptions = {
-      quality: 100,
-      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
-      destinationType: this.camera.DestinationType.DATA_URL,
+      quality: 50,
+      destinationType: this.camera.DestinationType.NATIVE_URI,
       encodingType: this.camera.EncodingType.PNG,
-      mediaType: this.camera.MediaType.PICTURE
+      mediaType: this.camera.MediaType.PICTURE,
+      targetWidth: 420,
+      targetHeight: 280
     }
 
-    this.camera.getPicture(options).then((imageData) => {
-      let base64Image = 'data:image/png;base64,' + imageData;
-      return base64Image;
-    }, (err) => {
-      return null;
-    });
-  }
-  
-  getPictureFromCamera(): any {
-    let options: CameraOptions = {
-      quality: 100,
-      sourceType: this.camera.PictureSourceType.CAMERA,
-      destinationType: this.camera.DestinationType.DATA_URL,
-      encodingType: this.camera.EncodingType.PNG,
-      mediaType: this.camera.MediaType.PICTURE
-    }
+    if (isFromCamera) {
+        options.sourceType = this.camera.PictureSourceType.CAMERA;
+        //this.camera.cleanup();
+      } else {
+        options.sourceType = this.camera.PictureSourceType.PHOTOLIBRARY;
+      }
 
-    this.camera.getPicture(options).then((imageData) => {
-      let base64Image = 'data:image/png;base64,' + imageData;
-      return base64Image;
-    }, (err) => {
-      return null;
-    });
+    return this.camera.getPicture(options);
   }
-  
-
 }

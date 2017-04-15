@@ -8,31 +8,60 @@
 
 
 <ion-content padding>
-  <form [formGroup]="registerForm" (submit)="createClub()" novalidate>
+  
+  <form [formGroup]="createClubForm" (submit)="createClub()" novalidate>
     <!-- Name -->
     <ion-item>
       <ion-label stacked>Nome</ion-label>
-      <ion-input #fullname formControlName="name" type="text" (change)="elementChanged(email)"
-        [class.invalid]="!registerForm.controls.name.valid && (nameChanged || submitAttempt)"></ion-input>
+      <ion-input #name formControlName="name" type="text" (change)="elementChanged(name)"
+        [class.invalid]="!createClubForm.controls.name.valid && (nameChanged || submitAttempt)"></ion-input>
     </ion-item>
-    <ion-item class="error-message" *ngIf="!registerForm.controls.name.valid  && (nameChanged || submitAttempt)">
+    <ion-item class="error-message" *ngIf="!createClubForm.controls.name.valid  && (nameChanged || submitAttempt)">
       <p>O nome do clube não pode estar em branco.</p>
     </ion-item>
     <!-- Description -->
     <ion-item>
       <ion-label stacked>Descrição</ion-label>
-      <ion-input #email formControlName="description" type="text" (change)="elementChanged(email)"
-        [class.invalid]="!registerForm.controls.description.valid && (descriptionChanged || submitAttempt)"></ion-input>
+      <ion-input #description formControlName="description" type="text" (change)="elementChanged(description)"
+        [class.invalid]="!createClubForm.controls.description.valid && (descriptionChanged || submitAttempt)"></ion-input>
     </ion-item>
-    <ion-item class="error-message" *ngIf="!registerForm.controls.description.valid  && (descriptionChanged || submitAttempt)">
+    <ion-item class="error-message" *ngIf="!createClubForm.controls.description.valid  && (descriptionChanged || submitAttempt)">
       <p>Por favor digite uma descrição válida.</p>
     </ion-item>
   </form>
-  <img src={{takenPicturePreview}}>
-  <button ion-button icon-only (click)="takePicture()">
-    <ion-icon name="reverse-camera"></ion-icon>
-  </button>
-  <button ion-button block bottom type="submit">
+  
+  <div class="picture-frame">
+      <ion-label stacked>Marca do clube 420x280px</ion-label>
+      
+      <div *ngIf="isPictureTaken" style="width: 10px; height: 10px;">
+        <ion-fab right>
+          <button ion-fab color="danger" (click)="removeTakenPicture()">
+            <ion-icon name="trash"></ion-icon>
+          </button>
+        </ion-fab>
+      </div>
+
+      <img *ngIf="!isPictureTaken" src="assets/img/default-placeholder-picture.png">
+      <img *ngIf="isPictureTaken" src={{pictureTaken}} >
+
+      <ion-fab center >
+        <button ion-fab>
+          <ion-icon name="reverse-camera"></ion-icon>
+        </button>
+        <ion-fab-list side="left">
+          <button ion-fab (click)="takePictureGallery()">
+            <ion-icon name="images"></ion-icon>
+          </button>
+        </ion-fab-list>
+        <ion-fab-list side="right">
+          <button ion-fab (click)="takePictureCamera()">
+            <ion-icon name="camera"></ion-icon>
+          </button>
+        </ion-fab-list>
+      </ion-fab>
+  </div>
+
+  <button ion-button block bottom type="submit" (click)="createClub()">
       Cadastrar
   </button>
 </ion-content>

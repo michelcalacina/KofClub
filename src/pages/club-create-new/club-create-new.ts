@@ -18,7 +18,7 @@ export class ClubCreateNew {
   descriptionChanged: boolean = false;
   isPictureTaken: boolean = false;
   pictureTaken: any;
-  
+  public base64declaration = "data:image/png;base64,";
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
@@ -54,14 +54,14 @@ export class ClubCreateNew {
   }
   
   takePictureCamera() {
-    this.cameraService.getPicture(true).then((imageData)=>{
-      this.loading.dismiss().then( () => {
-        //this.pictureTaken = 'data:image/png;base64,' + imageData;
-        this.pictureTaken = imageData;
-        this.isPictureTaken = true;
-      });
-    }, (err) => {
+    this.cameraService.getPicture(true).then( picture => {
+      this.pictureTaken = picture;
+      this.isPictureTaken = true;
+      console.log(picture);
       this.loading.dismiss();
+    }, err => { 
+      console.log(err);
+      this.loading.dismiss(); 
     });
 
     this.loading = this.loadingCtrl.create({
@@ -76,7 +76,6 @@ export class ClubCreateNew {
   }
 
   createClub() {
-    alert("create club");
     this.submitAttempt = true;
 
     if (!this.createClubForm.valid){
@@ -87,7 +86,8 @@ export class ClubCreateNew {
     , this.createClubForm.value.description
     , this.pictureTaken
     ).then( resource => {
-      let alert = this.alertCtrl.create({
+      this.loading.dismiss().then(()=>{
+        let alert = this.alertCtrl.create({
           message: "Criado com sucesso",
           buttons: [
             {
@@ -96,7 +96,8 @@ export class ClubCreateNew {
           ]
         });
         alert.present();
-      this.navCtrl.getPrevious();
+        //this.navCtrl.getPrevious();
+      })
     }, error => {
       this.loading.dismiss().then( () => {
         let alert = this.alertCtrl.create({
@@ -118,8 +119,8 @@ export class ClubCreateNew {
     this.loading.present();
   }
 
-  webFile(file) {
-    1 + 3;
+  public getPicture(): string {
+    return this.base64declaration + this.pictureTaken;
   }
 
 }

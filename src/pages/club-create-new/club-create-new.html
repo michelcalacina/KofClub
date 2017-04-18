@@ -42,7 +42,7 @@
       </div>
 
       <img *ngIf="!isPictureTaken" src="assets/img/default-placeholder-picture.png">
-      <img *ngIf="isPictureTaken" src={{pictureTaken}} >
+      <img *ngIf="isPictureTaken" src={{getPicture()}} >
 
       <ion-fab center >
         <button ion-fab>

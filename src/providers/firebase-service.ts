@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
-import { FilePath } from 'ionic/native';
 
 import firebase from 'firebase';
+
+var window: any;
 
 @Injectable()
 export class FirebaseService {
@@ -14,16 +15,11 @@ export class FirebaseService {
   public users: any;
   public clubs: any;
 
-  // Storage
-  public storage: any;
-
   constructor(public http: Http) {
     console.log('Hello FirebaseService Provider');
     this.fireAuth = firebase.auth();
     this.users = firebase.database().ref('users');
     this.clubs = firebase.database().ref('clubs');
-
-    this.storage = firebase.storage();
   }
 
   login(email: string, password: string): any {
@@ -48,36 +44,66 @@ export class FirebaseService {
   }
 
   createClub(name: string, description: string
-  , fileNativePath: any): any {
-    alert("firebase create club");
-    this.uploadFile(fileNativePath).then((res) => {
-      alert(JSON.stringify(res));
-    }, (err) => {
-      alert(JSON.stringify(err));
+  , dataUrl: any): any {
+    
+    return new Promise((resolve, reject) => {
+      this.uploadFile(dataUrl).then((res) => {
+        console.log("After send: "+res);
+        // TODO save on database metadata for file.
+        resolve(" Mock result for then ");
+      }, (err) => {
+        reject(err);
+      });
     });
-
-    return;
   }
 
-  private uploadFile (fileNativePath): any {
-    alert(fileNativePath);
-    //FilePath.resolveLocalFileSystemURL(fileNativePath)
-    // Not working fix this, need discover how create file.
-    (<any>window).resolveLocalFileSystemURL(fileNativePath), (res) => {
-      alert('first res')
-      res.file((resFile) => {
-        alert('resFile')
-        let reader = new FileReader();
-        reader.readAsArrayBuffer(resFile);
-        reader.onloadend = (evt: any) => {
-          alert("evt "+evt);
-          let imgBlob = new Blob([evt.target.result], {type: 'image/png'});
-          let fileStorage = this.storage.child("clubs-logo");
-          return fileStorage.put(imgBlob);
+  private uploadFile (fileBase64): any {
+    return new Promise( (resolve, reject) => {
+      this.b64toBlob(fileBase64).then (fileBlob => {
+        let storageRef = firebase.storage().ref();
+        let uploadTask = storageRef.child("images/myclublogo.png").put(fileBlob);
+      
+        uploadTask.on('state_changed', function (snapshot) {
+          // Observe state change events such as progress, pause, and resume
+          // See below for more detail
+          console.log(snapshot);
+        }, function(err) {
+
+          reject(err);
+        
+        }, function() {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          var downloadURL = uploadTask.snapshot.downloadURL;
+          resolve(downloadURL);
+        });
+      });
+    });
+  }
+
+  // Taken from: http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+  private b64toBlob(b64Data): Promise<Blob> {
+    return new Promise( (resolve, reject) => {
+      let contentType = "image/png";
+      let sliceSize = 512;
+
+      let byteCharacters = atob(b64Data);
+      let byteArrays = [];
+
+      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        let slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        let byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
         }
-      })
-    }, (err) => {
-      alert("erro no resolveLocal..." + err);  
-    }
+
+        let byteArray = new Uint8Array(byteNumbers);
+
+        byteArrays.push(byteArray);
+      }
+
+      resolve( new Blob(byteArrays, {type: contentType}) );
+    })
   }
 }

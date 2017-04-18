@@ -88,7 +88,7 @@ export class ClubCreateNew {
     ).then( resource => {
       this.loading.dismiss().then(()=>{
         let alert = this.alertCtrl.create({
-          message: "Criado com sucesso",
+          message: "Feito, que os duelos comecem!",
           buttons: [
             {
               text: "Ok",

@@ -1,14 +1,19 @@
+
 export class ClubModel {
+
     public title: string;
     public description: string;
-    public thumbnail: string;
+    public thumbnailURL: string;
+    public creationDate: object;
+    public userAdmin: string;
 
-    constructor(public titleParam: string
-    , public descriptionParam: string
-    , public thumbnailParam: string) {
+    private thumbnailBlob: Blob;
+    
+    constructor() {
 
-        this.title = titleParam;
-        this.description = descriptionParam;
-        this.thumbnail = thumbnailParam;
+    }
+
+    public getThumbnailBlob() {
+        return this.getThumbnailBlob;
     }
 }

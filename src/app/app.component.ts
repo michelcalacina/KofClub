@@ -27,15 +27,13 @@ export class MyApp {
       messagingSenderId: "696218730032"
     });
 
-    this.initializeApp();
-
-    // used for an example of ngFor and navigation
     this.pages = [
       { title: 'Meus Clubes', component: 'UserClubs' },
       { title: 'Todos os Clubes', component: 'Clubs' },
       { title: 'Perfil', component: 'UserProfile' }
     ];
 
+    this.initializeApp();
   }
 
   initializeApp() {

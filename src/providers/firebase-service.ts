@@ -27,6 +27,7 @@ export class FirebaseService {
   private clubsRef: any;
   private clubsMemberRef: any;
 
+
   constructor(public af: AngularFire) {
     this.fireAuth = firebase.auth();
     this.usersRef = firebase.database().ref(DB_ROOT_USERS);
@@ -64,22 +65,22 @@ export class FirebaseService {
     return new Promise((resolve, reject) => {
       this.uploadBlob(dataBase64, fileName, ST_PATH_LOGOS)
         .then((downloadURL) => {
-          let currentUserId = firebase.auth().currentUser.uid;
+          let uid = firebase.auth().currentUser.uid;
           // Save club on database.
           let club = new ClubModel();
           club.title = clubName;
           club.description = clubDescription;
           club.creationDate = firebase.database.ServerValue.TIMESTAMP;
-          club.userAdmin = currentUserId;
+          club.userAdmin = uid;
           club.thumbnailURL = downloadURL;
 
           let newClubKey = this.clubsRef.push().key;
 
           let updates = {};
           updates[DB_ROOT_CLUBS + newClubKey] = club;
-          updates[DB_ROOT_USERS + currentUserId + '/' + DB_ROOT_CLUBS + newClubKey] = true;
+          updates[DB_ROOT_USERS + uid + '/' + DB_ROOT_CLUBS + newClubKey] = true;
           // Update/Crete clubs-members with the new Club and default admin current user.
-          updates[DB_ROOT_CLUBS_MEMBERS + newClubKey + '/' + currentUserId] = true;
+          updates[DB_ROOT_CLUBS_MEMBERS + newClubKey + '/' + uid] = true;
           firebase.database().ref().update(updates).then( () => {
             resolve(true);
           });
@@ -107,16 +108,16 @@ export class FirebaseService {
     });
   }
   
-  private getUserClubKeys(uid): any {
+  private getUserClubKeys(uid): Promise<Array<string>> {
     return new Promise(resolve => {
       this.usersRef.child(uid).child('clubs')
       .once("value", snapshot => {
-        var tempArray: string[] = [];
+        let keys: string[] = [];
         // Convert Object Like {key: true, key: true}, to array of keys.
         for (let key in snapshot.val()) {
-          tempArray.push(key);
+          keys.push(key);
         }
-        resolve(tempArray);
+        resolve(keys);
       })
     });
   }
@@ -148,8 +149,22 @@ export class FirebaseService {
           let club: ClubModel = ClubModel.toClubModel(snapshot.val());
           club.setClubKey(snapshot.key);
           clubs.push(club);
-        });;
-        resolve(clubs);
+        });
+
+        // Mark My Clubs
+        let uid = firebase.auth().currentUser.uid;
+        this.getUserClubKeys(uid)
+        .then(keys => {
+          for(let k of keys) {
+            for (let c of clubs) {
+              if (c.getClubKey().trim().valueOf() === new String(k).trim().valueOf()) {
+                  c.setIsClubLoggedUser(true);
+                    break;
+              }
+            }
+          }
+          resolve(clubs);
+        });
       });
     });
    }

@@ -8,17 +8,26 @@ export class ClubModel {
     public userAdmin: string;
 
     private _clubKey: string;
+    private _isClubLoggedUser: boolean;
     
     constructor() {
-
+        this._isClubLoggedUser = false;
     }
 
-    public getClubKey() {
+    getClubKey = function(): string {
         return this._clubKey;
     }
 
-    public setClubKey(key: string) {
+    setClubKey = function(key: string) {
         this._clubKey = key;
+    }
+
+    setIsClubLoggedUser = function(status: boolean) {
+        this._isClubLoggedUser = status;
+    }
+
+    isClubLoggedUser = function(): boolean {
+        return this._isClubLoggedUser;
     }
 
     public static toClubModel(jsonLike: any): ClubModel {

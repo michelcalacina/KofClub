@@ -7,19 +7,28 @@
 <ion-content padding>
   
   <ion-list>
-    <ion-item *ngFor="let club of clubs" (click)="openClub(club)" >
+    <ion-item *ngFor="let club of clubs" >
       <ion-thumbnail item-left>
         <img src={{club.thumbnailURL}}>
       </ion-thumbnail>
-      <h2>{{club.title}}</h2>
-      <p>{{club.description}}</p>
+      <div class="text-main-info">
+        <ion-title>{{club.title}}</ion-title>
+        <H2>{{club.description}}</H2>
+      </div>
+
+      <div class="right-dynamic-fab">
+        <ion-fab right bottom>
+          <button *ngIf="club.isClubLoggedUser()" ion-fab color="secondary"
+                  (click)="openUserClub(club)">
+              <ion-icon name="happy"></ion-icon>
+          </button>
+          <button *ngIf="!club.isClubLoggedUser()" ion-fab color="danger" 
+                  (click)="requireAccessToClub(club)">
+              <ion-icon  name="person-add"></ion-icon>
+          </button>
+        </ion-fab>
+      </div>
     </ion-item>
   </ion-list>
-  
-  <ion-fab right bottom>
-    <button ion-fab (click)="createClub()">
-     <ion-icon name="add"></ion-icon>
-    </button>
- </ion-fab>
 
 </ion-content>

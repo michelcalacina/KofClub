@@ -11,6 +11,7 @@ const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
 const DB_ROOT_RANK = "/rank/";
 const DB_ROOT_CLUBS_MEMBERS = "/clubs-members/";
+const DB_ROOT_REQUEST_JOIN = "/clubs-join-members/"
 
 // Storage
 const ST_ROOT_IMAGES = "/images/";
@@ -77,13 +78,13 @@ export class FirebaseService {
           let newClubKey = this.clubsRef.push().key;
 
           let updates = {};
-          updates[DB_ROOT_CLUBS + newClubKey] = club;
-          updates[DB_ROOT_USERS + uid + '/' + DB_ROOT_CLUBS + newClubKey] = true;
+          updates[DB_ROOT_CLUBS + newClubKey] = club.toJSON();
+          updates[DB_ROOT_USERS + uid + DB_ROOT_CLUBS + newClubKey] = true;
           // Update/Crete clubs-members with the new Club and default admin current user.
           updates[DB_ROOT_CLUBS_MEMBERS + newClubKey + '/' + uid] = true;
           firebase.database().ref().update(updates).then( () => {
             resolve(true);
-          });
+          }).catch( err => {reject(err)});
       })
     });
   }
@@ -92,7 +93,7 @@ export class FirebaseService {
     return new Promise( (resolve) => {
       
       let promiseCommands = listKeys.map(function(val,key) {
-        return firebase.database().ref('clubs').child(val).once("value");
+        return firebase.database().ref('clubs').child(val).once('value');
       });
 
       Promise.all(promiseCommands)
@@ -143,7 +144,7 @@ export class FirebaseService {
    listAllClubs(): any {
     return new Promise(resolve => {
       let clubsList: Array<ClubModel> = new Array;
-      this.clubsRef.once("value", snapshots => {
+      this.clubsRef.once('value', snapshots => {
         let clubs: Array<ClubModel> = new Array;
         snapshots.forEach(snapshot => {
           let club: ClubModel = ClubModel.toClubModel(snapshot.val());
@@ -167,6 +168,19 @@ export class FirebaseService {
         });
       });
     });
+   }
+
+   requestAccessToClub(club: ClubModel): Promise<any> {
+     return new Promise( (resolve, reject) => {
+        let uid = firebase.auth().currentUser.uid;
+        let clubKey = club.getClubKey();
+        // Uses update to keep the structe on db: root/clubkey/uid: true.
+        let update = {};
+        update[DB_ROOT_REQUEST_JOIN + club.getClubKey() + '/' + uid] = true; 
+        firebase.database().ref().update(update).then( _ => {
+          resolve(true)
+        }).catch( err => reject(err) );
+     });
    }
 
   // -----------------------------------------------

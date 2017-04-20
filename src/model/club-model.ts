@@ -39,4 +39,12 @@ export class ClubModel {
         club.userAdmin = jsonLike.userAdmin;
         return club;
     }
+
+    public toJSON() {
+        return {"title": this.title,
+                "description": this.description,
+                "thumbnailURL": this.thumbnailURL,
+                "creationDate": this.creationDate,
+                "userAdmin": this.userAdmin};
+    }
 }

@@ -9,7 +9,7 @@
   <ion-list>
     <ion-item *ngFor="let club of clubs" (click)="openClub(club)" >
       <ion-thumbnail item-left>
-        <img src={{club.thumbnail}}>
+        <img src={{club.thumbnailURL}}>
       </ion-thumbnail>
       <h2>{{club.title}}</h2>
       <p>{{club.description}}</p>

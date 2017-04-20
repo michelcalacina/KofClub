@@ -13,49 +13,44 @@ import { ClubModel } from '../../model/club-model';
 export class UserClubs {
 
   loading: any;
-  clubs: Array<any> = new Array;
+  clubs: Array<ClubModel> = new Array;
+  private hasLoadedNewClubs = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
     
-    this.mockAddFakeClubs();
-  }
-
-  // Only for teste purpose.
-  private mockAddFakeClubs() {
-    let club1 = new ClubModel();
-    club1.title = "Kolonia fighters";
-    club1.description = "Clube de jogadores da colônia antônio aleixo";
-    club1.thumbnailURL = "assets/img/club-colonia.png";
-    
-    let club2 = new ClubModel();
-    club1.title = "Kolonia fighters";
-    club1.description = "Clube de jogadores da colônia antônio aleixo";
-    club1.thumbnailURL = "assets/img/club-colonia.png";
-    
-    this.clubs.push(club1);
-    this.clubs.push(club2);
+    this.loadClubsList();
   }
 
   loadClubsList() {
-    this.firebaseService.listCurrentUserClubs()
-      .then( clubList => {
-        this.clubs = clubList;
-        this.loading.dismiss();
-      })
-    
     this.loading = this.loadingCtrl.create({
       dismissOnPageChange: true,
     });
     this.loading.present();
+
+    this.firebaseService.listCurrentUserClubs()
+      .then( clubList => {
+        this.clubs = clubList;
+        this.loading.dismiss();
+      }, (err) => {
+        this.loading.dismiss();
+      });
   }
 
   createClub() {
+    this.hasLoadedNewClubs = true;
     this.navCtrl.push('ClubCreateNew');
   }
 
-  openClub(club) {
+  openClub(club: ClubModel) {
     this.navCtrl.push('ClubHome', {"club": club});
+  }
+
+  ionViewDidEnter() {
+    if (this.hasLoadedNewClubs) {
+      this.loadClubsList();
+      this.hasLoadedNewClubs = false;
+    }
   }
 
 }

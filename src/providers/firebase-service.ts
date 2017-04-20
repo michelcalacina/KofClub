@@ -3,10 +3,19 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 import firebase from 'firebase';
+import { AngularFire } from 'angularfire2';
 
 import { ClubModel } from '../model/club-model';
 
-var window: any;
+const DB_ROOT_CLUBS = "/clubs/";
+const DB_ROOT_USERS = "/users/";
+const DB_ROOT_RANK = "/rank/";
+const DB_ROOT_CLUBS_MEMBERS = "/clubs-members/";
+
+// Storage
+const ST_ROOT_IMAGES = "/images/";
+const ST_PATH_LOGOS = ST_ROOT_IMAGES + "logos/";
+
 
 @Injectable()
 export class FirebaseService {
@@ -16,14 +25,13 @@ export class FirebaseService {
   // DataBase
   private usersRef: any;
   private clubsRef: any;
+  private clubsMemberRef: any;
 
-  // Storage
-  private rootClubsLogo = "images/logo/";
-
-  constructor(public http: Http) {
+  constructor(public af: AngularFire) {
     this.fireAuth = firebase.auth();
-    this.usersRef = firebase.database().ref('users');
-    this.clubsRef = firebase.database().ref('clubs');
+    this.usersRef = firebase.database().ref(DB_ROOT_USERS);
+    this.clubsRef = firebase.database().ref(DB_ROOT_CLUBS);
+    this.clubsMemberRef = firebase.database().ref(DB_ROOT_CLUBS_MEMBERS);
   }
 
   // Login control.
@@ -52,24 +60,26 @@ export class FirebaseService {
   // Club Control
   createClub(clubName: string, clubDescription: string
   , dataBase64: any): any {
-    let fileName = clubName + "-logo" + ".png";
+    let fileName = clubName + ".png";
     return new Promise((resolve, reject) => {
-      this.uploadBlob(dataBase64, fileName, this.rootClubsLogo)
+      this.uploadBlob(dataBase64, fileName, ST_PATH_LOGOS)
         .then((downloadURL) => {
           let currentUserId = firebase.auth().currentUser.uid;
           // Save club on database.
           let club = new ClubModel();
           club.title = clubName;
-          clubDescription = clubDescription;
+          club.description = clubDescription;
           club.creationDate = firebase.database.ServerValue.TIMESTAMP;
           club.userAdmin = currentUserId;
           club.thumbnailURL = downloadURL;
 
           let newClubKey = this.clubsRef.push().key;
-          let updates = {};
-          updates['/clubes/' + newClubKey] = club;
-          updates['/users/' + currentUserId + '/' + 'clubs/' + newClubKey] = true;
 
+          let updates = {};
+          updates[DB_ROOT_CLUBS + newClubKey] = club;
+          updates[DB_ROOT_USERS + currentUserId + '/' + DB_ROOT_CLUBS + newClubKey] = true;
+          // Update/Crete clubs-members with the new Club and default admin current user.
+          updates[DB_ROOT_CLUBS_MEMBERS + newClubKey + '/' + currentUserId] = true;
           firebase.database().ref().update(updates).then( () => {
             resolve(true);
           });
@@ -77,11 +87,49 @@ export class FirebaseService {
     });
   }
 
-  listCurrentUserClubs(): Promise<Array<any>>  {
-    return new Promise(resolve => {
+  private getClubsByPromise(listKeys: Array<string>): any {
+    return new Promise( (resolve) => {
+      
+      let promiseCommands = listKeys.map(function(val,key) {
+        return firebase.database().ref('clubs').child(val).once("value");
+      });
 
+      Promise.all(promiseCommands)
+        .then(function (clubs) {
+          let clubsList = clubs.map( club => {
+            return club.val();
+          });
+          
+          resolve(clubsList);   
+        })
     });
   }
+  
+  private getClubKeys(uid): any {
+    return new Promise(resolve => {
+      this.usersRef.child(uid).child('clubs')
+      .once("value", snapshot => {
+        var tempArray: string[] = [];
+        // Convert Object Like {key: true, key: true}, to array of keys.
+        for (let key in snapshot.val()) {
+          tempArray.push(key);
+        }
+        resolve(tempArray);
+      })
+    });
+  }
+
+  listCurrentUserClubs(): any {
+    return new Promise((resolve,reject) => {
+        let currentUid = firebase.auth().currentUser.uid;
+        this.getClubKeys(currentUid)
+        .then (clubKeys => {
+          return this.getClubsByPromise(clubKeys)
+        }).then( clubs => {
+          return resolve(clubs);
+        }).catch (err => {reject(err)});
+    });
+}
 
   // -----------------------------------------------
 

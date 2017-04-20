@@ -1,6 +1,6 @@
 KofClub
 
-Ionic 2 Project with Firebase integration.
+Ionic 3 Project with Firebase integration.
 
 Requirements:
 

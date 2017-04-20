@@ -85,18 +85,21 @@ export class ClubCreateNew {
     this.createClubForm.value.name
     , this.createClubForm.value.description
     , this.pictureTaken
-    ).then( resource => {
+    ).then( _ => {
       this.loading.dismiss().then(()=>{
-        let alert = this.alertCtrl.create({
-          message: "Feito, que os duelos comecem!",
+        let mAlert = this.alertCtrl.create({
+          title: "FEITO",
+          message: "Que os duelos comecem!",
           buttons: [
             {
               text: "Ok",
+              handler: () => {
+                this.navCtrl.pop();
+              }
             }
-          ]
+          ],
         });
-        alert.present();
-        //this.navCtrl.getPrevious();
+        mAlert.present();
       })
     }, error => {
       this.loading.dismiss().then( () => {
@@ -105,7 +108,6 @@ export class ClubCreateNew {
           buttons: [
             {
               text: "Ok",
-              role: 'cancel'
             }
           ]
         });

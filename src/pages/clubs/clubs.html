@@ -18,13 +18,17 @@
 
       <div class="right-dynamic-fab">
         <ion-fab right bottom>
-          <button *ngIf="club.isClubLoggedUser()" ion-fab color="secondary"
+          <button *ngIf="isUserClubMember(club)" ion-fab color="secondary"
                   (click)="openUserClub(club)">
               <ion-icon name="happy"></ion-icon>
           </button>
-          <button *ngIf="!club.isClubLoggedUser()" ion-fab color="danger" 
+          <button *ngIf="isUserClubNotMember(club)" ion-fab color="danger" 
                   (click)="requireAccessToClub(club)">
               <ion-icon  name="person-add"></ion-icon>
+          </button>
+          <button *ngIf="isUserClubPendingMember(club)" ion-fab color="primary" 
+                  (click)="requireAccessToClub(club)">
+              <ion-icon  name="git-pull-request"></ion-icon>
           </button>
         </ion-fab>
       </div>

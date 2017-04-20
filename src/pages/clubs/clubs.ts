@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
-import { ClubModel } from '../../model/club-model';
+import { ClubModel, CLUB_USER_STATUS } from '../../model/club-model';
 
 import { FirebaseService } from '../../providers/firebase-service';
 
@@ -32,7 +32,7 @@ export class Clubs {
     });
     this.loading.present();
 
-    this.firebaseService.listAllClubs()
+    this.firebaseService.listClubsForUser()
     .then( clubs => {
       this.clubs = clubs;
       this.loading.dismiss();
@@ -80,7 +80,8 @@ export class Clubs {
     let club1 = ClubModel.toClubModel(j);
     let club2 = ClubModel.toClubModel(j);
 
-    club1.setIsClubLoggedUser(true);
+    //club1.setIsClubLoggedUser(true);
+    club1.setClubUserStatus(CLUB_USER_STATUS.MEMBER);
 
     this.clubs.push(club1);
     this.clubs.push(club2);
@@ -88,6 +89,18 @@ export class Clubs {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad Clubs');
+  }
+
+  isUserClubMember(club: ClubModel): boolean {
+    return club.getClubUserStatus() === CLUB_USER_STATUS.MEMBER;
+  }
+
+  isUserClubNotMember(club: ClubModel): boolean {
+    return club.getClubUserStatus() === CLUB_USER_STATUS.NOT_MEMBER;
+  }
+
+  isUserClubPendingMember(club: ClubModel): boolean {
+    return club.getClubUserStatus() === CLUB_USER_STATUS.PENDING;
   }
 
 }

@@ -5,13 +5,16 @@ import 'rxjs/add/operator/map';
 import firebase from 'firebase';
 import { AngularFire } from 'angularfire2';
 
-import { ClubModel } from '../model/club-model';
+import { ClubModel, CLUB_USER_STATUS } from '../model/club-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
 const DB_ROOT_RANK = "/rank/";
 const DB_ROOT_CLUBS_MEMBERS = "/clubs-members/";
-const DB_ROOT_REQUEST_JOIN = "/clubs-join-members/"
+// List all pending users by club, useful for admin.
+const DB_ROOT_CLUBS_JOIN_MEMBERS = "/clubs-join-members/";
+// List all pending clubs by user, useful for user join view.
+const DB_ROOT_MEMBERS_JOIN_CLUBS = "/members-join-clubs/";
 
 // Storage
 const ST_ROOT_IMAGES = "/images/";
@@ -27,7 +30,6 @@ export class FirebaseService {
   private usersRef: any;
   private clubsRef: any;
   private clubsMemberRef: any;
-
 
   constructor(public af: AngularFire) {
     this.fireAuth = firebase.auth();
@@ -138,12 +140,22 @@ export class FirebaseService {
     });
   }
 
-  /**
-   * Get all clubs.
-   */
-   listAllClubs(): any {
-    return new Promise(resolve => {
-      let clubsList: Array<ClubModel> = new Array;
+  private getUserPendingJoinClubs(uid: string): Promise<Array<string>> {
+    return new Promise( (resolve, reject) => {
+      firebase.database().ref(DB_ROOT_MEMBERS_JOIN_CLUBS).child(uid)
+      .once('value', snapshot => {
+        let joinClubKeys: string[] = [];
+        // Convert Object Like {key: true, key: true}, to array of keys.
+        for (let key in snapshot.val()) {
+          joinClubKeys.push(key);
+        } 
+        resolve(joinClubKeys);
+      }, err => {reject(err)});
+    });
+  }
+
+  private getAllClubs(): Promise<Array<ClubModel>> {
+    return new Promise( (resolve, reject) => {
       this.clubsRef.once('value', snapshots => {
         let clubs: Array<ClubModel> = new Array;
         snapshots.forEach(snapshot => {
@@ -151,24 +163,42 @@ export class FirebaseService {
           club.setClubKey(snapshot.key);
           clubs.push(club);
         });
-
-        // Mark My Clubs
-        let uid = firebase.auth().currentUser.uid;
-        this.getUserClubKeys(uid)
-        .then(keys => {
-          for(let k of keys) {
-            for (let c of clubs) {
-              if (c.getClubKey().trim().valueOf() === new String(k).trim().valueOf()) {
-                  c.setIsClubLoggedUser(true);
-                    break;
-              }
-            }
-          }
-          resolve(clubs);
-        });
+        resolve(clubs);
       });
     });
-   }
+  }
+
+  /**
+   * Get all clubs.
+   */
+  listClubsForUser(): any {
+    let uid = firebase.auth().currentUser.uid;
+    return new Promise( (resolve, reject) => {
+      Promise.all([this.getAllClubs(), 
+                  this.getUserClubKeys(uid),
+                  this.getUserPendingJoinClubs(uid)])
+      .then(data => {
+        let allClubs = data[0];
+        let userClubsKeys = data[1];
+        let pendingUserJoinClubs = data[2];
+
+        for (let c of allClubs) {
+          let clubKey = c.getClubKey().valueOf();
+          // current user belong to this club.
+          if (userClubsKeys.length > 0 && userClubsKeys.indexOf(clubKey) > -1) {
+            c.setClubUserStatus(CLUB_USER_STATUS.MEMBER);
+          } // current user wait for aproval to became member of clube.
+          else if (pendingUserJoinClubs.length > 0 
+                      && pendingUserJoinClubs.indexOf(clubKey) > -1) {
+            c.setClubUserStatus(CLUB_USER_STATUS.PENDING);
+          } else {
+            c.setClubUserStatus(CLUB_USER_STATUS.NOT_MEMBER);
+          }
+        }
+        resolve(allClubs);
+      }, err => {reject(err)});
+    });
+  }
 
    requestAccessToClub(club: ClubModel): Promise<any> {
      return new Promise( (resolve, reject) => {
@@ -176,7 +206,8 @@ export class FirebaseService {
         let clubKey = club.getClubKey();
         // Uses update to keep the structe on db: root/clubkey/uid: true.
         let update = {};
-        update[DB_ROOT_REQUEST_JOIN + club.getClubKey() + '/' + uid] = true; 
+        update[DB_ROOT_CLUBS_JOIN_MEMBERS + club.getClubKey() + '/' + uid] = true;
+        update[DB_ROOT_MEMBERS_JOIN_CLUBS + uid + '/' + club.getClubKey()] = true; 
         firebase.database().ref().update(update).then( _ => {
           resolve(true)
         }).catch( err => reject(err) );

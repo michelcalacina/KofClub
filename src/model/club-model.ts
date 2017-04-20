@@ -1,3 +1,8 @@
+export enum CLUB_USER_STATUS {
+    MEMBER,
+    NOT_MEMBER,
+    PENDING
+}
 
 export class ClubModel {
 
@@ -8,10 +13,11 @@ export class ClubModel {
     public userAdmin: string;
 
     private _clubKey: string;
-    private _isClubLoggedUser: boolean;
+    private clubUserStatus: CLUB_USER_STATUS;
     
+
     constructor() {
-        this._isClubLoggedUser = false;
+        this.clubUserStatus = CLUB_USER_STATUS.NOT_MEMBER;
     }
 
     getClubKey = function(): string {
@@ -22,12 +28,12 @@ export class ClubModel {
         this._clubKey = key;
     }
 
-    setIsClubLoggedUser = function(status: boolean) {
-        this._isClubLoggedUser = status;
+    setClubUserStatus(status: CLUB_USER_STATUS) {
+        this.clubUserStatus = status;
     }
 
-    isClubLoggedUser = function(): boolean {
-        return this._isClubLoggedUser;
+    getClubUserStatus(): CLUB_USER_STATUS {
+        return this.clubUserStatus;
     }
 
     public static toClubModel(jsonLike: any): ClubModel {

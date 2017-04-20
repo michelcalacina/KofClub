@@ -87,7 +87,7 @@ export class FirebaseService {
     });
   }
 
-  private getClubsByPromise(listKeys: Array<string>): any {
+  private getClubsByKeys(listKeys: Array<string>): any {
     return new Promise( (resolve) => {
       
       let promiseCommands = listKeys.map(function(val,key) {
@@ -97,7 +97,9 @@ export class FirebaseService {
       Promise.all(promiseCommands)
         .then(function (clubs) {
           let clubsList = clubs.map( club => {
-            return club.val();
+            let c: ClubModel = ClubModel.toClubModel(club.val());
+            c.setClubKey(club.key);
+            return c;
           });
           
           resolve(clubsList);   
@@ -105,7 +107,7 @@ export class FirebaseService {
     });
   }
   
-  private getClubKeys(uid): any {
+  private getUserClubKeys(uid): any {
     return new Promise(resolve => {
       this.usersRef.child(uid).child('clubs')
       .once("value", snapshot => {
@@ -119,17 +121,38 @@ export class FirebaseService {
     });
   }
 
+  /**
+   * Get the clubs that logged user belong on it.
+   */
   listCurrentUserClubs(): any {
     return new Promise((resolve,reject) => {
         let currentUid = firebase.auth().currentUser.uid;
-        this.getClubKeys(currentUid)
+        this.getUserClubKeys(currentUid)
         .then (clubKeys => {
-          return this.getClubsByPromise(clubKeys)
+          return this.getClubsByKeys(clubKeys)
         }).then( clubs => {
           return resolve(clubs);
         }).catch (err => {reject(err)});
     });
-}
+  }
+
+  /**
+   * Get all clubs.
+   */
+   listAllClubs(): any {
+    return new Promise(resolve => {
+      let clubsList: Array<ClubModel> = new Array;
+      this.clubsRef.once("value", snapshots => {
+        let clubs: Array<ClubModel> = new Array;
+        snapshots.forEach(snapshot => {
+          let club: ClubModel = ClubModel.toClubModel(snapshot.val());
+          club.setClubKey(snapshot.key);
+          clubs.push(club);
+        });;
+        resolve(clubs);
+      });
+    });
+   }
 
   // -----------------------------------------------
 

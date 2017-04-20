@@ -7,13 +7,27 @@ export class ClubModel {
     public creationDate: object;
     public userAdmin: string;
 
-    private thumbnailBlob: Blob;
+    private _clubKey: string;
     
     constructor() {
 
     }
 
-    public getThumbnailBlob() {
-        return this.getThumbnailBlob;
+    public getClubKey() {
+        return this._clubKey;
+    }
+
+    public setClubKey(key: string) {
+        this._clubKey = key;
+    }
+
+    public static toClubModel(jsonLike: any): ClubModel {
+        let club = new ClubModel();
+        club.title = jsonLike.title;
+        club.description = jsonLike.description;
+        club.thumbnailURL = jsonLike.thumbnailURL;
+        club.creationDate = jsonLike.creationDate;
+        club.userAdmin = jsonLike.userAdmin;
+        return club;
     }
 }

@@ -74,13 +74,15 @@ export class FirebaseService {
           club.title = clubName;
           club.description = clubDescription;
           club.creationDate = firebase.database.ServerValue.TIMESTAMP;
-          club.userAdmin = uid;
           club.thumbnailURL = downloadURL;
+          club.usersAdmin.push(uid);
 
           let newClubKey = this.clubsRef.push().key;
 
           let updates = {};
           updates[DB_ROOT_CLUBS + newClubKey] = club.toJSON();
+          // create the admin field separeted, array not works.
+          //updates[DB_ROOT_CLUBS + newClubKey + '/' + 'admins' + '/' + uid] = true;
           updates[DB_ROOT_USERS + uid + DB_ROOT_CLUBS + newClubKey] = true;
           // Update/Crete clubs-members with the new Club and default admin current user.
           updates[DB_ROOT_CLUBS_MEMBERS + newClubKey + '/' + uid] = true;
@@ -100,13 +102,16 @@ export class FirebaseService {
 
       Promise.all(promiseCommands)
         .then(function (clubs) {
-          let clubsList = clubs.map( club => {
-            let c: ClubModel = ClubModel.toClubModel(club.val());
-            c.setClubKey(club.key);
-            return c;
+          let clubList: Array<ClubModel> = new Array<ClubModel>();
+          clubs.forEach( club => {
+            if (club.val() !== null) {
+              let c: ClubModel = ClubModel.toClubModel(club.val());
+              c.setClubKey(club.key);
+              clubList.push(c);
+            }
           });
-          
-          resolve(clubsList);   
+                    
+          resolve(clubList);   
         })
     });
   }

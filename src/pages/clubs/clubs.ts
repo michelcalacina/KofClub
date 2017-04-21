@@ -22,8 +22,6 @@ export class Clubs {
   , public toastCtrl: ToastController ) {
 
     this.loadClubs();
-    // Only for teste.
-    //this.mockClubks();
   }
 
   loadClubs() {
@@ -67,24 +65,6 @@ export class Clubs {
     }
 
     toast.present();
-  }
-
-  // Only for teste, delete this after conclusion
-  mockClubks() {
-    let j = {"creationDate":1492652673040
-              ,"description":"ndjdkdkdkx"
-              ,"thumbnailURL":"https://firebasestorage.googleapis.com/v0/b/kof-club.appspot.com/o/images%2Flogos%2FKoccFighters.png?alt=media&token=7b69926a-1caa-43bc-81f7-1c69a4090bbd"
-              ,"title":"KoccFighters"
-              ,"userAdmin":"KUlqGiIDjKYzW6f3abZWtTZc4S03"}
-
-    let club1 = ClubModel.toClubModel(j);
-    let club2 = ClubModel.toClubModel(j);
-
-    //club1.setIsClubLoggedUser(true);
-    club1.setClubUserStatus(CLUB_USER_STATUS.MEMBER);
-
-    this.clubs.push(club1);
-    this.clubs.push(club2);
   }
 
   ionViewDidLoad() {

@@ -8,26 +8,24 @@ page-club-home {
         .card-title {
             position: absolute;
             top: 36%;
-            font-size: 2.0em;
+            font-size: 3.0em;
             width: 100%;
             font-weight: bold;
             color: #fff;
-        }
-
-        .card-subtitle {
-            font-size: 1.0em;
-            position: absolute;
-            top: 52%;
-            width: 100%;
-            color: #fff;
-        }
-
-        .card-title {
             text-shadow: 4px 4px 4px #000;
         }
 
         .card-subtitle {
+            font-size: 2em;
+            position: absolute;
+            top: 52%;
+            width: 100%;
+            color: #fff;
             text-shadow: 1px 1px 1px #000;
+        }
+
+        ion-card {
+            height: 200px;
         }
     }
 }

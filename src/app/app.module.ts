@@ -7,10 +7,9 @@ import { MyApp } from './app.component';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-import { HttpModule } from '@angular/http';
 import { FirebaseService } from '../providers/firebase-service';
 import { CameraService } from '../providers/camera-service';
-import { Camera, CameraOptions } from '@ionic-native/camera';
+import { Camera } from '@ionic-native/camera';
 import { AngularFireModule } from 'angularfire2';
 
 export const firebaseConfig = {

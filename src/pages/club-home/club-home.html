@@ -1,7 +1,16 @@
 <ion-header>
 
   <ion-navbar>
+
     <ion-title>{{club.title}}</ion-title>
+  
+    <ion-buttons end>
+      <button ion-button icon-only>
+        <label>{{qntdNewMembersPending}}</label>
+        <ion-icon name="contact"></ion-icon>
+      </button>
+    </ion-buttons>
+
   </ion-navbar>
 
 </ion-header>
@@ -9,7 +18,7 @@
 
 <ion-content class="card-background-page">
 
-  <ion-card>
+  <ion-card >
     <img src="assets/img/card-club-events.png"/>
     <div class="card-title">Eventos</div>
     <div class="card-subtitle">41 Listings</div>

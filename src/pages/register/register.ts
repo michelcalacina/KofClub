@@ -17,6 +17,8 @@ export class Register {
   submitAttempt: boolean = false;
   loading: any;
 
+  avatarUrl: string;
+
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
   , public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
@@ -27,6 +29,8 @@ export class Register {
       , email: ['', Validators.compose([Validators.required, Validators.pattern(EMAIL_REGEXP)])]
       , password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
+
+    this.avatarUrl = "assets/img/profile-kusanagi.png";
   }
 
   elementChanged(input){
@@ -44,6 +48,7 @@ export class Register {
     this.registerForm.value.email
     , this.registerForm.value.password
     , this.registerForm.value.fullname
+    , this.avatarUrl
     ).then( authService => {
       this.navCtrl.setRoot('Home');
     }, error => {

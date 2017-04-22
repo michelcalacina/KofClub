@@ -6,6 +6,7 @@ import firebase from 'firebase';
 import { AngularFire } from 'angularfire2';
 
 import { ClubModel, CLUB_USER_STATUS } from '../model/club-model';
+import { UserProfileModel } from '../model/user-profile-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
@@ -31,6 +32,9 @@ export class FirebaseService {
   private clubsRef: any;
   private clubsMemberRef: any;
 
+  // Common
+  private UserProfile: UserProfileModel;
+
   constructor(public af: AngularFire) {
     this.fireAuth = firebase.auth();
     this.usersRef = firebase.database().ref(DB_ROOT_USERS);
@@ -40,14 +44,57 @@ export class FirebaseService {
 
   // Login control.
   login(email: string, password: string): any {
-    return this.fireAuth.signInWithEmailAndPassword(email, password);
+    return new Promise((resolve,reject) => {
+      this.fireAuth.signInWithEmailAndPassword(email, password)
+      .then((snapshot) => {
+        let uid = firebase.auth().currentUser.uid;
+        this.usersRef.child(uid)
+        .once('value', usnapshot => {
+          if (usnapshot.val() !== null) {
+            let userProfile = new UserProfileModel();
+            userProfile.setUid = usnapshot.key;
+            userProfile.creationDate = usnapshot.val().creationDate;
+            userProfile.displayName = usnapshot.val().displayName;
+            userProfile.email = usnapshot.val().email;
+            userProfile.thumbnailUrl = usnapshot.val().thumbnailUrl;
+            
+            let objClubs = usnapshot.val().clubs;
+            if (objClubs != null && objClubs != undefined) {
+              for (let c in objClubs) {
+                userProfile.clubs.push(new String(c));
+              }
+            }
+            
+            this.UserProfile = userProfile;
+            resolve(true);
+          } else {
+            reject("Invalid User Profile");
+          }
+        });
+      }, (err) => {
+        reject(err);
+      });
+    });
+    
   }
 
-  register(email: string, password: string, name: string): any {
+  register(email: string, password: string, name: string, thumbnail: string): any {
     return this.fireAuth.createUserWithEmailAndPassword(email, password)
     .then(
       (newUser) => {
-        this.usersRef.child(newUser.uid).set({name: name, email: email});
+        let userProfile = new UserProfileModel();
+        userProfile.displayName = name;
+        userProfile.email = email;
+        userProfile.creationDate = firebase.database.ServerValue.TIMESTAMP;
+        userProfile.thumbnailUrl = thumbnail;
+        userProfile.setUid(newUser.uid);
+        let update = {};
+        update[DB_ROOT_USERS + newUser.uid] = userProfile;
+        
+        firebase.database().ref().update(update);
+
+        // Save this reference for global purpose.
+        this.UserProfile = userProfile;
       }
     )
   }
@@ -235,6 +282,12 @@ export class FirebaseService {
     });
   }
 
+  listPendingUsersClub(club: ClubModel, userKeys: Array<string>): Promise<UserProfileModel> {
+    return new Promise((resolve, reject) => {
+      // TODO
+    });
+  }
+
   // -----------------------------------------------
 
   // Util Control
@@ -288,8 +341,9 @@ export class FirebaseService {
     });
   }
 
-  getCurrentUser(): firebase.User {
-    return firebase.auth().currentUser;
+  // The LoggedUser profile, include thumbnail further more informations.
+  getUserProfile() {
+    return this.UserProfile;
   }
 
 }

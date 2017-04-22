@@ -15,7 +15,7 @@ export class ClubHome {
   public isLoggedOnAdmin: boolean = false;
   
   // For users admin control pending users request to enter on club.
-  private pendingUsersKey = new Array<string>();
+  private pendingUserKeys = new Array<string>();
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService) {
@@ -31,8 +31,8 @@ export class ClubHome {
 
   verifyIsLoggedOnAdmin(): boolean {
     let result: boolean = false;
-    let user = this.firebaseService.getCurrentUser();
-    if (this.club.admins.indexOf(user.uid) > -1) {
+    let user = this.firebaseService.getUserProfile();
+    if (this.club.admins.indexOf(user.getUid()) > -1) {
       result = true;
     }
 
@@ -43,13 +43,13 @@ export class ClubHome {
     if (this.isLoggedOnAdmin) {
       this.firebaseService.getPendingRequestToEnterClub(this.club)
       .then( (pendingUserKeys) => {
-        this.pendingUsersKey = pendingUserKeys;
+        this.pendingUserKeys = pendingUserKeys;
       });
     }
   }
 
   showPendingUsers() {
-    // TODO.
+    this.navCtrl.push("PendingAcceptanceUsers", {"club": this.club, "userKeys": this.pendingUserKeys});
   }
 
   // Only for teste, delete this after conclusion

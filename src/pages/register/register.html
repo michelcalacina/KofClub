@@ -5,12 +5,15 @@
 </ion-header>
 
 <ion-content padding>
+  <ion-avatar class="profile-avatar-custom">
+      <img src={{avatarUrl}}>
+  </ion-avatar>
   <form [formGroup]="registerForm" (submit)="register()" novalidate>
     <!-- Name -->
     <ion-item>
       <ion-label stacked>Nome</ion-label>
       <ion-input #fullname formControlName="fullname" type="text" (change)="elementChanged(fullname)"
-        placeholder="Nome completo"
+        placeholder="Nome"
         [class.invalid]="!registerForm.controls.fullname.valid && (fullnameChanged || submitAttempt)"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!registerForm.controls.fullname.valid  && (fullnameChanged || submitAttempt)">

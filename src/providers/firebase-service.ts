@@ -12,9 +12,9 @@ const DB_ROOT_USERS = "/users/";
 const DB_ROOT_RANK = "/rank/";
 const DB_ROOT_CLUBS_MEMBERS = "/clubs-members/";
 // List all pending users by club, useful for admin.
-const DB_ROOT_CLUBS_JOIN_MEMBERS = "/clubs-join-members/";
+const DB_ROOT_JOIN_CLUBS_MEMBERS = "/join-clubs-members/";
 // List all pending clubs by user, useful for user join view.
-const DB_ROOT_MEMBERS_JOIN_CLUBS = "/members-join-clubs/";
+const DB_ROOT_JOIN_MEMBERS_CLUBS = "/join-members-clubs/";
 
 // Storage
 const ST_ROOT_IMAGES = "/images/";
@@ -147,7 +147,7 @@ export class FirebaseService {
 
   private getUserPendingJoinClubs(uid: string): Promise<Array<string>> {
     return new Promise( (resolve, reject) => {
-      firebase.database().ref(DB_ROOT_MEMBERS_JOIN_CLUBS).child(uid)
+      firebase.database().ref(DB_ROOT_JOIN_MEMBERS_CLUBS).child(uid)
       .once('value', snapshot => {
         let joinClubKeys: string[] = [];
         // Convert Object Like {key: true, key: true}, to array of keys.
@@ -205,19 +205,35 @@ export class FirebaseService {
     });
   }
 
-   requestAccessToClub(club: ClubModel): Promise<any> {
-     return new Promise( (resolve, reject) => {
-        let uid = firebase.auth().currentUser.uid;
-        let clubKey = club.getClubKey();
-        // Uses update to keep the structe on db: root/clubkey/uid: true.
-        let update = {};
-        update[DB_ROOT_CLUBS_JOIN_MEMBERS + club.getClubKey() + '/' + uid] = true;
-        update[DB_ROOT_MEMBERS_JOIN_CLUBS + uid + '/' + club.getClubKey()] = true; 
-        firebase.database().ref().update(update).then( _ => {
-          resolve(true)
-        }).catch( err => reject(err) );
-     });
-   }
+  requestAccessToClub(club: ClubModel): Promise<any> {
+    return new Promise( (resolve, reject) => {
+      let uid = firebase.auth().currentUser.uid;
+      let clubKey = club.getClubKey();
+      // Uses update to keep the structe on db: root/clubkey/uid: true.
+      let update = {};
+      update[DB_ROOT_JOIN_CLUBS_MEMBERS + club.getClubKey() + '/' + uid] = true;
+      update[DB_ROOT_JOIN_MEMBERS_CLUBS + uid + '/' + club.getClubKey()] = true; 
+      firebase.database().ref().update(update).then( _ => {
+        resolve(true)
+      }).catch( err => reject(err) );
+    });
+  }
+
+
+  getPendingRequestToEnterClub(club: ClubModel): Promise<Array<string>> {
+    return new Promise((resolve, reject) => {
+      firebase.database().ref(DB_ROOT_JOIN_CLUBS_MEMBERS).child(club.getClubKey())
+      .once('value', snapshot => {
+        let userKeys = new Array<string>();
+        for (let userKey in snapshot.val()) {
+          userKeys.push(userKey);
+        }
+        resolve(userKeys);
+      }, (err) => {
+        reject(err);
+      });
+    });
+  }
 
   // -----------------------------------------------
 

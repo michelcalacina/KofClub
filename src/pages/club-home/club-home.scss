@@ -1,4 +1,5 @@
 page-club-home {
+
     .card-background-page {
         ion-card {
             position: relative;
@@ -26,6 +27,33 @@ page-club-home {
 
         ion-card {
             height: 200px;
+        }
+    }
+
+    div.animation-count-pending {
+
+        @keyframes animation-text-size {
+            0% { color: #ff9800; font-size: 30px;}
+            10% { color: #ff5722; font-size: 50px;}
+            20% { color: #ff9800; font-size: 30px;}
+            30% { color: #f4511e; font-size: 50px;}
+            50% { color: #ff9800; font-size: 30px;}
+            50% { color: #f4511e; font-size: 50px;}
+            50% { color: #ff9800; font-size: 30px;}
+            75% { color: #d84315; font-size: 50px;}
+            50% { color: #ff9800; font-size: 30px;}
+            90% { color: #f4511e; font-size: 50px;}
+            100% { color: #ff9800; font-size: 30px;}
+        }
+
+        label {
+            
+            text-shadow: 1px 1px 1px #000;
+            font-size: 30px;
+            // transform-origin: 50% 100%;
+            animation-name: animation-text-size;
+            animation-duration: 30s;
+            // animation-delay: 1s;
         }
     }
 }

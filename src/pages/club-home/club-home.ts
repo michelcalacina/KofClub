@@ -12,13 +12,15 @@ import { ClubModel } from '../../model/club-model';
 export class ClubHome {
 
   public club: ClubModel;
-  public qntdNewMembersPending = 0;
   public isLoggedOnAdmin: boolean = false;
+  
+  // For users admin control pending users request to enter on club.
+  private pendingUsersKey = new Array<string>();
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService) {
-    this.club = navParams.get("club");
     
+    this.club = navParams.get("club");
     this.isLoggedOnAdmin = this.verifyIsLoggedOnAdmin();
 
     // Only for test please remove.
@@ -38,7 +40,16 @@ export class ClubHome {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ClubHome');
+    if (this.isLoggedOnAdmin) {
+      this.firebaseService.getPendingRequestToEnterClub(this.club)
+      .then( (pendingUserKeys) => {
+        this.pendingUsersKey = pendingUserKeys;
+      });
+    }
+  }
+
+  showPendingUsers() {
+    // TODO.
   }
 
   // Only for teste, delete this after conclusion

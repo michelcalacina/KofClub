@@ -75,7 +75,7 @@ export class FirebaseService {
           club.description = clubDescription;
           club.creationDate = firebase.database.ServerValue.TIMESTAMP;
           club.thumbnailURL = downloadURL;
-          club.usersAdmin.push(uid);
+          club.admins.push(uid);
 
           let newClubKey = this.clubsRef.push().key;
 
@@ -270,6 +270,10 @@ export class FirebaseService {
         });
       });
     });
+  }
+
+  getCurrentUser(): firebase.User {
+    return firebase.auth().currentUser;
   }
 
 }

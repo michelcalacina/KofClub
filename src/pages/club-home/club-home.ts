@@ -13,14 +13,28 @@ export class ClubHome {
 
   public club: ClubModel;
   public qntdNewMembersPending = 0;
+  public isLoggedOnAdmin: boolean = false;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams
+  , public firebaseService: FirebaseService) {
     this.club = navParams.get("club");
     
+    this.isLoggedOnAdmin = this.verifyIsLoggedOnAdmin();
+
     // Only for test please remove.
     if (this.club == undefined) {
       this.mockClubks();
     }
+  }
+
+  verifyIsLoggedOnAdmin(): boolean {
+    let result: boolean = false;
+    let user = this.firebaseService.getCurrentUser();
+    if (this.club.admins.indexOf(user.uid) > -1) {
+      result = true;
+    }
+
+    return result;
   }
 
   ionViewDidLoad() {
@@ -33,7 +47,8 @@ export class ClubHome {
               ,"description":"ndjdkdkdkx"
               ,"thumbnailURL":"https://firebasestorage.googleapis.com/v0/b/kof-club.appspot.com/o/images%2Flogos%2FKoccFighters.png?alt=media&token=7b69926a-1caa-43bc-81f7-1c69a4090bbd"
               ,"title":"KoccFighters"
-              ,"userAdmin":"KUlqGiIDjKYzW6f3abZWtTZc4S03"}
+              ,"admins":{KUlqGiIDjKYzW6f3abZWtTZc4S03: true}
+            };
 
     let club1 = ClubModel.toClubModel(j);
     this.club = club1;

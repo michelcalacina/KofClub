@@ -10,7 +10,7 @@ export class ClubModel {
     public description: string;
     public thumbnailURL: string;
     public creationDate: object;
-    public usersAdmin: Array<string>;
+    public admins: Array<string>;
 
     private _clubKey: string;
     private clubUserStatus: CLUB_USER_STATUS;
@@ -18,7 +18,7 @@ export class ClubModel {
 
     constructor() {
         this.clubUserStatus = CLUB_USER_STATUS.NOT_MEMBER;
-        this.usersAdmin = new Array<string>();
+        this.admins = new Array<string>();
     }
 
     getClubKey = function(): string {
@@ -45,14 +45,14 @@ export class ClubModel {
         club.creationDate = jsonLike.creationDate;
         let admins = jsonLike.admins;
         for(let ua in admins) {
-            club.usersAdmin.push(ua);
+            club.admins.push(ua);
         }
         return club;
     }
 
     public toJSON() {
         let jua = {};
-        for (let ua of this.usersAdmin) {
+        for (let ua of this.admins) {
             jua[ua] = true;
         }
 

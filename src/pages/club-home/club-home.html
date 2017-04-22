@@ -4,7 +4,7 @@
 
     <ion-title>{{club.title}}</ion-title>
   
-    <ion-buttons end>
+    <ion-buttons *ngIf="isLoggedOnAdmin" end>
       <button ion-button icon-only>
         <label>{{qntdNewMembersPending}}</label>
         <ion-icon name="contact"></ion-icon>

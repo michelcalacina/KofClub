@@ -42,9 +42,10 @@ export class Clubs {
   requireAccessToClub(club: ClubModel) {
     this.firebaseService.requestAccessToClub(club)
     .then( res => {
-      this.presentToast("Solicitação enviada!")
+      this.presentToast("Solicitação enviada!");
+      club.setClubUserStatus(CLUB_USER_STATUS.PENDING);
     }, (err) => {
-      this.presentToast(err, true);
+      this.presentToast("Não foi possível solicitar acesso ao club!", true);
     });
   }
 

@@ -64,7 +64,7 @@ export class FirebaseService {
                 userProfile.clubs.push(new String(c));
               }
             }
-            
+            // Current userProfile for general app use.
             this.UserProfile = userProfile;
             resolve(true);
           } else {
@@ -79,24 +79,29 @@ export class FirebaseService {
   }
 
   register(email: string, password: string, name: string, thumbnail: string): any {
-    return this.fireAuth.createUserWithEmailAndPassword(email, password)
-    .then(
-      (newUser) => {
-        let userProfile = new UserProfileModel();
-        userProfile.displayName = name;
-        userProfile.email = email;
-        userProfile.creationDate = firebase.database.ServerValue.TIMESTAMP;
-        userProfile.thumbnailUrl = thumbnail;
-        userProfile.setUid(newUser.uid);
-        let update = {};
-        update[DB_ROOT_USERS + newUser.uid] = userProfile;
-        
-        firebase.database().ref().update(update);
-
-        // Save this reference for global purpose.
-        this.UserProfile = userProfile;
-      }
-    )
+    return new Promise((resolve, reject) => {
+      this.fireAuth.createUserWithEmailAndPassword(email, password)
+        .then(
+          (newUser) => {
+            let userProfile = new UserProfileModel();
+            userProfile.displayName = name;
+            userProfile.email = email;
+            userProfile.creationDate = firebase.database.ServerValue.TIMESTAMP;
+            userProfile.thumbnailUrl = thumbnail;
+            userProfile.setUid(newUser.uid);
+            let update = {};
+            update[DB_ROOT_USERS + newUser.uid] = userProfile.toJSON();
+            
+            // Update user profile db.
+            firebase.database().ref().update(update).then( _ => {
+              // after update login with new user.
+              this.login(email, password).then( _ => {
+                resolve(true);
+              });
+            }, (err) => {reject(err)});
+          }
+        )
+    }); 
   }
 
   resetPassword(email: string): any {

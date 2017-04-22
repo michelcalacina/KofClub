@@ -18,4 +18,17 @@ export class UserProfileModel {
     public setUid(uid: string) {
         this._uid = uid;
     }
+
+    public toJSON() {
+        let jup = {};
+        for (let ua in this.clubs) {
+            jup[ua] = true;
+        }
+
+        return {"displayName": this.displayName,
+                "email": this.email,
+                "thumbnailUrl": this.thumbnailUrl,
+                "creationDate": this.creationDate,
+                "clubs": jup};
+    }
 }

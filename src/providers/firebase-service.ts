@@ -33,7 +33,7 @@ export class FirebaseService {
   private clubsMemberRef: any;
 
   // Common
-  private UserProfile: UserProfileModel;
+  private userProfile: UserProfileModel;
 
   constructor(public af: AngularFire) {
     this.fireAuth = firebase.auth();
@@ -65,7 +65,7 @@ export class FirebaseService {
               }
             }
             // Current userProfile for general app use.
-            this.UserProfile = userProfile;
+            this.userProfile = userProfile;
             resolve(true);
           } else {
             reject("Invalid User Profile");
@@ -287,9 +287,79 @@ export class FirebaseService {
     });
   }
 
-  listPendingUsersClub(club: ClubModel, userKeys: Array<string>): Promise<UserProfileModel> {
+  listPendingUsersClub(club: ClubModel, userKeys: Array<string>): Promise<Array<UserProfileModel>> {
     return new Promise((resolve, reject) => {
-      // TODO
+      let commands = userKeys.map((value, key) => {
+        return this.usersRef.child(value).once('value');
+      });
+
+      Promise.all(commands)
+      .then(snapshots => {
+        let users = new Array<UserProfileModel>();
+        snapshots.forEach(snapshot => {
+          // Ignore garbage datas.
+          if (snapshot === null)
+            return;
+
+          let user = new UserProfileModel();
+          user.displayName = snapshot.val().displayName;
+          user.email = snapshot.val().email;
+          user.creationDate = snapshot.val().creationDate;
+          user.thumbnailUrl = snapshot.val().thumbnailUrl;
+          user.setUid(snapshot.key);
+          let clubKeys = snapshot.val().clubs;
+          if (clubKeys !== undefined && clubKeys !== null) {
+            for(let c in clubKeys) {
+              user.clubs.push(new String(c));
+            }
+          }
+          users.push(user);
+        });
+        resolve(users);
+      })
+      .catch((err) => {reject(err)});
+    });
+  }
+
+  acceptPendingUsersToClub(users: Array<UserProfileModel>, club: ClubModel): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // Update each user in db user and db clubs
+      let commands = {};      
+      users.forEach(user => {
+        // Add
+        commands[
+          DB_ROOT_USERS
+          + user.getUid()
+          + DB_ROOT_CLUBS
+          + club.getClubKey()] = true;
+        
+        commands[
+          DB_ROOT_CLUBS
+          + club.getClubKey()
+          +"/"+ user.getUid()] = true;
+
+        //Remove
+        commands[
+          DB_ROOT_JOIN_CLUBS_MEMBERS
+          + club.getClubKey()
+          +"/"+ user.getUid()] = null;
+
+        commands[
+          DB_ROOT_JOIN_MEMBERS_CLUBS
+          + user.getUid()
+          +"/"+ club.getClubKey()] = null;
+      });
+
+      firebase.database().ref().update(commands)
+      .then( (_) => {
+        resolve(true);
+      }).catch((err) => {reject(err)});
+    });
+  }
+
+  rejectPendingUsersToClub(users: Array<UserProfileModel>, club: ClubModel): Promise<any> {
+    return new Promise((resolve, reject) => {
+      
     });
   }
 
@@ -346,9 +416,21 @@ export class FirebaseService {
     });
   }
 
+  // TODO Refactory after testes.
   // The LoggedUser profile, include thumbnail further more informations.
   getUserProfile() {
-    return this.UserProfile;
+    // Mock for test delete as soon as possible
+    if (this.userProfile !== undefined) {
+      return this.userProfile;
+    } else {
+      let userProfile = new UserProfileModel();
+      userProfile.setUid("pl6v0IKonzN7QA2Xx7tuxo6csZC2");
+      userProfile.displayName = "mich";
+      userProfile.email = "michel.teste@email.com";
+      userProfile.thumbnailUrl = "assets/img/profile-kusanagi.png";
+
+      return userProfile;
+    }
   }
 
 }

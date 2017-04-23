@@ -5,16 +5,17 @@
     <ion-title>{{club.title}}</ion-title>
   
     
-      <ion-buttons *ngIf="isLoggedOnAdmin" end (click)="showPendingUsers()">
+      <ion-buttons *ngIf="isLoggedOnAdmin" end>
         
-        <div *ngIf="pendingUsersKey.length == 0">
+        <div *ngIf="pendingUserKeys.length === 0">
         <button ion-button icon-only>
           <label >{{pendingUserKeys.length}}</label>
           <ion-icon name="contact"></ion-icon>
         </button>
         </div>
 
-        <div *ngIf="pendingUsersKey.length > 0" class="animation-count-pending">
+        <div *ngIf="pendingUserKeys.length > 0" class="animation-count-pending" 
+              (click)="showPendingUsers()">
         <button ion-button icon-only>
           <label >{{pendingUserKeys.length}}</label>
           <ion-icon name="contact"></ion-icon>

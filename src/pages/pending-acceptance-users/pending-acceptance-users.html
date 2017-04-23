@@ -1,12 +1,38 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>pending-acceptance-users</ion-title>
+    <ion-title>Novos membros</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <h1>Chibata</h1>
+  
+  <ion-list no-lines>
+    <ion-item *ngFor="let user of users">
+      <ion-avatar item-left>
+        <img src={{user.thumbnailUrl}}>
+      </ion-avatar>
+      <ion-label float>{{user.displayName}}</ion-label>
+      <ion-checkbox item-right 
+          (ionChange)="onCheckedChange($event.checked, user)">
+      </ion-checkbox>
+      </ion-item>
+  </ion-list>
+
+<div class="botton-buttons-custom">
+    <button ion-button color="danger" round 
+    [disabled]="attemptActionUsers.length === 0"
+    (click)="refuseSelectedUsers()">
+      <ion-icon name="trash"></ion-icon>
+      EXCLUIR
+    </button>
+    <button ion-button color="primary" round 
+    [disabled]="attemptActionUsers.length === 0"
+    (click)="acceptSelectedUsers()">
+      <ion-icon name="person-add"></ion-icon>
+      ACEITAR
+    </button>
+  </div>
 </ion-content>

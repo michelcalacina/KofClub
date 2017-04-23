@@ -15,7 +15,7 @@ export class ClubHome {
   public isLoggedOnAdmin: boolean = false;
   
   // For users admin control pending users request to enter on club.
-  private pendingUserKeys = new Array<string>();
+  public pendingUserKeys: Array<string>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService) {
@@ -27,6 +27,8 @@ export class ClubHome {
     if (this.club == undefined) {
       this.mockClubks();
     }
+
+    this.pendingUserKeys = new Array<string>();
   }
 
   verifyIsLoggedOnAdmin(): boolean {
@@ -39,10 +41,10 @@ export class ClubHome {
     return result;
   }
 
-  ionViewDidLoad() {
+  ionViewWillEnter() {
     if (this.isLoggedOnAdmin) {
       this.firebaseService.getPendingRequestToEnterClub(this.club)
-      .then( (pendingUserKeys) => {
+      .then((pendingUserKeys) => {
         this.pendingUserKeys = pendingUserKeys;
       });
     }
@@ -58,7 +60,7 @@ export class ClubHome {
               ,"description":"ndjdkdkdkx"
               ,"thumbnailURL":"https://firebasestorage.googleapis.com/v0/b/kof-club.appspot.com/o/images%2Flogos%2FKoccFighters.png?alt=media&token=7b69926a-1caa-43bc-81f7-1c69a4090bbd"
               ,"title":"KoccFighters"
-              ,"admins":{KUlqGiIDjKYzW6f3abZWtTZc4S03: true}
+              ,"admins":{"KUlqGiIDjKYzW6f3abZWtTZc4S03": true}
             };
 
     let club1 = ClubModel.toClubModel(j);

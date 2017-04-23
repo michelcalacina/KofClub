@@ -359,7 +359,25 @@ export class FirebaseService {
 
   rejectPendingUsersToClub(users: Array<UserProfileModel>, club: ClubModel): Promise<any> {
     return new Promise((resolve, reject) => {
-      
+      // Update each user in db user and db clubs
+      let commands = {};      
+      users.forEach(user => {
+        //Remove
+        commands[
+          DB_ROOT_JOIN_CLUBS_MEMBERS
+          + club.getClubKey()
+          +"/"+ user.getUid()] = null;
+
+        commands[
+          DB_ROOT_JOIN_MEMBERS_CLUBS
+          + user.getUid()
+          +"/"+ club.getClubKey()] = null;
+      });
+
+      firebase.database().ref().update(commands)
+      .then( (_) => {
+        resolve(true);
+      }).catch((err) => {reject(err)});
     });
   }
 

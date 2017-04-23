@@ -334,7 +334,7 @@ export class FirebaseService {
           + club.getClubKey()] = true;
         
         commands[
-          DB_ROOT_CLUBS
+          DB_ROOT_CLUBS_MEMBERS
           + club.getClubKey()
           +"/"+ user.getUid()] = true;
 

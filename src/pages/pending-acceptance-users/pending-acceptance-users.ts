@@ -60,12 +60,12 @@ export class PendingAcceptanceUsers {
           }
         });
         this.attemptActionUsers = new Array<UserProfileModel>();
-        this.showToastMessage("Feito! novos membros adicionados.");
+        this.showToastMessage("Feito!");
       }
     }, (err) => {
       console.log(err);
       this.loading.dismiss();
-      this.showToastMessage("Falha ao adicionar membros");
+      this.showToastMessage("Falha ao adicionar");
     });
 
     this.loading = this.loadingCtrl.create({
@@ -77,8 +77,29 @@ export class PendingAcceptanceUsers {
   refuseSelectedUsers() {
     this.firebaseService.rejectPendingUsersToClub(this.attemptActionUsers, this.club)
       .then((res) => {
-        
-      });
+        this.loading.dismiss();
+        if (this.attemptActionUsers.length === this.users.length) {
+          this.navCtrl.pop();
+        } else {
+          this.attemptActionUsers.forEach(u => {
+            let index = this.users.indexOf(u);
+            if (index > -1) {
+              this.users.splice(index, 1);   
+            }
+          });
+          this.attemptActionUsers = new Array<UserProfileModel>();
+          this.showToastMessage("Removido!");
+       }
+      }, (err) => {
+        console.log(err);
+        this.loading.dismiss();
+        this.showToastMessage("Falha ao excluir solicitação!");
+    });
+
+    this.loading = this.loadingCtrl.create({
+    dismissOnPageChange: true,
+    });
+    this.loading.present();
   }
 
   ionViewDidLoad() {

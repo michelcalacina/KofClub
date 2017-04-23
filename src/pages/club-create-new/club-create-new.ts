@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { FirebaseService } from '../../providers/firebase-service';
 import { CameraService } from '../../providers/camera-service';
@@ -22,7 +22,7 @@ export class ClubCreateNew {
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
-  , public alertCtrl: AlertController, public loadingCtrl: LoadingController
+  , public loadingCtrl: LoadingController, public toastCtrl: ToastController
   , public cameraService: CameraService) {
     
     this.createClubForm = formBuilder.group({
@@ -52,23 +52,6 @@ export class ClubCreateNew {
     });
     this.loading.present(); 
   }
-  
-  takePictureCamera() {
-    this.cameraService.getPicture(true).then( picture => {
-      this.pictureTaken = picture;
-      this.isPictureTaken = true;
-      console.log(picture);
-      this.loading.dismiss();
-    }, err => { 
-      console.log(err);
-      this.loading.dismiss(); 
-    });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present(); 
-  }
 
   removeTakenPicture() {
     this.isPictureTaken = false;
@@ -78,40 +61,27 @@ export class ClubCreateNew {
   createClub() {
     this.submitAttempt = true;
 
-    if (!this.createClubForm.valid){
+    if (!this.createClubForm.valid) {
       return;
     }
+    if (!this.isPictureTaken) {
+      this.showToastMessage("Nenhuma logomarca selecionada!", false);
+      return;
+    }
+
     this.firebaseService.createClub(
     this.createClubForm.value.name
     , this.createClubForm.value.description
     , this.pictureTaken
     ).then( _ => {
       this.loading.dismiss().then(()=>{
-        let mAlert = this.alertCtrl.create({
-          title: "FEITO",
-          message: "Que os duelos comecem!",
-          buttons: [
-            {
-              text: "Ok",
-              handler: () => {
-                this.navCtrl.pop();
-              }
-            }
-          ],
-        });
-        mAlert.present();
+        this.showToastMessage(this.createClubForm.value.name + " criado com sucesso!", true);
       })
     }, error => {
       this.loading.dismiss().then( () => {
-        let alert = this.alertCtrl.create({
-          message: error.message,
-          buttons: [
-            {
-              text: "Ok",
-            }
-          ]
-        });
-        alert.present();
+        this.showToastMessage(
+          "Não consegui criar o club, talvez esteja com problema de conexão no momento!"
+          , false);
       });
     });
 
@@ -123,6 +93,27 @@ export class ClubCreateNew {
 
   public getPicture(): string {
     return this.base64declaration + this.pictureTaken;
+  }
+
+  private showToastMessage(message: string, showClose: boolean) {
+    let toast = this.toastCtrl.create({
+      message: message,
+      dismissOnPageChange: true,
+      closeButtonText: "OK"
+    });
+    if (showClose) {
+      toast.setShowCloseButton(true);
+    } else {
+      toast.setDuration(3000);
+    }
+
+    toast.onDidDismiss(() => {
+      if (showClose) {
+        this.navCtrl.pop();
+      }
+    });
+
+    toast.present();
   }
 
 }

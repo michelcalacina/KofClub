@@ -4,15 +4,20 @@ page-club-create-new {
         display: flex; 
         flex-direction: column; 
         justify-content: center;
-        margin-bottom: 1em;
-        margin-top: 1em;
-        padding: 1em;
 
-        img {
-            display: block;
-            height: 280px;
-            max-height: 280px;
-            width: auto;
+        ion-thumbnail {
+            min-width: 15rem;    
+            min-height: 10rem;
+            img {
+                display: block;
+                width: 15rem;
+                height: 10rem;
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 15rem;
+                max-height: 10rem;
+            }
+            
         }
     }
 }

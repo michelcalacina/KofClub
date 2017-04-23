@@ -1,67 +1,63 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Criar KoF Club</ion-title>
+    <ion-title>Novo Club</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+  <div class="picture-frame">
+      <ion-fab right *ngIf="isPictureTaken">
+        <button ion-fab mini color="danger" (click)="removeTakenPicture()">
+          <ion-icon name="trash"></ion-icon>
+        </button>
+      </ion-fab>
+      <ion-item>
+        <ion-thumbnail>
+          <img *ngIf="!isPictureTaken" src="assets/img/default-placeholder-picture.png">
+          <img *ngIf="isPictureTaken" src={{getPicture()}} >
+        </ion-thumbnail>
+        <span style="margin-left: 94px; font-size: 1.6rem;">escolha a logomarca</span>
+      </ion-item>
+      
+      <ion-fab center *ngIf="!isPictureTaken" >
+        <button ion-fab mini (click)="takePictureGallery()">
+          <ion-icon name="images"></ion-icon>
+        </button>
+      </ion-fab>
+  </div>
   
   <form [formGroup]="createClubForm" (submit)="createClub()" novalidate>
     <!-- Name -->
     <ion-item>
       <ion-label stacked>Nome</ion-label>
-      <ion-input #name formControlName="name" type="text" (change)="elementChanged(name)"
-        [class.invalid]="!createClubForm.controls.name.valid && (nameChanged || submitAttempt)"></ion-input>
+      <ion-input #name formControlName="name" type="text" maxLength="25" 
+        (change)="elementChanged(name)"
+        [class.invalid]="!createClubForm.controls.name.valid 
+          && (nameChanged || submitAttempt)"></ion-input>
     </ion-item>
-    <ion-item class="error-message" *ngIf="!createClubForm.controls.name.valid  && (nameChanged || submitAttempt)">
-      <p>O nome do clube não pode estar em branco.</p>
+    <ion-item class="error-message" *ngIf="!createClubForm.controls.name.valid  
+      && (nameChanged || submitAttempt)">
+      <p>Nome inválido.</p>
     </ion-item>
     <!-- Description -->
     <ion-item>
       <ion-label stacked>Descrição</ion-label>
-      <ion-input #description formControlName="description" type="text" (change)="elementChanged(description)"
-        [class.invalid]="!createClubForm.controls.description.valid && (descriptionChanged || submitAttempt)"></ion-input>
+      <ion-input #description formControlName="description" type="text" maxLength="38" 
+        (change)="elementChanged(description)"
+        [class.invalid]="!createClubForm.controls.description.valid 
+          && (descriptionChanged || submitAttempt)"></ion-input>
     </ion-item>
-    <ion-item class="error-message" *ngIf="!createClubForm.controls.description.valid  && (descriptionChanged || submitAttempt)">
-      <p>Por favor digite uma descrição válida.</p>
+    <ion-item class="error-message" *ngIf="!createClubForm.controls.description.valid  
+      && (descriptionChanged || submitAttempt)">
+      <p>Descrição válida.</p>
     </ion-item>
+    <button ion-button block bottom type="submit">
+      SALVAR
+    </button>
   </form>
+
   
-  <div class="picture-frame">
-      <ion-label stacked>Marca do clube 420x280px</ion-label>
-      
-      <div *ngIf="isPictureTaken" style="width: 10px; height: 10px;">
-        <ion-fab right>
-          <button ion-fab color="danger" (click)="removeTakenPicture()">
-            <ion-icon name="trash"></ion-icon>
-          </button>
-        </ion-fab>
-      </div>
-
-      <img *ngIf="!isPictureTaken" src="assets/img/default-placeholder-picture.png">
-      <img *ngIf="isPictureTaken" src={{getPicture()}} >
-
-      <ion-fab center >
-        <button ion-fab>
-          <ion-icon name="reverse-camera"></ion-icon>
-        </button>
-        <ion-fab-list side="left">
-          <button ion-fab (click)="takePictureGallery()">
-            <ion-icon name="images"></ion-icon>
-          </button>
-        </ion-fab-list>
-        <ion-fab-list side="right">
-          <button ion-fab (click)="takePictureCamera()">
-            <ion-icon name="camera"></ion-icon>
-          </button>
-        </ion-fab-list>
-      </ion-fab>
-  </div>
-
-  <button ion-button block bottom type="submit" (click)="createClub()">
-      Cadastrar
-  </button>
 </ion-content>

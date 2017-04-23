@@ -13,12 +13,12 @@ export class CameraService {
   // Return a promisse with the image data or error.
   getPicture(isFromCamera: boolean): any {
     let options: CameraOptions = {
-      quality: 50,
+      quality: 100,
       destinationType: this.camera.DestinationType.DATA_URL,
       encodingType: this.camera.EncodingType.PNG,
       mediaType: this.camera.MediaType.PICTURE,
-      targetWidth: 420,
-      targetHeight: 280
+      targetWidth: 240,
+      targetHeight: 180
     }
 
     if (isFromCamera) {

@@ -4,6 +4,11 @@ page-club-home {
         background-color: #ff9800;
     }
 
+    .custom-title {
+       font-family: ssf4; 
+       font-size: 1.2rem; 
+    }
+
     .card-background-page {
         ion-card {
             position: relative;
@@ -18,17 +23,18 @@ page-club-home {
         .card-title {
             position: absolute;
             top: 20%;
-            font-size: 2.5rem;
+            font-size: 1.5rem;
             width: 100%;
-            font-weight: bold;
+            font-weight: normal;
             color: #fff;
             text-shadow: 4px 4px 4px #000;
+            font-family: 'ssf4';
         }
 
         .card-subtitle {
             font-size: 2rem;
             position: absolute;
-            top: 38%;
+            top: 42%;
             width: 100%;
             color: #fff;
             text-shadow: 3px 3px 3px #000;
@@ -42,25 +48,25 @@ page-club-home {
     div.animation-count-pending {
 
         @keyframes animation-text-size {
-            0% { color: #ff9800; font-size: 30px;}
-            10% { color: #ff5722; font-size: 50px;}
-            20% { color: #ff9800; font-size: 30px;}
-            30% { color: #f4511e; font-size: 50px;}
-            50% { color: #ff9800; font-size: 30px;}
-            50% { color: #f4511e; font-size: 50px;}
-            50% { color: #ff9800; font-size: 30px;}
-            75% { color: #d84315; font-size: 50px;}
-            50% { color: #ff9800; font-size: 30px;}
-            90% { color: #f4511e; font-size: 50px;}
-            100% { color: #ff9800; font-size: 30px;}
+            0% { color: #FFFFFF; font-size: 2.2rem;}
+            10% { color: #000000; font-size: 3.5rem;}
+            20% { color: #FFFFFF; font-size: 2.2rem;}
+            30% { color: #000000; font-size: 3.5rem;}
+            50% { color: #FFFFFF; font-size: 2.2rem;}
+            50% { color: #000000; font-size: 3.5rem;}
+            50% { color: #FFFFFF; font-size: 2.2rem;}
+            75% { color: #000000; font-size: 3.5rem;}
+            50% { color: #FFFFFF; font-size: 2.2rem;}
+            90% { color: #000000; font-size: 3.5rem;}
+            100% { color: #FFFFFF; font-size: 2.2rem;}
         }
 
         label {
             
             text-shadow: 1px 1px 1px #000;
-            font-size: 30px;
+            font-size: 2.2rem;
             animation-name: animation-text-size;
-            animation-duration: 30s;
+            animation-duration: 16s;
         }
     }
 }

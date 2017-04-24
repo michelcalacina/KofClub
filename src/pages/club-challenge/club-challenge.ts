@@ -2,23 +2,23 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
- * Generated class for the ClubChalenge page.
+ * Generated class for the ClubChallenge page.
  *
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
  */
 @IonicPage()
 @Component({
-  selector: 'page-club-chalenge',
-  templateUrl: 'club-chalenge.html',
+  selector: 'page-club-challenge',
+  templateUrl: 'club-challenge.html',
 })
-export class ClubChalenge {
+export class ClubChallenge {
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ClubChalenge');
+    console.log('ionViewDidLoad ClubChallenge');
   }
 
 }

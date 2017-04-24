@@ -14,3 +14,11 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
+
+// Add Super Street Fighter IV Font. ssf4
+@font-face {
+  font-family: 'ssf4';
+  src: url('../assets/fonts/SSF4-ABUKET.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}

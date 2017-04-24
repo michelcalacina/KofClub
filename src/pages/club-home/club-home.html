@@ -1,9 +1,10 @@
 <ion-header>
 
-  <ion-navbar>
+  <ion-navbar >
 
-    <ion-title>{{club.title}}</ion-title>
-  
+    <ion-title>
+      <p>{{club.title}}</p>
+    </ion-title>
     
       <ion-buttons *ngIf="isLoggedOnAdmin" end>
         
@@ -31,28 +32,22 @@
 
 <ion-content class="card-background-page">
 
-  <ion-card >
-    <img src="assets/img/card-club-events.png"/>
-    <div class="card-title">Eventos</div>
-    <div class="card-subtitle">41 Listings</div>
-  </ion-card>
-
-  <ion-card>
-    <img src="assets/img/card-club-rank.png"/>
-    <div class="card-title">Rank</div>
-    <div class="card-subtitle">64 Listings</div>
-  </ion-card>
-
-  <ion-card>
-    <img src="assets/img/card-club-challenge.png"/>
-    <div class="card-title">Duelo</div>
+  <ion-card style="background-color: #ff5722">
+    <img src="assets/img/sagat-tiger-nees.png"/>
+    <div class="card-title">DESAFIAR</div>
     <div class="card-subtitle">72 Listings</div>
   </ion-card>
 
-  <ion-card>
-    <img src="assets/img/card-club-members.png"/>
-    <div class="card-title mtext-shadow">Membros</div>
-    <div class="card-subtitle">28 Listings</div>
+  <ion-card style="background-color: #3f51b5">
+    <img src="assets/img/ken-masters-shoryiuuken.png"/>
+    <div class="card-title">EVENTOS</div>
+    <div class="card-subtitle">41 Listings</div>
+  </ion-card>
+
+  <ion-card style="background-color:  #673ab7">
+    <img src="assets/img/heihachi-mishima-full-gauge.png"/>
+    <div class="card-title">RANK</div>
+    <div class="card-subtitle">64 Listings</div>
   </ion-card>
 
 </ion-content>

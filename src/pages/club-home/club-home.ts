@@ -21,19 +21,22 @@ export class ClubHome {
   , public firebaseService: FirebaseService) {
     
     this.club = navParams.get("club");
-    this.isLoggedOnAdmin = this.verifyIsLoggedOnAdmin();
-
+    
     // Only for test please remove.
     if (this.club == undefined) {
       this.mockClubks();
     }
+    //---------------remove later ---------------
 
+
+    this.isLoggedOnAdmin = this.verifyIsLoggedOnAdmin();
     this.pendingUserKeys = new Array<string>();
   }
 
   verifyIsLoggedOnAdmin(): boolean {
     let result: boolean = false;
     let user = this.firebaseService.getUserProfile();
+       
     if (this.club.admins.indexOf(user.getUid()) > -1) {
       result = true;
     }
@@ -66,5 +69,6 @@ export class ClubHome {
     let club1 = ClubModel.toClubModel(j);
     this.club = club1;
   }
+  // ------------------------------REMOVE LATER-----------------
 
 }

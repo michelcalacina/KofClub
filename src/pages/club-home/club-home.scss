@@ -1,15 +1,24 @@
 page-club-home {
 
+    .toolbar-background {
+        background-color: #ff9800;
+    }
+
     .card-background-page {
         ion-card {
             position: relative;
             text-align: center;
+
+            img {
+                height: 142px;
+                width: 120px;
+            }
         }
 
         .card-title {
             position: absolute;
-            top: 36%;
-            font-size: 3.0em;
+            top: 20%;
+            font-size: 2.5rem;
             width: 100%;
             font-weight: bold;
             color: #fff;
@@ -17,16 +26,16 @@ page-club-home {
         }
 
         .card-subtitle {
-            font-size: 2em;
+            font-size: 2rem;
             position: absolute;
-            top: 52%;
+            top: 38%;
             width: 100%;
             color: #fff;
-            text-shadow: 1px 1px 1px #000;
+            text-shadow: 3px 3px 3px #000;
         }
 
         ion-card {
-            height: 200px;
+            height: 14rem;
         }
     }
 

@@ -14,7 +14,6 @@ export class UserClubs {
 
   loading: any;
   clubs: Array<ClubModel> = new Array;
-  private hasLoadedNewClubs = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
@@ -23,11 +22,6 @@ export class UserClubs {
   }
 
   loadClubsList() {
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
-
     this.firebaseService.listCurrentUserClubs()
       .then( clubList => {
         this.clubs = clubList;
@@ -35,22 +29,19 @@ export class UserClubs {
       }, (err) => {
         this.loading.dismiss();
       });
+
+      this.loading = this.loadingCtrl.create({
+        dismissOnPageChange: true,
+      });
+      this.loading.present();
   }
 
   createClub() {
-    this.hasLoadedNewClubs = true;
     this.navCtrl.push('ClubCreateNew');
   }
 
   openClub(club: ClubModel) {
     this.navCtrl.push('ClubHome', {"club": club});
-  }
-
-  ionViewDidEnter() {
-    if (this.hasLoadedNewClubs) {
-      this.loadClubsList();
-      this.hasLoadedNewClubs = false;
-    }
   }
 
 }

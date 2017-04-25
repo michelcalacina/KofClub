@@ -3,12 +3,12 @@ export class UserProfileModel {
     public thumbnailUrl: string;
     public creationDate: object;
     public displayName: string;
-    public clubs: Array<object>;
 
     private _uid: string;
+    private clubs: Array<string>;
 
     constructor() {
-        this.clubs = new Array<object>();
+        this.clubs = new Array<string>();
     }
 
     public getUid(): string {
@@ -19,16 +19,19 @@ export class UserProfileModel {
         this._uid = uid;
     }
 
+    public getClubs() {
+        return this.clubs;
+    }
+
+    public setClubs(clubs: Array<string>) {
+        this.clubs = clubs;
+    }
+
     public toJSON() {
-        let jup = {};
-        for (let ua in this.clubs) {
-            jup[ua] = true;
-        }
 
         return {"displayName": this.displayName,
                 "email": this.email,
                 "thumbnailUrl": this.thumbnailUrl,
-                "creationDate": this.creationDate,
-                "clubs": jup};
+                "creationDate": this.creationDate};
     }
 }

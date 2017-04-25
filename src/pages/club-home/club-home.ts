@@ -21,13 +21,6 @@ export class ClubHome {
   , public firebaseService: FirebaseService) {
     
     this.club = navParams.get("club");
-    
-    // Only for test please remove.
-    if (this.club == undefined) {
-      this.mockClubks();
-    }
-    //---------------remove later ---------------
-
 
     this.isLoggedOnAdmin = this.verifyIsLoggedOnAdmin();
     this.pendingUserKeys = new Array<string>();
@@ -57,18 +50,10 @@ export class ClubHome {
     this.navCtrl.push("PendingAcceptanceUsers", {"club": this.club, "userKeys": this.pendingUserKeys});
   }
 
-  // Only for teste, delete this after conclusion
-  mockClubks() {
-    let j = {"creationDate":1492652673040
-              ,"description":"ndjdkdkdkx"
-              ,"thumbnailURL":"https://firebasestorage.googleapis.com/v0/b/kof-club.appspot.com/o/images%2Flogos%2FKoccFighters.png?alt=media&token=7b69926a-1caa-43bc-81f7-1c69a4090bbd"
-              ,"title":"KoccFighters"
-              ,"admins":{"KUlqGiIDjKYzW6f3abZWtTZc4S03": true}
-            };
-
-    let club1 = ClubModel.toClubModel(j);
-    this.club = club1;
+  openChallenge() {
+    this.navCtrl.push("ClubChallenge", {"club": this, "isAdmin": this.isLoggedOnAdmin});
   }
-  // ------------------------------REMOVE LATER-----------------
+
+  
 
 }

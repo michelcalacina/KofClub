@@ -6,7 +6,6 @@
 
 </ion-header>
 
-
 <ion-content padding>
   <div class="picture-frame">
       <ion-fab right *ngIf="isPictureTaken">
@@ -19,7 +18,7 @@
           <img *ngIf="!isPictureTaken" src="assets/img/default-placeholder-picture.png">
           <img *ngIf="isPictureTaken" src={{getPicture()}} >
         </ion-thumbnail>
-        <span style="margin-left: 94px; font-size: 1.6rem;">escolha a logomarca</span>
+        <span style="margin-left: 25%; font-size: 1.6rem;">escolha a logomarca</span>
       </ion-item>
       
       <ion-fab center *ngIf="!isPictureTaken" >

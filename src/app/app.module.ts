@@ -10,16 +10,6 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { FirebaseService } from '../providers/firebase-service';
 import { CameraService } from '../providers/camera-service';
 import { Camera } from '@ionic-native/camera';
-import { AngularFireModule } from 'angularfire2';
-
-export const firebaseConfig = {
-  apiKey: "AIzaSyAHDEjrqVFI0ko98ShvPVxoTLVYmxLokoo",
-  authDomain: "kof-club.firebaseapp.com",
-  databaseURL: "https://kof-club.firebaseio.com",
-  storageBucket: "kof-club.appspot.com",
-  messagingSenderId: "696218730032",
-  projectId: "kof-club"
-};
 
 @NgModule({
   declarations: [
@@ -28,7 +18,6 @@ export const firebaseConfig = {
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
   ],
   bootstrap: [IonicApp],
   entryComponents: [

@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 import firebase from 'firebase';
-import { AngularFire } from 'angularfire2';
 
 import { ClubModel, CLUB_USER_STATUS } from '../model/club-model';
 import { UserProfileModel } from '../model/user-profile-model';
@@ -11,11 +9,12 @@ import { UserProfileModel } from '../model/user-profile-model';
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
 const DB_ROOT_RANK = "/rank/";
-const DB_ROOT_CLUBS_MEMBERS = "/clubs-members/";
+const DB_ROOT_CLUB_MEMBERS = "/club-members/";
+const DB_ROOT_MEMBER_CLUBS = "/member-clubs/";
 // List all pending users by club, useful for admin.
-const DB_ROOT_JOIN_CLUBS_MEMBERS = "/join-clubs-members/";
+const DB_ROOT_JOIN_CLUB_MEMBERS = "/join-club-members/";
 // List all pending clubs by user, useful for user join view.
-const DB_ROOT_JOIN_MEMBERS_CLUBS = "/join-members-clubs/";
+const DB_ROOT_JOIN_MEMBER_CLUBS = "/join-member-clubs/";
 
 // Storage
 const ST_ROOT_IMAGES = "/images/";
@@ -30,16 +29,18 @@ export class FirebaseService {
   // DataBase
   private usersRef: any;
   private clubsRef: any;
-  private clubsMemberRef: any;
+  private clubMembersRef: any;
+  private memberClubsRef: any;
 
   // Common
   private userProfile: UserProfileModel;
 
-  constructor(public af: AngularFire) {
+  constructor() {
     this.fireAuth = firebase.auth();
     this.usersRef = firebase.database().ref(DB_ROOT_USERS);
     this.clubsRef = firebase.database().ref(DB_ROOT_CLUBS);
-    this.clubsMemberRef = firebase.database().ref(DB_ROOT_CLUBS_MEMBERS);
+    this.clubMembersRef = firebase.database().ref(DB_ROOT_CLUB_MEMBERS);
+    this.memberClubsRef = firebase.database().ref(DB_ROOT_MEMBER_CLUBS);
   }
 
   // Login control.
@@ -58,12 +59,6 @@ export class FirebaseService {
             userProfile.email = usnapshot.val().email;
             userProfile.thumbnailUrl = usnapshot.val().thumbnailUrl;
             
-            let objClubs = usnapshot.val().clubs;
-            if (objClubs != null && objClubs != undefined) {
-              for (let c in objClubs) {
-                userProfile.clubs.push(new String(c));
-              }
-            }
             // Current userProfile for general app use.
             this.userProfile = userProfile;
             resolve(true);
@@ -133,51 +128,13 @@ export class FirebaseService {
 
           let updates = {};
           updates[DB_ROOT_CLUBS + newClubKey] = club.toJSON();
-          // create the admin field separeted, array not works.
-          //updates[DB_ROOT_CLUBS + newClubKey + '/' + 'admins' + '/' + uid] = true;
-          updates[DB_ROOT_USERS + uid + DB_ROOT_CLUBS + newClubKey] = true;
+
+          updates[DB_ROOT_MEMBER_CLUBS + uid + '/' + newClubKey] = true;
           // Update/Crete clubs-members with the new Club and default admin current user.
-          updates[DB_ROOT_CLUBS_MEMBERS + newClubKey + '/' + uid] = true;
+          updates[DB_ROOT_CLUB_MEMBERS + newClubKey + '/' + uid] = true;
           firebase.database().ref().update(updates).then( () => {
             resolve(true);
           }).catch( err => {reject(err)});
-      })
-    });
-  }
-
-  private getClubsByKeys(listKeys: Array<string>): any {
-    return new Promise( (resolve) => {
-      
-      let promiseCommands = listKeys.map(function(val,key) {
-        return firebase.database().ref('clubs').child(val).once('value');
-      });
-
-      Promise.all(promiseCommands)
-        .then(function (clubs) {
-          let clubList: Array<ClubModel> = new Array<ClubModel>();
-          clubs.forEach( club => {
-            if (club.val() !== null) {
-              let c: ClubModel = ClubModel.toClubModel(club.val());
-              c.setClubKey(club.key);
-              clubList.push(c);
-            }
-          });
-                    
-          resolve(clubList);   
-        })
-    });
-  }
-  
-  private getUserClubKeys(uid): Promise<Array<string>> {
-    return new Promise(resolve => {
-      this.usersRef.child(uid).child('clubs')
-      .once("value", snapshot => {
-        let keys: string[] = [];
-        // Convert Object Like {key: true, key: true}, to array of keys.
-        for (let key in snapshot.val()) {
-          keys.push(key);
-        }
-        resolve(keys);
       })
     });
   }
@@ -194,34 +151,6 @@ export class FirebaseService {
         }).then( clubs => {
           return resolve(clubs);
         }).catch (err => {reject(err)});
-    });
-  }
-
-  private getUserPendingJoinClubs(uid: string): Promise<Array<string>> {
-    return new Promise( (resolve, reject) => {
-      firebase.database().ref(DB_ROOT_JOIN_MEMBERS_CLUBS).child(uid)
-      .once('value', snapshot => {
-        let joinClubKeys: string[] = [];
-        // Convert Object Like {key: true, key: true}, to array of keys.
-        for (let key in snapshot.val()) {
-          joinClubKeys.push(key);
-        } 
-        resolve(joinClubKeys);
-      }, err => {reject(err)});
-    });
-  }
-
-  private getAllClubs(): Promise<Array<ClubModel>> {
-    return new Promise( (resolve, reject) => {
-      this.clubsRef.once('value', snapshots => {
-        let clubs: Array<ClubModel> = new Array;
-        snapshots.forEach(snapshot => {
-          let club: ClubModel = ClubModel.toClubModel(snapshot.val());
-          club.setClubKey(snapshot.key);
-          clubs.push(club);
-        });
-        resolve(clubs);
-      });
     });
   }
 
@@ -263,18 +192,17 @@ export class FirebaseService {
       let clubKey = club.getClubKey();
       // Uses update to keep the structe on db: root/clubkey/uid: true.
       let update = {};
-      update[DB_ROOT_JOIN_CLUBS_MEMBERS + club.getClubKey() + '/' + uid] = true;
-      update[DB_ROOT_JOIN_MEMBERS_CLUBS + uid + '/' + club.getClubKey()] = true; 
+      update[DB_ROOT_JOIN_CLUB_MEMBERS + club.getClubKey() + '/' + uid] = true;
+      update[DB_ROOT_JOIN_MEMBER_CLUBS + uid + '/' + club.getClubKey()] = true; 
       firebase.database().ref().update(update).then( _ => {
         resolve(true)
       }).catch( err => reject(err) );
     });
   }
 
-
   getPendingRequestToEnterClub(club: ClubModel): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
-      firebase.database().ref(DB_ROOT_JOIN_CLUBS_MEMBERS).child(club.getClubKey())
+      firebase.database().ref(DB_ROOT_JOIN_CLUB_MEMBERS).child(club.getClubKey())
       .once('value', snapshot => {
         let userKeys = new Array<string>();
         for (let userKey in snapshot.val()) {
@@ -307,12 +235,6 @@ export class FirebaseService {
           user.creationDate = snapshot.val().creationDate;
           user.thumbnailUrl = snapshot.val().thumbnailUrl;
           user.setUid(snapshot.key);
-          let clubKeys = snapshot.val().clubs;
-          if (clubKeys !== undefined && clubKeys !== null) {
-            for(let c in clubKeys) {
-              user.clubs.push(new String(c));
-            }
-          }
           users.push(user);
         });
         resolve(users);
@@ -334,18 +256,18 @@ export class FirebaseService {
           + club.getClubKey()] = true;
         
         commands[
-          DB_ROOT_CLUBS_MEMBERS
+          DB_ROOT_CLUB_MEMBERS
           + club.getClubKey()
           +"/"+ user.getUid()] = true;
 
         //Remove
         commands[
-          DB_ROOT_JOIN_CLUBS_MEMBERS
+          DB_ROOT_JOIN_CLUB_MEMBERS
           + club.getClubKey()
           +"/"+ user.getUid()] = null;
 
         commands[
-          DB_ROOT_JOIN_MEMBERS_CLUBS
+          DB_ROOT_JOIN_MEMBER_CLUBS
           + user.getUid()
           +"/"+ club.getClubKey()] = null;
       });
@@ -364,12 +286,12 @@ export class FirebaseService {
       users.forEach(user => {
         //Remove
         commands[
-          DB_ROOT_JOIN_CLUBS_MEMBERS
+          DB_ROOT_JOIN_CLUB_MEMBERS
           + club.getClubKey()
           +"/"+ user.getUid()] = null;
 
         commands[
-          DB_ROOT_JOIN_MEMBERS_CLUBS
+          DB_ROOT_JOIN_MEMBER_CLUBS
           + user.getUid()
           +"/"+ club.getClubKey()] = null;
       });
@@ -378,6 +300,31 @@ export class FirebaseService {
       .then( (_) => {
         resolve(true);
       }).catch((err) => {reject(err)});
+    });
+  }
+
+  getClubMembers(club: ClubModel): Promise<UserProfileModel> {
+    return new Promise((resolve,reject) => {
+      this.getClubMemberKeys(club).then((userKeys: Array<string>) => {
+        let commands = userKeys.map((val, key) => {
+          return this.usersRef.child(val).once('val');
+        });
+
+        Promise.all(commands).then(snapshots => {
+          let users = new Array<UserProfileModel>();
+          snapshots.forEach(element => {
+            let user = new UserProfileModel();
+            user.setUid(element.key);
+            user.creationDate = element.val().creationDate;
+            user.displayName = element.val().displayName;
+            user.email = element.val().email;
+            user.thumbnailUrl = element.val().thumbnailUrl;
+
+            users.push(user);
+          });
+          resolve(users);
+        }, (err) => {reject(err)});
+      });
     });
   }
 
@@ -434,21 +381,85 @@ export class FirebaseService {
     });
   }
 
-  // TODO Refactory after testes.
   // The LoggedUser profile, include thumbnail further more informations.
   getUserProfile() {
-    // Mock for test delete as soon as possible
-    if (this.userProfile !== undefined) {
       return this.userProfile;
-    } else {
-      let userProfile = new UserProfileModel();
-      userProfile.setUid("pl6v0IKonzN7QA2Xx7tuxo6csZC2");
-      userProfile.displayName = "mich";
-      userProfile.email = "michel.teste@email.com";
-      userProfile.thumbnailUrl = "assets/img/profile-kusanagi.png";
-
-      return userProfile;
-    }
   }
 
+  private getUserPendingJoinClubs(uid: string): Promise<Array<string>> {
+    return new Promise( (resolve, reject) => {
+      firebase.database().ref(DB_ROOT_JOIN_MEMBER_CLUBS).child(uid)
+      .once('value', snapshot => {
+        let joinClubKeys: string[] = [];
+        // Convert Object Like {key: true, key: true}, to array of keys.
+        for (let key in snapshot.val()) {
+          joinClubKeys.push(key);
+        } 
+        resolve(joinClubKeys);
+      }, err => {reject(err)});
+    });
+  }
+
+  private getAllClubs(): Promise<Array<ClubModel>> {
+    return new Promise( (resolve, reject) => {
+      this.clubsRef.once('value', snapshots => {
+        let clubs: Array<ClubModel> = new Array;
+        snapshots.forEach(snapshot => {
+          let club: ClubModel = ClubModel.toClubModel(snapshot.val());
+          club.setClubKey(snapshot.key);
+          clubs.push(club);
+        });
+        resolve(clubs);
+      });
+    });
+  }
+
+  private getClubsByKeys(listKeys: Array<string>): any {
+    return new Promise( (resolve) => {
+      
+      let promiseCommands = listKeys.map(function(val,key) {
+        return firebase.database().ref('clubs').child(val).once('value');
+      });
+
+      Promise.all(promiseCommands)
+        .then(function (clubs) {
+          let clubList: Array<ClubModel> = new Array<ClubModel>();
+          clubs.forEach( club => {
+            if (club.val() !== null) {
+              let c: ClubModel = ClubModel.toClubModel(club.val());
+              c.setClubKey(club.key);
+              clubList.push(c);
+            }
+          });
+                    
+          resolve(clubList);   
+        })
+    });
+  }
+  
+  private getUserClubKeys(uid): Promise<Array<string>> {
+    return new Promise(resolve => {
+      this.memberClubsRef.child(uid)
+      .once("value", snapshot => {
+        let keys: string[] = [];
+        // Convert Object Like {key: true, key: true}, to array of keys.
+        for (let key in snapshot.val()) {
+          keys.push(key);
+        }
+        resolve(keys);
+      })
+    });
+  }
+
+  private getClubMemberKeys(club: ClubModel): Promise<Array<string>> {
+    return new Promise((resolve, reject) => {
+      this.clubMembersRef.child(club.getClubKey()).once('value', (snapshot) => {
+        let userKeys = new Array<string>();
+        snapshot.forEach(element => {
+          userKeys.push(element.key);
+        });
+        resolve(userKeys);
+      }, (err) => {reject(err)});
+    });
+  }
 }

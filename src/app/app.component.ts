@@ -17,15 +17,15 @@ export class MyApp {
 
   constructor(public platform: Platform, public statusBar: StatusBar
     , public splashScreen: SplashScreen) {
-    // Initialize Firebase
-    // firebase.initializeApp({
-    //   apiKey: "AIzaSyAHDEjrqVFI0ko98ShvPVxoTLVYmxLokoo",
-    //   authDomain: "kof-club.firebaseapp.com",
-    //   databaseURL: "https://kof-club.firebaseio.com",
-    //   projectId: "kof-club",
-    //   storageBucket: "kof-club.appspot.com",
-    //   messagingSenderId: "696218730032"
-    // });
+    //Initialize Firebase
+    firebase.initializeApp({
+      apiKey: "AIzaSyAHDEjrqVFI0ko98ShvPVxoTLVYmxLokoo",
+      authDomain: "kof-club.firebaseapp.com",
+      databaseURL: "https://kof-club.firebaseio.com",
+      projectId: "kof-club",
+      storageBucket: "kof-club.appspot.com",
+      messagingSenderId: "696218730032"
+    });
 
     this.pages = [
       { title: 'Meus Clubes', component: 'UserClubs' },

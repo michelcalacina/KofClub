@@ -303,11 +303,11 @@ export class FirebaseService {
     });
   }
 
-  getClubMembers(club: ClubModel): Promise<UserProfileModel> {
+  getClubMembers(club: ClubModel): Promise<Array<UserProfileModel>> {
     return new Promise((resolve,reject) => {
       this.getClubMemberKeys(club).then((userKeys: Array<string>) => {
         let commands = userKeys.map((val, key) => {
-          return this.usersRef.child(val).once('val');
+          return this.usersRef.child(val).once('value');
         });
 
         Promise.all(commands).then(snapshots => {
@@ -382,8 +382,24 @@ export class FirebaseService {
   }
 
   // The LoggedUser profile, include thumbnail further more informations.
-  getUserProfile() {
-      return this.userProfile;
+  getUserProfile(): Promise<UserProfileModel> {
+      return new Promise((resolve,reject) => {
+        if (this.userProfile !== undefined) {
+          resolve(this.userProfile);
+        } else {
+          this.usersRef.child(firebase.auth().currentUser.uid)
+          .once('value', (snapshot) => {
+            let user = new UserProfileModel();
+            user.setUid(snapshot.key);
+            user.displayName = snapshot.val().displayName;
+            user.email = snapshot.val().email;
+            user.thumbnailUrl = snapshot.val().thumbnailUrl;
+            user.creationDate = snapshot.val().creationDate;
+            this.userProfile = user;
+            resolve(this.userProfile);
+          }, (err) => {reject(err)});
+        }
+    });
   }
 
   private getUserPendingJoinClubs(uid: string): Promise<Array<string>> {
@@ -456,7 +472,11 @@ export class FirebaseService {
       this.clubMembersRef.child(club.getClubKey()).once('value', (snapshot) => {
         let userKeys = new Array<string>();
         snapshot.forEach(element => {
-          userKeys.push(element.key);
+          let currentUid = firebase.auth().currentUser.uid;
+          // Remove current user from list.
+          if (new String(currentUid).valueOf() !== new String(element.key).valueOf()) {
+            userKeys.push(element.key);
+          }
         });
         resolve(userKeys);
       }, (err) => {reject(err)});

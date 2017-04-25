@@ -8,5 +8,12 @@
 
 
 <ion-content padding>
-
+  <ion-list no-lines>
+        <ion-item *ngFor="let member of members">
+          <ion-avatar item-left>
+            <img src={{member.thumbnailUrl}}>
+          </ion-avatar>
+          <ion-label float>{{member.displayName}}</ion-label>
+        </ion-item>
+    </ion-list>
 </ion-content>

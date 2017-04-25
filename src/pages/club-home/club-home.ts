@@ -22,19 +22,17 @@ export class ClubHome {
     
     this.club = navParams.get("club");
 
-    this.isLoggedOnAdmin = this.verifyIsLoggedOnAdmin();
+    this.verifyIsLoggedOnAdmin();
     this.pendingUserKeys = new Array<string>();
   }
 
-  verifyIsLoggedOnAdmin(): boolean {
+  verifyIsLoggedOnAdmin() {
     let result: boolean = false;
-    let user = this.firebaseService.getUserProfile();
-       
-    if (this.club.admins.indexOf(user.getUid()) > -1) {
-      result = true;
-    }
-
-    return result;
+    this.firebaseService.getUserProfile().then((user) => {
+      if (this.club.admins.indexOf(user.getUid()) > -1) {
+        this.isLoggedOnAdmin = true;
+      }
+    });
   }
 
   ionViewWillEnter() {
@@ -51,9 +49,7 @@ export class ClubHome {
   }
 
   openChallenge() {
-    this.navCtrl.push("ClubChallenge", {"club": this, "isAdmin": this.isLoggedOnAdmin});
+    this.navCtrl.push("ClubChallenge", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
   }
-
-  
 
 }

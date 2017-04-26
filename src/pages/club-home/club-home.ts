@@ -29,7 +29,7 @@ export class ClubHome {
   verifyIsLoggedOnAdmin() {
     let result: boolean = false;
     this.firebaseService.getUserProfile().then((user) => {
-      if (this.club.admins.indexOf(user.getUid()) > -1) {
+      if (this.club.admins.indexOf(user.getUid().valueOf()) > -1) {
         this.isLoggedOnAdmin = true;
       }
     });

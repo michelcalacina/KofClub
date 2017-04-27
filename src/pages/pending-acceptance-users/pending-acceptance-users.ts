@@ -102,10 +102,6 @@ export class PendingAcceptanceUsers {
     this.loading.present();
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad PendingAcceptanceUsers');
-  }
-
   showToastMessage(message: string) {
     this.toastCtrl.create({
         message: message,

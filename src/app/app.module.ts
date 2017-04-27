@@ -17,7 +17,11 @@ import { Camera } from '@ionic-native/camera';
   ],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp),
+    IonicModule.forRoot(MyApp, {
+      monthShortNames: [
+        'jan', 'fev', 'mar', 'abr', 'mai', 'jun'
+        , 'jul', 'ago', 'set', 'out', 'nov', 'dex']
+    }),
   ],
   bootstrap: [IonicApp],
   entryComponents: [

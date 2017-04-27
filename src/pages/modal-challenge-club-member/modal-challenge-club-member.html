@@ -1,0 +1,25 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Configurar Duelo</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-item>
+    <ion-label>Local</ion-label>
+    <ion-input type="text" [(ngModel)]="challengeLocal"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label> Data / Hora</ion-label>
+    <ion-datetime displayFormat="DD MMM - HH:mm" 
+    pickerFormat="DD MMM HH:mm"
+    [(ngModel)]="challengeDate"></ion-datetime>
+  </ion-item>
+
+  <button ion-button full (click)="confirmChallenge()">CONFIRMAR</button>
+
+</ion-content>

@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController
+  , ModalController } from 'ionic-angular';
 
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';
 import { UserProfileModel } from '../../model/user-profile-model';
+
 
 @IonicPage()
 @Component({
@@ -17,7 +19,8 @@ export class ClubChallengeCreateNew {
   private loading: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
-  , public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
+  , public firebaseService: FirebaseService, public loadingCtrl: LoadingController
+  , public modalCtrl: ModalController) {
     
     this.club = navParams.get("club");
     this.loadClubMembers();
@@ -39,8 +42,16 @@ export class ClubChallengeCreateNew {
     });
   }
 
+  openChallengeView(member: UserProfileModel) {
+    let modalChallenge = this.modalCtrl.create('ModalChallengeClubMember'
+    , {"member": member, "club": this.club});
+    modalChallenge.present();
+  }
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad ClubChallengeCreateNew');
   }
 
 }
+
+

@@ -330,6 +330,17 @@ export class FirebaseService {
 
   // -----------------------------------------------
 
+  // Challenge Control
+  createChallenge(club: ClubModel, opponent: UserProfileModel
+      , challengeLocal: string, challengeDate: string): Promise<boolean> {
+    
+    return new Promise((resolve, reject) => {
+       // TODO
+    });
+  }
+
+  // ------------------------------------------------
+
   // Util Control
   // Taken from: http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
   private b64toBlob(b64Data): Promise<Blob> {

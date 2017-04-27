@@ -9,7 +9,7 @@
 
 <ion-content padding>
   <ion-list no-lines>
-        <ion-item *ngFor="let member of members">
+        <ion-item *ngFor="let member of members" (click)="openChallengeView(member)">
           <ion-avatar item-left>
             <img src={{member.thumbnailUrl}}>
           </ion-avatar>

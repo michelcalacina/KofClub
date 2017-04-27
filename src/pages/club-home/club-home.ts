@@ -26,8 +26,7 @@ export class ClubHome {
     this.pendingUserKeys = new Array<string>();
   }
 
-  verifyIsLoggedOnAdmin() {
-    let result: boolean = false;
+  verifyIsLoggedOnAdmin() {    let result: boolean = false;
     this.firebaseService.getUserProfile().then((user) => {
       if (this.club.admins.indexOf(user.getUid().valueOf()) > -1) {
         this.isLoggedOnAdmin = true;

@@ -1,3 +1,15 @@
 page-club-challenge {
+    // Reduce ionic padding inside ion-item.
+    .label {
+        margin: 0;
+    }
 
+    .buttons-card {
+        display: table;
+        margin: 0 auto;
+    }
+
+    .local-time {
+        text-align: left;
+    }
 }

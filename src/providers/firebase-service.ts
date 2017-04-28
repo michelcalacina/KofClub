@@ -273,26 +273,25 @@ export class FirebaseService {
       users.forEach(user => {
         // Add
         commands[
-          DB_ROOT_USERS
+          DB_ROOT_MEMBER_CLUBS
           + user.getUid()
-          + DB_ROOT_CLUBS
-          + club.getClubKey()] = true;
+          + '/' + club.getClubKey()] = true;
         
         commands[
           DB_ROOT_CLUB_MEMBERS
           + club.getClubKey()
-          +"/"+ user.getUid()] = true;
+          + "/" + user.getUid()] = true;
 
         //Remove
         commands[
           DB_ROOT_JOIN_CLUB_MEMBERS
           + club.getClubKey()
-          +"/"+ user.getUid()] = null;
+          + "/" + user.getUid()] = null;
 
         commands[
           DB_ROOT_JOIN_MEMBER_CLUBS
           + user.getUid()
-          +"/"+ club.getClubKey()] = null;
+          + "/" + club.getClubKey()] = null;
       });
 
       firebase.database().ref().update(commands)
@@ -377,7 +376,7 @@ export class FirebaseService {
 
         otherChallenges.forEach( oc => {
           opponents.forEach(o => {
-            if (oc.challenged.valueOf() === o.getUid().valueOf()) {
+            if (oc.challenger.valueOf() === o.getUid().valueOf()) {
               oc.opponent = o;
             }
           });

@@ -5,16 +5,29 @@ import firebase from 'firebase';
 
 import { ClubModel, CLUB_USER_STATUS } from '../model/club-model';
 import { UserProfileModel } from '../model/user-profile-model';
+import { ChallengeModel, ChallengeStatus } from '../model/challenge-model';
+import { ChallengeProfileModel } from '../model/challenge-profile-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
+
 const DB_ROOT_USERS = "/users/";
+
 const DB_ROOT_RANK = "/rank/";
+
 const DB_ROOT_CLUB_MEMBERS = "/club-members/";
 const DB_ROOT_MEMBER_CLUBS = "/member-clubs/";
 // List all pending users by club, useful for admin.
 const DB_ROOT_JOIN_CLUB_MEMBERS = "/join-club-members/";
 // List all pending clubs by user, useful for user join view.
 const DB_ROOT_JOIN_MEMBER_CLUBS = "/join-member-clubs/";
+
+const DB_ROOT_CHALLENGES = "/challenges/";
+// Store from challenger to challenged. Get that who, I do wish to challenge.
+const DB_ROOT_CLUB_CHALLENGER = "/club-challenger/";
+// Store from challenged to challenger. Get that who, wish do challenge me.
+const DB_ROOT_CLUB_CHALLENGED = "/club-challenged/";
+const DB_ROOT_ADMIN_CHALLENGES_VALIDATION = "/admin-challenges-validation/";
+const DB_ROOT_EVENT_CHALLENGES = "/event-challenges/";
 
 // Storage
 const ST_ROOT_IMAGES = "/images/";
@@ -31,6 +44,11 @@ export class FirebaseService {
   private clubsRef: any;
   private clubMembersRef: any;
   private memberClubsRef: any;
+  private challengesRef: any;
+  private clubChallengerRef: any;
+  private clubChallengedRef: any;
+  private adminChallengesValidationRef: any;
+  private eventChallengesRef: any;
 
   // Common
   private userProfile: UserProfileModel;
@@ -41,6 +59,11 @@ export class FirebaseService {
     this.clubsRef = firebase.database().ref(DB_ROOT_CLUBS);
     this.clubMembersRef = firebase.database().ref(DB_ROOT_CLUB_MEMBERS);
     this.memberClubsRef = firebase.database().ref(DB_ROOT_MEMBER_CLUBS);
+    this.challengesRef = firebase.database().ref(DB_ROOT_CHALLENGES);
+    this.clubChallengerRef = firebase.database().ref(DB_ROOT_CLUB_CHALLENGER);
+    this.clubChallengedRef = firebase.database().ref(DB_ROOT_CLUB_CHALLENGED);
+    this.adminChallengesValidationRef = firebase.database().ref(DB_ROOT_ADMIN_CHALLENGES_VALIDATION);
+    this.eventChallengesRef = firebase.database().ref(DB_ROOT_EVENT_CHALLENGES);
   }
 
   // Login control.
@@ -303,7 +326,7 @@ export class FirebaseService {
     });
   }
 
-  getClubMembers(club: ClubModel): Promise<Array<UserProfileModel>> {
+  getClubOtherMembers(club: ClubModel): Promise<Array<UserProfileModel>> {
     return new Promise((resolve,reject) => {
       this.getClubMemberKeys(club).then((userKeys: Array<string>) => {
         let commands = userKeys.map((val, key) => {
@@ -331,11 +354,62 @@ export class FirebaseService {
   // -----------------------------------------------
 
   // Challenge Control
-  createChallenge(club: ClubModel, opponent: UserProfileModel
-      , challengeLocal: string, challengeDate: string): Promise<boolean> {
-    
+
+  loadChallengeHomeDatas(club: ClubModel): Promise<Array<Array<ChallengeModel>>> {
+    return new Promise((resolve,reject) => {
+      Promise.all([
+        this.getUserChallengerList(club),
+        this.getUserChallengedList(club),
+        this.getClubOtherMembers(club)
+      ]).then(data => {
+        let myChallenges = data[0];
+        let otherChallenges = data[1];
+        let opponents = data[2];
+        
+        // Configure the opponents in challenge, to easy view render.
+        myChallenges.forEach( mc => {
+          opponents.forEach(o => {
+            if (mc.challenged.valueOf() === o.getUid().valueOf()) {
+              mc.opponent = o;
+            }
+          });
+        });
+
+        otherChallenges.forEach( oc => {
+          opponents.forEach(o => {
+            if (oc.challenged.valueOf() === o.getUid().valueOf()) {
+              oc.opponent = o;
+            }
+          });
+        });
+
+        let result = new Array<Array<ChallengeModel>>();
+        result.push(myChallenges);
+        result.push(otherChallenges);
+        resolve(result);
+      }, (err) => {reject(err)});
+    });
+  }
+
+  createChallenge(club: ClubModel, challenge: ChallengeModel): Promise<boolean> {
     return new Promise((resolve, reject) => {
-       // TODO
+       this.challengesRef.child(club.getClubKey())
+       .push(challenge.toJson()).then((snapshot) => {
+         let updateCommand = {};
+         // Update the challenger relashionships.
+         // The challenger.
+         updateCommand[DB_ROOT_CLUB_CHALLENGER + club.getClubKey() + '/'
+         + challenge.challenger + '/'
+         + snapshot.key] = true;
+         // Update the opponent.
+         updateCommand[DB_ROOT_CLUB_CHALLENGED + club.getClubKey() + '/'
+         + challenge.challenged + '/'
+         + snapshot.key] = true;
+
+         firebase.database().ref().update(updateCommand).then((_) => {
+          resolve(true);
+         });
+        }, (err) => {reject(err);});
     });
   }
 
@@ -493,4 +567,86 @@ export class FirebaseService {
       }, (err) => {reject(err)});
     });
   }
+
+  // Get all challenges created by current user.
+  private getUserChallengerList(club: ClubModel): Promise<Array<ChallengeModel>> {
+    return new Promise((resolve,reject) => {
+      // Get first the keys.
+      this.clubChallengerRef.child(club.getClubKey())
+      .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
+        let commands = new Array<any>();
+        // create the commands with the keys.
+        snapshots.forEach(snapshot => {
+          commands.push(
+            this.challengesRef.child(club.getClubKey()).child(snapshot.key).once('value')
+          )
+        });
+
+        // empty challenges
+        if (commands.length === 0) {
+          resolve(new Array<ChallengeModel>());
+        }
+
+        Promise.all(commands)
+        .then((snapshots) => {
+          let challenges = new Array<ChallengeModel>();
+          snapshots.forEach(snapshot => {
+            let challenge = new ChallengeModel();
+            challenge.dbKey = snapshot.key;
+            challenge.challenger = snapshot.val().challenger;
+            challenge.challenged = snapshot.val().challenged;
+            challenge.date = snapshot.val().date;
+            challenge.local = snapshot.val().local;
+            // Workaround to set the currect enum val, from string.
+            //let statusVal = ChallengeStatus[snapshot.val().status];
+            challenge.status = (<any>ChallengeStatus)[snapshot.val().status];
+
+            challenges.push(challenge);
+          });
+          resolve(challenges);
+        });
+      }, (err) => {reject(err)});
+    });
+  }
+
+  // Get challenges create by other users, that mention current user.
+  private getUserChallengedList(club: ClubModel): Promise<Array<ChallengeModel>> {
+    return new Promise((resolve,reject) => {
+      // Get first the keys.
+      this.clubChallengedRef.child(club.getClubKey())
+      .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
+        let commands = new Array<any>();
+        // create the commands with the keys.
+        snapshots.forEach(snapshot => {
+          commands.push(
+            this.challengesRef.child(club.getClubKey()).child(snapshot.key).once('value')
+          )
+        });
+
+        // empty challenges
+        if (commands.length === 0) {
+          resolve(new Array<ChallengeModel>());
+        }
+
+        Promise.all(commands)
+        .then((snapshots) => {
+          let challenges = new Array<ChallengeModel>();
+          snapshots.forEach(snapshot => {
+            let challenge = new ChallengeModel();
+            challenge.challenger = snapshot.val().challenger;
+            challenge.challenged = snapshot.val().challenged;
+            challenge.date = snapshot.val().date;
+            challenge.local = snapshot.val().local;
+            // Workaround to set the currect enum val, from string.
+            // let statusVal = ChallengeStatus[snapshot.val().status];
+            challenge.status = (<any>ChallengeStatus)[snapshot.val().status];
+
+            challenges.push(challenge);
+          });
+          resolve(challenges);
+        });
+      }, (err) => {reject(err)});
+    });
+  }
+
 }

@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams
-  , LoadingController, ToastController } from 'ionic-angular';
+  , LoadingController, ToastController, ViewController } from 'ionic-angular';
 
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';
 import { UserProfileModel } from '../../model/user-profile-model';
+import { ChallengeModel, ChallengeStatus } from '../../model/challenge-model';
 
 @IonicPage()
 @Component({
@@ -12,46 +13,70 @@ import { UserProfileModel } from '../../model/user-profile-model';
   templateUrl: 'modal-challenge-club-member.html',
 })
 export class ModalChallengeClubMember {
-  private opponent: UserProfileModel;
   private club: ClubModel;
   private loading: any;
-  challengeLocal: string;
-  challengeDate: any;
+  challenge: ChallengeModel;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public loadingCtrl: LoadingController, public firebaseService: FirebaseService
-  , public toatCtrl: ToastController) {
+  , public toatCtrl: ToastController, public viewCtrl: ViewController) {
 
-    this.opponent = navParams.get("member");
+    let opponent: UserProfileModel = navParams.get("member");
     this.club = navParams.get("club");
-    this.challengeDate = new Date().toISOString();
-  
+
+    this.challenge = new ChallengeModel();
+    this.challenge.date = new Date().toISOString();
+    // Get the current logged user, as challenger.
+    this.firebaseService.getUserProfile().then( (loggedUser) => {
+      this.challenge.challenger = loggedUser.getUid();
+    });
+    this.challenge.challenged = opponent.getUid();
+    this.challenge.status = ChallengeStatus.PENDING;
 }
 
   confirmChallenge() {
+    if (this.challenge.local === undefined 
+    || this.challenge.local.trim().length === 0) {
+      this.showToast("Informe o local!", false);
+      return;
+    }
+
     this.loading = this.loadingCtrl.create({
       dismissOnPageChange: true,
       showBackdrop: false
     });
 
     this.firebaseService.createChallenge(this.club
-      , this.opponent, this.challengeLocal, this.challengeDate).then( (_) => {
-      this.loading.dismiss();
-      let toast = this.toatCtrl.create({
-        message: "Desafio lançado, aguardando confirmação do adversário!",
-        showCloseButton: true,
-        closeButtonText: "OK",
-        dismissOnPageChange: true,
+      , this.challenge).then((_) => {
+        this.loading.dismiss().then(() => {
+          this.showToast("Desafio lançado, aguardando confirmação do adversário!", true);
       });
-
-      toast.onDidDismiss(() => {
-        this.navCtrl.pop();
-      });
-
     }, (err) => {
       this.loading.dismiss();
       console.log(err);
     });
   }
 
+  cancel() {
+    this.viewCtrl.dismiss({success: false});
+  }
+
+  private showToast(message: string, showButton: boolean) {
+    let toast = this.toatCtrl.create({
+        message: message,
+        showCloseButton: showButton,
+        closeButtonText: "OK",
+        dismissOnPageChange: true,
+      });
+
+      if (!showButton) {
+        toast.setDuration(3000);
+      }
+
+      toast.onDidDismiss(() => {
+        this.viewCtrl.dismiss({success: true});
+      });
+
+      toast.present();
+  }
 }

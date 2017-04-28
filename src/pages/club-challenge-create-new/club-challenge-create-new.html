@@ -8,12 +8,13 @@
 
 
 <ion-content padding>
-  <ion-list no-lines>
-        <ion-item *ngFor="let member of members" (click)="openChallengeView(member)">
+  <ion-list>
+        <ion-item *ngFor="let cp of challengesProfile" (click)="openChallengeView(cp)">
           <ion-avatar item-left>
-            <img src={{member.thumbnailUrl}}>
+            <img src={{cp.user.thumbnailUrl}}>
           </ion-avatar>
-          <ion-label float>{{member.displayName}}</ion-label>
+          <ion-label float>{{cp.user.displayName}}</ion-label>
+          <ion-icon name="rose" item-right></ion-icon>
         </ion-item>
     </ion-list>
 </ion-content>

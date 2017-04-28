@@ -6,9 +6,46 @@
 
 </ion-header>
 
+<!-- Pending wait my confirmation -->
+<ion-content no-padding>
+  <ion-list>
+    <ion-list-header>
+      Aceitar desafios
+    </ion-list-header>
+    <ion-item *ngFor="let c of otherChallengesPending">
+      colocar um card aqui
+    </ion-item>
+</ion-list>
 
-<ion-content padding>
-  Here comes a new challenger
+<!-- Pending waiting my opponents -->
+<ion-list>
+  <ion-list-header>
+    Aguardando Aceitação
+  </ion-list-header>
+  <ion-item *ngFor="let c of myChallengesPending">
+    <ion-card>
+      <ion-card-header>
+        RIVAIS
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-avatar item-left>
+            <img src={{loggedUser.thumbnailUrl}}>
+          </ion-avatar>
+          <h2>{{loggedUser.displayName}}</h2>
+        </ion-item>
+        <p style="text-align: center;">Vs</p>
+        <ion-item>
+          <h2 style="text-align: right;">{{c.opponent.displayName}}</h2>
+          <ion-avatar item-right>
+            <img src={{c.opponent.thumbnailUrl}}>
+          </ion-avatar>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+  </ion-item>
+</ion-list>
 
   <ion-fab right bottom>
     <button ion-fab (click)="openChallengeCreateView()">

@@ -5,21 +5,22 @@ export enum ChallengeStatus {
     ACCEPTED,
     REFUSED,
     ACCOMPLISHED,
-    VERIFIED,
     ADMIN_VALIDATION,
     COMPLETED
 }
 export class ChallengeModel {
-    public challenger: UserProfileModel;
-    public challeged: UserProfileModel;
+    public dbKey: string;
+    public challenger: string;
+    public challenged: string;
     public local: string;
     public date: string;
     public status: ChallengeStatus;
+    public opponent: UserProfileModel;
 
     toJson(): any {
         let jcm = {};
-        jcm["challenger"] = this.challenger.getUid().valueOf();
-        jcm["challenged"] = this.challeged.getUid().valueOf();
+        jcm["challenger"] = this.challenger;
+        jcm["challenged"] = this.challenged;
         jcm["local"] = this.local.valueOf();
         jcm["date"] = this.date.valueOf();
         jcm["status"] = ChallengeStatus[this.status];

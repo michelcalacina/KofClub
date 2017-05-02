@@ -22,19 +22,18 @@ export class ClubChallenge {
 
   // Challenges that I receive
   otherChallengesPending: Array<ChallengeModel>;
-  otherChallengesAccepted: Array<ChallengeModel>;
   otherChallengesRefused: Array<ChallengeModel>;
   otherChallengesAccomplished: Array<ChallengeModel>;
 
   // Challenges that I create
   myChallengesPending: Array<ChallengeModel>;
-  myChallengesAccepted: Array<ChallengeModel>;
   myChallengesRefused: Array<ChallengeModel>;
   myChallengesAccomplished: Array<ChallengeModel>;
   
   // Special challenges behavior.
   challengesAdminValidation: Array<ChallengeModel>;
   challengesCompleted: Array<ChallengeModel>;
+  challengesAccepted: Array<ChallengeModel>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
@@ -42,17 +41,16 @@ export class ClubChallenge {
     this.isAdminLogged = navParams.get("isAdmin");
 
     this.myChallengesPending = new Array<ChallengeModel>();
-    this.myChallengesAccepted = new Array<ChallengeModel>();
     this.myChallengesRefused = new Array<ChallengeModel>();
     this.myChallengesAccomplished = new Array<ChallengeModel>();
 
     this.otherChallengesPending = new Array<ChallengeModel>();
-    this.otherChallengesAccepted = new Array<ChallengeModel>();
     this.otherChallengesRefused = new Array<ChallengeModel>();
     this.otherChallengesAccomplished = new Array<ChallengeModel>();
     
     this.challengesAdminValidation = new Array<ChallengeModel>();
     this.challengesCompleted = new Array<ChallengeModel>();
+    this.challengesAccepted = new Array<ChallengeModel>();
 
     this.getLoggedUser();
 
@@ -74,15 +72,11 @@ export class ClubChallenge {
       myChallenges.push(mcp.challenged);
     });
 
-    this.myChallengesAccepted.forEach(mcp => {
+    this.challengesAccepted.forEach(mcp => {
       myChallenges.push(mcp.challenged);
     });
 
     this.otherChallengesPending.forEach(mcp => {
-      otherChallenges.push(mcp.challenged);
-    });
-
-    this.otherChallengesAccepted.forEach(mcp => {
       otherChallenges.push(mcp.challenged);
     });
 
@@ -119,7 +113,7 @@ export class ClubChallenge {
             this.myChallengesPending.push(c);
             break;
           case ChallengeStatus.ACCEPTED:
-            this.myChallengesAccepted.push(c);
+            this.challengesAccepted.push(c);
             break;
           case ChallengeStatus.REFUSED:
             this.myChallengesRefused.push(c);
@@ -142,7 +136,7 @@ export class ClubChallenge {
             this.otherChallengesPending.push(c);
             break;
           case ChallengeStatus.ACCEPTED:
-            this.otherChallengesAccepted.push(c);
+            this.challengesAccepted.push(c);
             break;
           case ChallengeStatus.REFUSED:
             this.otherChallengesRefused.push(c);
@@ -176,6 +170,23 @@ export class ClubChallenge {
       if (o.getUid().valueOf() === uid.valueOf()) {
         return o.displayName.valueOf();
       }
+    });
+  }
+
+  acceptChallenge(challenge: ChallengeModel) {
+    this.loading = this.loadingCtrl.create({
+      dismissOnPageChange: true
+    })
+    this.loading.present();
+
+    this.firebaseService.acceptUserChallenge(challenge, this.club)
+    .then((_) => {
+      let index = this.otherChallengesPending.indexOf(challenge);
+      this.otherChallengesPending.splice(index, 1);
+      this.challengesAccepted.push(challenge);
+      this.loading.dismiss();
+    }, (err) => {
+      this.loading.dismiss();
     });
   }
 

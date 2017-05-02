@@ -23,7 +23,7 @@ export class ChallengeModel {
         jcm["challenged"] = this.challenged;
         jcm["local"] = this.local.valueOf();
         jcm["date"] = this.date.valueOf();
-        jcm["status"] = ChallengeStatus[this.status];
+        jcm["status"] = this.status;
 
         return jcm;
     }

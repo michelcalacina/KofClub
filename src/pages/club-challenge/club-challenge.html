@@ -26,7 +26,7 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button outline medium icon-left>
+            <button ion-button outline medium icon-left (click)="acceptChallenge(c)">
               <ion-icon name="ios-thumbs-up"></ion-icon>
               ACEITAR
             </button>
@@ -43,7 +43,7 @@
 
 <!-- Pending waiting my opponents -->
 <ion-list>
-  <ion-list-header><H2>AGUARDADO OPONENTE</H2></ion-list-header>
+  <ion-list-header><H2>AGUARDANDO OPONENTE</H2></ion-list-header>
   <ion-item *ngFor="let c of myChallengesPending">
     <ion-card>
       <ion-card-content>

@@ -9,9 +9,7 @@ import { ChallengeModel, ChallengeStatus } from '../model/challenge-model';
 import { ChallengeProfileModel } from '../model/challenge-profile-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
-
 const DB_ROOT_USERS = "/users/";
-
 const DB_ROOT_RANK = "/rank/";
 
 const DB_ROOT_CLUB_MEMBERS = "/club-members/";
@@ -412,6 +410,23 @@ export class FirebaseService {
     });
   }
 
+  acceptUserChallenge(challenge: ChallengeModel, club: ClubModel): Promise<any> {
+    return new Promise((resolve,reject) => {
+      let commands = {};
+      commands[DB_ROOT_CHALLENGES + club.getClubKey() 
+        + '/' + challenge.dbKey + '/' + 'status'] = ChallengeStatus.ACCEPTED;
+      
+      commands[DB_ROOT_EVENT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey] = true;
+
+      firebase.database().ref('/').update(commands).then((snapshot) => {
+        resolve(true)
+      }, (err) => {
+        reject(err);
+      });
+    });
+  }
+
   // ------------------------------------------------
 
   // Util Control
@@ -570,7 +585,7 @@ export class FirebaseService {
   // Get all challenges created by current user.
   private getUserChallengerList(club: ClubModel): Promise<Array<ChallengeModel>> {
     return new Promise((resolve,reject) => {
-      // Get first the keys.
+      // Get the keys first.
       this.clubChallengerRef.child(club.getClubKey())
       .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
         let commands = new Array<any>();
@@ -596,9 +611,8 @@ export class FirebaseService {
             challenge.challenged = snapshot.val().challenged;
             challenge.date = snapshot.val().date;
             challenge.local = snapshot.val().local;
-            // Workaround to set the currect enum val, from string.
-            //let statusVal = ChallengeStatus[snapshot.val().status];
-            challenge.status = (<any>ChallengeStatus)[snapshot.val().status];
+            // Set the currect enum val, from string.
+            challenge.status = snapshot.val().status;
 
             challenges.push(challenge);
           });
@@ -611,7 +625,7 @@ export class FirebaseService {
   // Get challenges create by other users, that mention current user.
   private getUserChallengedList(club: ClubModel): Promise<Array<ChallengeModel>> {
     return new Promise((resolve,reject) => {
-      // Get first the keys.
+      // Get the keys first.
       this.clubChallengedRef.child(club.getClubKey())
       .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
         let commands = new Array<any>();
@@ -632,13 +646,13 @@ export class FirebaseService {
           let challenges = new Array<ChallengeModel>();
           snapshots.forEach(snapshot => {
             let challenge = new ChallengeModel();
+            challenge.dbKey = snapshot.key;
             challenge.challenger = snapshot.val().challenger;
             challenge.challenged = snapshot.val().challenged;
             challenge.date = snapshot.val().date;
             challenge.local = snapshot.val().local;
-            // Workaround to set the currect enum val, from string.
-            // let statusVal = ChallengeStatus[snapshot.val().status];
-            challenge.status = (<any>ChallengeStatus)[snapshot.val().status];
+            // Set the currect enum val, from string.
+            challenge.status = snapshot.val().status;
 
             challenges.push(challenge);
           });

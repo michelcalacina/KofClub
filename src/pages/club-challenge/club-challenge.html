@@ -9,7 +9,7 @@
 <ion-content no-padding>
 
 <!-- Pending waiting my confirmation -->
-<ion-list>
+<ion-list *ngIf="otherChallengesPending.length > 0">
   <ion-list-header><H2>ME DESAFIOU</H2></ion-list-header>
   <ion-item *ngFor="let c of otherChallengesPending">
     <ion-card>
@@ -30,7 +30,7 @@
               <ion-icon name="ios-thumbs-up"></ion-icon>
               ACEITAR
             </button>
-            <button ion-button color="danger" medium outline icon-left>
+            <button ion-button color="danger" medium outline icon-left (click)="excludeChallenge(c)">
               <ion-icon name="ios-thumbs-down"></ion-icon>
               RECUSAR
             </button>
@@ -42,7 +42,7 @@
 </ion-list>
 
 <!-- Pending waiting my opponents -->
-<ion-list>
+<ion-list *ngIf="myChallengesPending.length > 0">
   <ion-list-header><H2>AGUARDANDO OPONENTE</H2></ion-list-header>
   <ion-item *ngFor="let c of myChallengesPending">
     <ion-card>
@@ -59,7 +59,36 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button color="danger" outline medium icon-left>
+            <button ion-button color="danger" outline medium icon-left (click)="excludeChallenge(c)">
+              <ion-icon name="trash"></ion-icon>
+              EXCLUIR
+            </button>
+          </ion-buttons>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ion-item>
+</ion-list>
+
+<!-- Accepted challenges -->
+<ion-list *ngIf="challengesAccepted.length > 0">
+  <ion-list-header><H2>CONFIRMADO</H2></ion-list-header>
+  <ion-item *ngFor="let c of challengesAccepted">
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-avatar item-left>
+            <img src={{c.opponent.thumbnailUrl}}>
+          </ion-avatar>
+          <H2>{{c.opponent.displayName}}</H2>
+        </ion-item>
+        <ion-item class="local-time">
+          <h3>Local: {{c.local}}</h3>
+          <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
+        </ion-item>
+        <ion-item>
+          <ion-buttons class="buttons-card">
+            <button ion-button color="danger" outline medium icon-left (click)="excludeChallenge(c)">
               <ion-icon name="trash"></ion-icon>
               EXCLUIR
             </button>

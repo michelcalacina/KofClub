@@ -42,8 +42,7 @@ export class ModalChallengeClubMember {
     }
 
     this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-      showBackdrop: false
+      dismissOnPageChange: true
     });
 
     this.firebaseService.createChallenge(this.club

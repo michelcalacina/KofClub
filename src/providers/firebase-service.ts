@@ -427,6 +427,33 @@ export class FirebaseService {
     });
   }
 
+  excludeChallenge(challenge: ChallengeModel, club: ClubModel): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+      let commands = {};
+      // Remove the challenger
+      commands[DB_ROOT_CLUB_CHALLENGER + club.getClubKey() 
+      +'/'+ challenge.challenger +'/'+ challenge.dbKey] = null;
+
+      // Remove the challenged
+      commands[DB_ROOT_CLUB_CHALLENGED + club.getClubKey() 
+      +'/'+ challenge.challenged +'/'+ challenge.dbKey] = null;
+
+      // Remove the event if it is confirmed.
+      commands[DB_ROOT_EVENT_CHALLENGES + club.getClubKey() 
+      +'/'+ challenge.dbKey] = null;
+
+      commands[DB_ROOT_CHALLENGES + club.getClubKey() 
+      +'/'+ challenge.dbKey] = null;
+
+      firebase.database().ref('/').update(commands)
+      .then((_) => {
+        resolve(true);
+      }, (err) => {
+        reject(err);
+      });
+    });
+  }
+
   // ------------------------------------------------
 
   // Util Control

@@ -35,8 +35,8 @@ export class ClubChallenge {
   challengesCompleted: Array<ChallengeModel>;
   challengesAccepted: Array<ChallengeModel>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams
-  , public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams,
+   public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
     this.club = navParams.get("club");
     this.isAdminLogged = navParams.get("isAdmin");
 
@@ -53,14 +53,6 @@ export class ClubChallenge {
     this.challengesAccepted = new Array<ChallengeModel>();
 
     this.getLoggedUser();
-
-    // Only for test please remove.
-    if (this.club == undefined) {
-      this.mockClubks();
-      this.isAdminLogged = true;
-    }
-    //---------------remove later ---------------
-
     this.loadChallengesCurrentUser();
   }
 
@@ -100,7 +92,6 @@ export class ClubChallenge {
 
   // receive a array with arrays inside, first array contais my challengers,
   // second array contais challenge against me.
-  // Third contains Opponents list.
   loadChallengesCurrentUser() {
     this.firebaseService.loadChallengeHomeDatas(this.club)
     .then((dataArray) => {
@@ -165,14 +156,6 @@ export class ClubChallenge {
     this.loading.present();
   }
 
-  getOpponentName(uid: string) {
-    this.opponents.forEach(o => {
-      if (o.getUid().valueOf() === uid.valueOf()) {
-        return o.displayName.valueOf();
-      }
-    });
-  }
-
   acceptChallenge(challenge: ChallengeModel) {
     this.loading = this.loadingCtrl.create({
       dismissOnPageChange: true
@@ -190,17 +173,31 @@ export class ClubChallenge {
     });
   }
 
-  // Only for teste, delete this after conclusion
-  mockClubks() {
-    let j = {"creationDate":1492652673040
-              ,"description":"ndjdkdkdkx"
-              ,"thumbnailURL":"https://firebasestorage.googleapis.com/v0/b/kof-club.appspot.com/o/images%2Flogos%2FKoccFighters.png?alt=media&token=7b69926a-1caa-43bc-81f7-1c69a4090bbd"
-              ,"title":"KoccFighters"
-              ,"admins":{"KUlqGiIDjKYzW6f3abZWtTZc4S03": true}
-            };
+  excludeChallenge(challenge: ChallengeModel) {
+    this.loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    this.loading.present();
 
-    let club1 = ClubModel.toClubModel(j);
-    this.club = club1;
+    this.firebaseService.excludeChallenge(challenge, this.club)
+    .then((_) => {
+      // Update the view.
+      switch(challenge.status) {
+        case ChallengeStatus.PENDING:
+          // Verify it was created by me.
+          let index = this.myChallengesPending.indexOf(challenge);
+          if (index > -1) {
+            this.myChallengesPending.splice(index);
+          } else { // Otherwise remove from received challenges.
+            index = this.otherChallengesPending.indexOf(challenge);
+            this.otherChallengesPending.splice(index);
+          }
+          break;
+        case ChallengeStatus.ACCEPTED:
+          index = this.challengesAccepted.indexOf(challenge);
+          this.challengesAccepted.splice(index);
+          break;
+      }
+      this.loading.dismiss();
+    }, (err) => {this.loading.dismiss();});
   }
-  // ------------------------------REMOVE LATER-----------------
+
 }

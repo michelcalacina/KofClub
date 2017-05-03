@@ -18,7 +18,8 @@ export class ModalChallengeLaunchResult {
   challenge: ChallengeModel;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-  public firebaseService: FirebaseService) {
+  public firebaseService: FirebaseService, public loadingCtrl: LoadingController,
+  public viewCtrl: ViewController, public toastCtrl: ToastController) {
     this.club = navParams.get("club");
     this.loggedUser = navParams.get("loggedUser");
     this.challenge = navParams.get("challenge");
@@ -29,14 +30,44 @@ export class ModalChallengeLaunchResult {
   }
 
   launchResult() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
     this.firebaseService.launchChallengeResult(this.club, this.challenge)
     .then((_) => {
-      // TODO
-    }, (err) => {});
+      loading.dismiss().then(() => {
+        this.showToast("Aguardando confirmação do oponente", true);
+      });
+    }, (err) => {
+      loading.dismiss();
+      this.showToast("Falha de comunicação com o serviço de dados!", false);
+    });
+  }
+
+  cancel() {
+    this.viewCtrl.dismiss({success: false});
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ModalChallengeLaunchResult');
+  }
+
+  private showToast(message: string, showButton: boolean) {
+    let toast = this.toastCtrl.create({
+        message: message,
+        showCloseButton: showButton,
+        closeButtonText: "OK",
+        dismissOnPageChange: true,
+      });
+
+      if (!showButton) {
+        toast.setDuration(3000);
+      }
+
+      toast.onDidDismiss(() => {
+        this.viewCtrl.dismiss({success: true, challengeUpdated: this.challenge});
+      });
+
+      toast.present();
   }
 
 }

@@ -21,16 +21,16 @@ export class ClubChallenge {
 
   // Challenges that I receive
   otherChallengesPending: Array<ChallengeModel>;
-  otherChallengesAccomplished: Array<ChallengeModel>;
 
   // Challenges that I create
   myChallengesPending: Array<ChallengeModel>;
-  myChallengesAccomplished: Array<ChallengeModel>;
   
   // Special challenges behavior.
   challengesAdminValidation: Array<ChallengeModel>;
   challengesCompleted: Array<ChallengeModel>;
   challengesAccepted: Array<ChallengeModel>;
+  challengesOtherUserAccomplished: Array<ChallengeModel>;
+  challengesLoggedUserAccomplished: Array<ChallengeModel>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
    public firebaseService: FirebaseService, public loadingCtrl: LoadingController, 
@@ -40,14 +40,13 @@ export class ClubChallenge {
     this.isAdminLogged = navParams.get("isAdmin");
 
     this.myChallengesPending = new Array<ChallengeModel>();
-    this.myChallengesAccomplished = new Array<ChallengeModel>();
-
     this.otherChallengesPending = new Array<ChallengeModel>();
-    this.otherChallengesAccomplished = new Array<ChallengeModel>();
     
     this.challengesAdminValidation = new Array<ChallengeModel>();
     this.challengesCompleted = new Array<ChallengeModel>();
     this.challengesAccepted = new Array<ChallengeModel>();
+    this.challengesLoggedUserAccomplished = new Array<ChallengeModel>();
+    this.challengesOtherUserAccomplished = new Array<ChallengeModel>();
 
     this.getLoggedUser();
     this.hasEnterCreateNew = false;
@@ -80,8 +79,12 @@ export class ClubChallenge {
     let modalLaunchResult = this.modalCtrl.create("ModalChallengeLaunchResult", 
       {club: this.club, challenge: challenge, loggedUser: this.loggedUser});
     
-    modalLaunchResult.onDidDismiss((isDone: boolean = false) => {
-
+    modalLaunchResult.onDidDismiss((success: boolean, challengeUpdated: ChallengeModel) => {
+      if (success) {
+        let index = this.challengesAccepted.indexOf(challenge);
+        this.challengesAccepted.splice(index, 1);
+        this.challengesLoggedUserAccomplished.push(challengeUpdated);
+      }
     });
 
     modalLaunchResult.present();
@@ -103,14 +106,13 @@ export class ClubChallenge {
     // To avoid redundance, clear all arrays.
     if (this.hasEnterCreateNew) {
       this.myChallengesPending = new Array<ChallengeModel>();
-      this.myChallengesAccomplished = new Array<ChallengeModel>();
-
       this.otherChallengesPending = new Array<ChallengeModel>();
-      this.otherChallengesAccomplished = new Array<ChallengeModel>();
       
       this.challengesAdminValidation = new Array<ChallengeModel>();
       this.challengesCompleted = new Array<ChallengeModel>();
       this.challengesAccepted = new Array<ChallengeModel>();
+      this.challengesLoggedUserAccomplished = new Array<ChallengeModel>();
+      this.challengesOtherUserAccomplished = new Array<ChallengeModel>();
       this.hasEnterCreateNew = false;
     }
 
@@ -133,7 +135,11 @@ export class ClubChallenge {
             this.challengesAccepted.push(c);
             break;
           case ChallengeStatus.ACCOMPLISHED:
-            this.myChallengesAccomplished.push(c);
+            if (c.isResultLaunchedByChallenger) {
+              this.challengesLoggedUserAccomplished.push(c);
+            } else {
+              this.challengesOtherUserAccomplished.push(c);
+            }
             break;
           case ChallengeStatus.ADMIN_VALIDATION:
             this.challengesAdminValidation.push(c);
@@ -153,7 +159,11 @@ export class ClubChallenge {
             this.challengesAccepted.push(c);
             break;
           case ChallengeStatus.ACCOMPLISHED:
-            this.otherChallengesAccomplished.push(c);
+            if (c.isResultLaunchedByChallenger) {
+              this.challengesOtherUserAccomplished.push(c);
+            } else {
+              this.challengesLoggedUserAccomplished.push(c);
+            }
             break;
           case ChallengeStatus.ADMIN_VALIDATION:
             this.challengesAdminValidation.push(c);
@@ -215,4 +225,11 @@ export class ClubChallenge {
     }, (err) => {loading.dismiss();});
   }
 
+  confirmAccomplishedChallenge(challenge: ChallengeModel) {
+    // TODO
+  }
+
+  refuseAccomplishedChallenge(challenge: ChallengeModel) {
+    // TODO
+  }
 }

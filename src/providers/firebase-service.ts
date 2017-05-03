@@ -457,21 +457,13 @@ export class FirebaseService {
   launchChallengeResult(club: ClubModel, challenge: ChallengeModel): Promise<boolean> {
     return new Promise((resolve,reject) => {
       let commands = {};
-      commands[DB_ROOT_CHALLENGES + club.getClubKey()
-      + '/' + challenge.dbKey + '/status'] = ChallengeStatus.ACCOMPLISHED;
-
+      commands['status'] = ChallengeStatus.ACCOMPLISHED;
+      commands['challengerWins'] = challenge.challengerWins;
+      commands['challengedWins'] = challenge.challengedWins;
       if (challenge.isResultLaunchedByChallenger) {
-        commands[DB_ROOT_CHALLENGES + club.getClubKey()
-        + '/' + challenge.dbKey + '/isResultByChallenger'] = true;
+        commands['isResultByChallenger'] = true;
       }
-
-      commands[DB_ROOT_CHALLENGES + club.getClubKey()
-      + '/' + challenge.dbKey + '/challengerWins'] = challenge.challengerWins;
-
-      commands[DB_ROOT_CHALLENGES + club.getClubKey()
-      + '/' + challenge.dbKey + '/challengedWins'] = challenge.challengedWins;
-
-      firebase.database().ref('/').update(commands)
+      this.challengesRef.child(club.getClubKey()).child(challenge.dbKey).update(commands)
       .then((_) => {
         resolve(true);
       }, (err) => {reject(err);});

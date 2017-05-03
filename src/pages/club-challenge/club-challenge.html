@@ -209,6 +209,115 @@
   </ion-item>
 </ion-list>
 
+<!-- Completed -->
+<ion-list *ngIf="challengesCompleted.length > 0">
+  <ion-list-header><H2>FINALIZADOS - RESULTADO FINAL</H2></ion-list-header>
+  <ion-item *ngFor="let c of challengesCompleted">
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-avatar item-left>
+            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
+              src={{loggedUser.thumbnailUrl}}>
+            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
+              src={{c.opponent.thumbnailUrl}}>
+          </ion-avatar>
+          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()">
+            {{loggedUser.displayName}}</H2>
+          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()">
+            {{c.opponent.displayName}}</H2>
+        </ion-item>
+
+        <ion-item>
+          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+            type="number" readonly></ion-input>
+
+          <ion-input style="max-width: 35px; float: center;" 
+            type="text" placeholder="VS" readonly></ion-input>
+
+          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+            type="number" readonly></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-avatar item-right>
+            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
+              src={{c.opponent.thumbnailUrl}}>
+            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
+              src={{loggedUser.thumbnailUrl}}>
+          </ion-avatar>
+          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()"
+            style="text-align: right;">{{c.opponent.displayName}}</H2>
+          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
+            style="text-align: right;">{{loggedUser.displayName}}</H2>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ion-item>
+</ion-list>
+
+<!-- Admin validation -->
+<ion-list *ngIf="challengesAdminValidation.length > 0">
+  <ion-list-header><H2>AGUARDANDO VALIDAÇÃO DO ADMIN</H2></ion-list-header>
+  <ion-item *ngFor="let c of challengesAdminValidation">
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-avatar item-left>
+            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
+              src={{loggedUser.thumbnailUrl}}>
+            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
+              src={{c.opponent.thumbnailUrl}}>
+          </ion-avatar>
+          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()">
+            {{loggedUser.displayName}}</H2>
+          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()">
+            {{c.opponent.displayName}}</H2>
+        </ion-item>
+
+        <ion-item>
+          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+            type="number" readonly></ion-input>
+
+          <ion-input style="max-width: 35px; float: center;" 
+            type="text" placeholder="VS" readonly></ion-input>
+
+          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+            type="number" readonly></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-avatar item-right>
+            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
+              src={{c.opponent.thumbnailUrl}}>
+            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
+              src={{loggedUser.thumbnailUrl}}>
+          </ion-avatar>
+          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()"
+            style="text-align: right;">{{c.opponent.displayName}}</H2>
+          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
+            style="text-align: right;">{{loggedUser.displayName}}</H2>
+        </ion-item>
+
+        <ion-item>
+          <ion-buttons class="buttons-card">
+            <button ion-button outline medium icon-left 
+              (click)="confirmAccomplishedChallenge(c)">
+              <ion-icon name="ios-thumbs-up"></ion-icon>
+              APROVAR
+            </button>
+            <button ion-button color="danger" medium outline icon-left 
+              (click)="excludeChallenge(c)">
+              <ion-icon name="ios-thumbs-down"></ion-icon>
+              EXCLUIR
+            </button>
+          </ion-buttons>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ion-item>
+</ion-list>
+
   <ion-fab right bottom>
     <button ion-fab (click)="openChallengeCreateView()">
      <ion-icon name="add"></ion-icon>

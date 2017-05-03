@@ -16,6 +16,7 @@ export class ModalChallengeLaunchResult {
   private club: ClubModel;
   loggedUser: UserProfileModel;
   challenge: ChallengeModel;
+  private isLoggedAdim: boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
   public firebaseService: FirebaseService, public loadingCtrl: LoadingController,
@@ -23,6 +24,7 @@ export class ModalChallengeLaunchResult {
     this.club = navParams.get("club");
     this.loggedUser = navParams.get("loggedUser");
     this.challenge = navParams.get("challenge");
+    this.isLoggedAdim = navParams.get("isLoggedAdmin");
 
     if (this.loggedUser.getUid().valueOf() === this.challenge.challenger.valueOf()) {
       this.challenge.isResultLaunchedByChallenger = true;
@@ -32,7 +34,7 @@ export class ModalChallengeLaunchResult {
   launchResult() {
     let loading = this.loadingCtrl.create({dismissOnPageChange: true});
     loading.present();
-    this.firebaseService.launchChallengeResult(this.club, this.challenge)
+    this.firebaseService.launchChallengeResult(this.club, this.challenge, this.isLoggedAdim)
     .then((_) => {
       loading.dismiss().then(() => {
         this.showToast("Aguardando confirmação do oponente", true);

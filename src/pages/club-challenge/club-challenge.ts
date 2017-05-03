@@ -77,13 +77,19 @@ export class ClubChallenge {
 
   openLaunchResult(challenge: ChallengeModel) {
     let modalLaunchResult = this.modalCtrl.create("ModalChallengeLaunchResult", 
-      {club: this.club, challenge: challenge, loggedUser: this.loggedUser});
+      {club: this.club, challenge: challenge, loggedUser: this.loggedUser
+        , isLoggedAdmin: this.isAdminLogged});
     
     modalLaunchResult.onDidDismiss((success: boolean, challengeUpdated: ChallengeModel) => {
       if (success) {
         let index = this.challengesAccepted.indexOf(challenge);
-        this.challengesAccepted.splice(index, 1);
-        this.challengesLoggedUserAccomplished.push(challengeUpdated);
+          this.challengesAccepted.splice(index, 1);
+        // Admins can save challenges without need of opponent confirmation.
+        if (this.isAdminLogged) {
+          this.challengesCompleted.push(challengeUpdated);
+        } else {
+          this.challengesLoggedUserAccomplished.push(challengeUpdated);
+        }
       }
     });
 
@@ -103,7 +109,7 @@ export class ClubChallenge {
   // receive a array with arrays inside, first array contais my challengers,
   // second array contais challenge against me.
   loadChallengesCurrentUser() {
-    // To avoid redundance, clear all arrays.
+    // To avoid duplicity, clear all arrays.
     if (this.hasEnterCreateNew) {
       this.myChallengesPending = new Array<ChallengeModel>();
       this.otherChallengesPending = new Array<ChallengeModel>();
@@ -121,10 +127,16 @@ export class ClubChallenge {
     });
     loading.present();
 
-    this.firebaseService.loadChallengeHomeDatas(this.club)
+    this.firebaseService.loadChallengeHomeDatas(this.club, this.isAdminLogged)
     .then((dataArray) => {
       let myChallenges: Array<ChallengeModel> = dataArray[0];
       let otherChallenges = dataArray[1];
+      
+      if (this.isAdminLogged) {
+        dataArray[2].forEach(c => {
+          this.challengesAdminValidation.push(c);
+        });
+      }
 
       myChallenges.forEach(c => {
         switch (c.status) {
@@ -226,10 +238,35 @@ export class ClubChallenge {
   }
 
   confirmAccomplishedChallenge(challenge: ChallengeModel) {
-    // TODO
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+    this.firebaseService.confirmAccomplishedChallenge(challenge, this.club)
+    .then((_) => {
+        let index = this.challengesOtherUserAccomplished.indexOf(challenge);
+        this.challengesOtherUserAccomplished.splice(index);
+        this.challengesCompleted.push(challenge);
+        loading.dismiss();
+    }, (err) => {
+      console.log(err);
+      loading.dismiss();
+    });
   }
 
   refuseAccomplishedChallenge(challenge: ChallengeModel) {
-    // TODO
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+    this.firebaseService.refuseAccomplishedChallenge(challenge, this.club, this.isAdminLogged)
+    .then((_) => {
+        let index = this.challengesOtherUserAccomplished.indexOf(challenge);
+        this.challengesOtherUserAccomplished.splice(index);
+        // If logged is admin, the challenge was removed on service, other wise still remain for validation.
+        if (!this.isAdminLogged) {
+          this.challengesAdminValidation.push(challenge);
+        }
+        loading.dismiss();
+    }, (err) => {
+      console.log(err);
+      loading.dismiss();
+    });
   }
 }

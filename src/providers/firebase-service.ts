@@ -24,7 +24,7 @@ const DB_ROOT_CHALLENGES = "/challenges/";
 const DB_ROOT_CLUB_CHALLENGER = "/club-challenger/";
 // Store from challenged to challenger. Get that who, wish do challenge me.
 const DB_ROOT_CLUB_CHALLENGED = "/club-challenged/";
-const DB_ROOT_ADMIN_CHALLENGES_VALIDATION = "/admin-challenges-validation/";
+const DB_ROOT_CHALLENGES_ADMIN_VALIDATION = "/challenges-admin-validation/";
 const DB_ROOT_EVENT_CHALLENGES = "/event-challenges/";
 
 // Storage
@@ -45,7 +45,7 @@ export class FirebaseService {
   private challengesRef: any;
   private clubChallengerRef: any;
   private clubChallengedRef: any;
-  private adminChallengesValidationRef: any;
+  private challengesAdminValidationRef: any;
   private eventChallengesRef: any;
 
   // Common
@@ -60,7 +60,7 @@ export class FirebaseService {
     this.challengesRef = firebase.database().ref(DB_ROOT_CHALLENGES);
     this.clubChallengerRef = firebase.database().ref(DB_ROOT_CLUB_CHALLENGER);
     this.clubChallengedRef = firebase.database().ref(DB_ROOT_CLUB_CHALLENGED);
-    this.adminChallengesValidationRef = firebase.database().ref(DB_ROOT_ADMIN_CHALLENGES_VALIDATION);
+    this.challengesAdminValidationRef = firebase.database().ref(DB_ROOT_CHALLENGES_ADMIN_VALIDATION);
     this.eventChallengesRef = firebase.database().ref(DB_ROOT_EVENT_CHALLENGES);
   }
 
@@ -352,7 +352,7 @@ export class FirebaseService {
 
   // Challenge Control
 
-  loadChallengeHomeDatas(club: ClubModel): Promise<Array<Array<ChallengeModel>>> {
+  loadChallengeHomeDatas(club: ClubModel, isAdmin: boolean): Promise<Array<Array<ChallengeModel>>> {
     return new Promise((resolve,reject) => {
       Promise.all([
         this.getUserChallengerList(club),
@@ -383,7 +383,15 @@ export class FirebaseService {
         let result = new Array<Array<ChallengeModel>>();
         result.push(myChallenges);
         result.push(otherChallenges);
-        resolve(result);
+        if (isAdmin) {
+          this.getChallengeAdminValidation(club)
+          .then(challengesValidation => {
+            result.push(challengesValidation);
+            resolve(result);
+          });
+        } else {
+          resolve(result);
+        }
       }, (err) => {reject(err)});
     });
   }
@@ -454,10 +462,15 @@ export class FirebaseService {
     });
   }
 
-  launchChallengeResult(club: ClubModel, challenge: ChallengeModel): Promise<boolean> {
+  launchChallengeResult(club: ClubModel, challenge: ChallengeModel, 
+    isAdmin: boolean): Promise<boolean> {
     return new Promise((resolve,reject) => {
       let commands = {};
-      commands['status'] = ChallengeStatus.ACCOMPLISHED;
+      if (isAdmin) {
+        commands['status'] = ChallengeStatus.COMPLETED;
+      } else {
+        commands['status'] = ChallengeStatus.ACCOMPLISHED;
+      }
       commands['challengerWins'] = challenge.challengerWins;
       commands['challengedWins'] = challenge.challengedWins;
       if (challenge.isResultLaunchedByChallenger) {
@@ -470,6 +483,44 @@ export class FirebaseService {
     });
   }
 
+  confirmAccomplishedChallenge(challenge: ChallengeModel, club: ClubModel): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let command = {}
+      command['status'] = ChallengeStatus.COMPLETED;
+      this.challengesRef.child(club.getClubKey()).child(challenge.dbKey).update(command)
+      .then((_) => {
+        resolve(true);
+      }, (err) => {reject(err);});
+    });
+  }
+
+  refuseAccomplishedChallenge(challenge: ChallengeModel, club: ClubModel
+    , isAdmin: boolean): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (isAdmin) { // Admin can exclude any challenge without require confirmation.
+        this.excludeChallenge(challenge, club)
+        .then((_) => {
+          resolve(true);
+        }, (err) => {
+          reject(err);
+        });
+      } else { 
+        let command = {}
+        command[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/status'] = ChallengeStatus.ADMIN_VALIDATION;
+        
+        command[DB_ROOT_CHALLENGES_ADMIN_VALIDATION + club.getClubKey()
+        + '/' + challenge.dbKey] = true;
+
+        firebase.database().ref('/').update(command)
+        .then((_) => {
+          resolve(true);
+        }, (err) => {
+          reject(err);
+        });
+      }
+    });
+  }
   // ------------------------------------------------
 
   // Util Control
@@ -674,6 +725,48 @@ export class FirebaseService {
       // Get the keys first.
       this.clubChallengedRef.child(club.getClubKey())
       .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
+        let commands = new Array<any>();
+        // create the commands with the keys.
+        snapshots.forEach(snapshot => {
+          commands.push(
+            this.challengesRef.child(club.getClubKey()).child(snapshot.key).once('value')
+          )
+        });
+
+        // empty challenges
+        if (commands.length === 0) {
+          resolve(new Array<ChallengeModel>());
+        }
+
+        Promise.all(commands)
+        .then((snapshots) => {
+          let challenges = new Array<ChallengeModel>();
+          snapshots.forEach(snapshot => {
+            let challenge = new ChallengeModel();
+            challenge.dbKey = snapshot.key;
+            challenge.challenger = snapshot.val().challenger;
+            challenge.challenged = snapshot.val().challenged;
+            challenge.date = snapshot.val().date;
+            challenge.local = snapshot.val().local;
+            // Set the currect enum val, from string.
+            challenge.status = snapshot.val().status;
+            challenge.challengerWins = snapshot.val().challengerWins;
+            challenge.challengedWins = snapshot.val().challengedWins;
+            challenge.isResultLaunchedByChallenger = snapshot.val().isResultByChallenger;
+            challenges.push(challenge);
+          });
+          resolve(challenges);
+        });
+      }, (err) => {reject(err)});
+    });
+  }
+
+  // Get challenges that need admin validation.
+  private getChallengeAdminValidation(club: ClubModel): Promise<Array<ChallengeModel>> {
+    return new Promise((resolve,reject) => {
+      // Get the keys first.
+      this.challengesAdminValidationRef.child(club.getClubKey())
+      .once('value', (snapshots) => {
         let commands = new Array<any>();
         // create the commands with the keys.
         snapshots.forEach(snapshot => {

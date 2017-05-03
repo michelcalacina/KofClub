@@ -454,6 +454,30 @@ export class FirebaseService {
     });
   }
 
+  launchChallengeResult(club: ClubModel, challenge: ChallengeModel): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+      let commands = {};
+      commands[DB_ROOT_CHALLENGES + club.getClubKey()
+      + '/' + challenge.dbKey + '/status'] = ChallengeStatus.ACCOMPLISHED;
+
+      if (challenge.isResultLaunchedByChallenger) {
+        commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/isResultByChallenger'] = true;
+      }
+
+      commands[DB_ROOT_CHALLENGES + club.getClubKey()
+      + '/' + challenge.dbKey + '/challengerWins'] = challenge.challengerWins;
+
+      commands[DB_ROOT_CHALLENGES + club.getClubKey()
+      + '/' + challenge.dbKey + '/challengedWins'] = challenge.challengedWins;
+
+      firebase.database().ref('/').update(commands)
+      .then((_) => {
+        resolve(true);
+      }, (err) => {reject(err);});
+    });
+  }
+
   // ------------------------------------------------
 
   // Util Control
@@ -640,6 +664,9 @@ export class FirebaseService {
             challenge.local = snapshot.val().local;
             // Set the currect enum val, from string.
             challenge.status = snapshot.val().status;
+            challenge.challengerWins = snapshot.val().challengerWins;
+            challenge.challengedWins = snapshot.val().challengedWins;
+            challenge.isResultLaunchedByChallenger = snapshot.val().isResultByChallenger;
 
             challenges.push(challenge);
           });
@@ -680,7 +707,9 @@ export class FirebaseService {
             challenge.local = snapshot.val().local;
             // Set the currect enum val, from string.
             challenge.status = snapshot.val().status;
-
+            challenge.challengerWins = snapshot.val().challengerWins;
+            challenge.challengedWins = snapshot.val().challengedWins;
+            challenge.isResultLaunchedByChallenger = snapshot.val().isResultByChallenger;
             challenges.push(challenge);
           });
           resolve(challenges);

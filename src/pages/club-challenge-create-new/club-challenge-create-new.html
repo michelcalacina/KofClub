@@ -14,7 +14,8 @@
             <img src={{cp.user.thumbnailUrl}}>
           </ion-avatar>
           <ion-label float>{{cp.user.displayName}}</ion-label>
-          <ion-icon name="rose" item-right></ion-icon>
+          <ion-icon *ngIf="cp.isChallenge" name="game-controller-b" color="secondary" item-right></ion-icon>
+          <ion-icon *ngIf="!cp.isChallenge" name="glasses" color="primary" item-right></ion-icon>
         </ion-item>
     </ion-list>
 </ion-content>

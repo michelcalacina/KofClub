@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController
-  , ModalController } from 'ionic-angular';
+  , ModalController, ToastController } from 'ionic-angular';
 
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';
@@ -21,7 +21,7 @@ export class ClubChallengeCreateNew {
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController
-  , public modalCtrl: ModalController) {
+  , public modalCtrl: ModalController, public toastCtrl: ToastController) {
     
     this.club = navParams.get("club");
     this.challengesProfile = new Array<ChallengeProfileModel>();
@@ -36,26 +36,19 @@ export class ClubChallengeCreateNew {
 
     this.firebaseService.getClubOtherMembers(this.club)
     .then((users: Array<UserProfileModel>) => {
-      let otherChallenges: Array<string> = this.navParams.get("otherChallenges");
-      let myChallenges: Array<string> = this.navParams.get("myChallenges");
+      let runningChallenges: Array<string> = this.navParams.get("runningChallenges");
 
       users.forEach(user => {
         let challengeProfile = new ChallengeProfileModel();
         challengeProfile.user = user;
 
-        myChallenges.forEach(mc => {
-          if (mc.valueOf() === user.getUid().valueOf()) {
-            challengeProfile.isChallenged = true;
+        runningChallenges.forEach(rc => {
+          if (rc.valueOf() === user.getUid().valueOf()) {
+            challengeProfile.isChallenge = true;
             return false;  
           }
         });
 
-        otherChallenges.forEach(oc => {
-          if (oc.valueOf() === user.getUid().valueOf()) {
-            challengeProfile.isChallenger = true;
-            return false;
-          }
-        });
         this.challengesProfile.push(challengeProfile);
       });
 
@@ -67,11 +60,17 @@ export class ClubChallengeCreateNew {
   }
 
   openChallengeView(challengeProfile: ChallengeProfileModel) {
+    if (challengeProfile.isChallenge) {
+      this.showToast("Você já possui um desafio em andamento contra " + challengeProfile.user.displayName);
+      return;
+    }
+    
     let modalChallenge = this.modalCtrl.create('ModalChallengeClubMember'
     , {"member": challengeProfile.user, "club": this.club});
+    
     modalChallenge.onDidDismiss((success: boolean = false) => {
       if (success) {
-        challengeProfile.isChallenged = true;
+        challengeProfile.isChallenge = true;
       }
     });
     modalChallenge.present();
@@ -79,6 +78,15 @@ export class ClubChallengeCreateNew {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ClubChallengeCreateNew');
+  }
+
+  showToast(message: string) {
+    let toast = this.toastCtrl.create({
+      dismissOnPageChange: true,
+      duration: 3000,
+      message: message,
+    });
+    toast.present();
   }
 
 }

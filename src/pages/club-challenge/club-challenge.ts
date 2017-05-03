@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController
-  , LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController,
+  ModalController } from 'ionic-angular';
 
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';
@@ -15,19 +15,16 @@ import { ChallengeModel, ChallengeStatus } from '../../model/challenge-model';
 export class ClubChallenge {
   
   private club: ClubModel;
-  private loading: any;
   isAdminLogged: boolean;
-  private opponents: Array<UserProfileModel>;
   private loggedUser: UserProfileModel;
+  private hasEnterCreateNew: boolean;
 
   // Challenges that I receive
   otherChallengesPending: Array<ChallengeModel>;
-  otherChallengesRefused: Array<ChallengeModel>;
   otherChallengesAccomplished: Array<ChallengeModel>;
 
   // Challenges that I create
   myChallengesPending: Array<ChallengeModel>;
-  myChallengesRefused: Array<ChallengeModel>;
   myChallengesAccomplished: Array<ChallengeModel>;
   
   // Special challenges behavior.
@@ -36,16 +33,16 @@ export class ClubChallenge {
   challengesAccepted: Array<ChallengeModel>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
-   public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
+   public firebaseService: FirebaseService, public loadingCtrl: LoadingController, 
+   public modalCtrl: ModalController) {
+
     this.club = navParams.get("club");
     this.isAdminLogged = navParams.get("isAdmin");
 
     this.myChallengesPending = new Array<ChallengeModel>();
-    this.myChallengesRefused = new Array<ChallengeModel>();
     this.myChallengesAccomplished = new Array<ChallengeModel>();
 
     this.otherChallengesPending = new Array<ChallengeModel>();
-    this.otherChallengesRefused = new Array<ChallengeModel>();
     this.otherChallengesAccomplished = new Array<ChallengeModel>();
     
     this.challengesAdminValidation = new Array<ChallengeModel>();
@@ -53,35 +50,45 @@ export class ClubChallenge {
     this.challengesAccepted = new Array<ChallengeModel>();
 
     this.getLoggedUser();
-    this.loadChallengesCurrentUser();
+    this.hasEnterCreateNew = false;
   }
 
   openChallengeCreateView() {
-    let myChallenges = new Array<string>();
-    let otherChallenges = new Array<string>();
+    this.hasEnterCreateNew = true;
+    let runningChallenges = new Array<string>();
 
     this.myChallengesPending.forEach(mcp => {
-      myChallenges.push(mcp.challenged);
+      runningChallenges.push(mcp.opponent.getUid());
     });
 
     this.challengesAccepted.forEach(mcp => {
-      myChallenges.push(mcp.challenged);
+      runningChallenges.push(mcp.opponent.getUid());
     });
 
     this.otherChallengesPending.forEach(mcp => {
-      otherChallenges.push(mcp.challenged);
+      runningChallenges.push(mcp.opponent.getUid());
     });
 
     this.navCtrl.push('ClubChallengeCreateNew', 
     {
       "club": this.club,
-      "myChallenges": myChallenges,
-      "otherChallenges": otherChallenges
+      "runningChallenges": runningChallenges
     });
   }
 
-  ionViewDidLoad() {
+  openLaunchResult(challenge: ChallengeModel) {
+    let modalLaunchResult = this.modalCtrl.create("ModalChallengeLaunchResult", 
+      {club: this.club, challenge: challenge, loggedUser: this.loggedUser});
+    
+    modalLaunchResult.onDidDismiss((isDone: boolean = false) => {
 
+    });
+
+    modalLaunchResult.present();
+  }
+
+  ionViewWillEnter() {
+    this.loadChallengesCurrentUser();
   }
 
   getLoggedUser() {
@@ -93,6 +100,25 @@ export class ClubChallenge {
   // receive a array with arrays inside, first array contais my challengers,
   // second array contais challenge against me.
   loadChallengesCurrentUser() {
+    // To avoid redundance, clear all arrays.
+    if (this.hasEnterCreateNew) {
+      this.myChallengesPending = new Array<ChallengeModel>();
+      this.myChallengesAccomplished = new Array<ChallengeModel>();
+
+      this.otherChallengesPending = new Array<ChallengeModel>();
+      this.otherChallengesAccomplished = new Array<ChallengeModel>();
+      
+      this.challengesAdminValidation = new Array<ChallengeModel>();
+      this.challengesCompleted = new Array<ChallengeModel>();
+      this.challengesAccepted = new Array<ChallengeModel>();
+      this.hasEnterCreateNew = false;
+    }
+
+    let loading = this.loadingCtrl.create({
+      dismissOnPageChange: true
+    });
+    loading.present();
+
     this.firebaseService.loadChallengeHomeDatas(this.club)
     .then((dataArray) => {
       let myChallenges: Array<ChallengeModel> = dataArray[0];
@@ -105,9 +131,6 @@ export class ClubChallenge {
             break;
           case ChallengeStatus.ACCEPTED:
             this.challengesAccepted.push(c);
-            break;
-          case ChallengeStatus.REFUSED:
-            this.myChallengesRefused.push(c);
             break;
           case ChallengeStatus.ACCOMPLISHED:
             this.myChallengesAccomplished.push(c);
@@ -129,9 +152,6 @@ export class ClubChallenge {
           case ChallengeStatus.ACCEPTED:
             this.challengesAccepted.push(c);
             break;
-          case ChallengeStatus.REFUSED:
-            this.otherChallengesRefused.push(c);
-            break;
           case ChallengeStatus.ACCOMPLISHED:
             this.otherChallengesAccomplished.push(c);
             break;
@@ -144,38 +164,33 @@ export class ClubChallenge {
         }
       });
 
-      this.loading.dismiss();
+      loading.dismiss();
     }, (err) => {
       console.log(err);
-      this.loading.dismiss();
+      loading.dismiss();
     });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true
-    });
-    this.loading.present();
   }
 
   acceptChallenge(challenge: ChallengeModel) {
-    this.loading = this.loadingCtrl.create({
+    let loading = this.loadingCtrl.create({
       dismissOnPageChange: true
     })
-    this.loading.present();
+    loading.present();
 
     this.firebaseService.acceptUserChallenge(challenge, this.club)
     .then((_) => {
       let index = this.otherChallengesPending.indexOf(challenge);
       this.otherChallengesPending.splice(index, 1);
       this.challengesAccepted.push(challenge);
-      this.loading.dismiss();
+      loading.dismiss();
     }, (err) => {
-      this.loading.dismiss();
+      loading.dismiss();
     });
   }
 
   excludeChallenge(challenge: ChallengeModel) {
-    this.loading = this.loadingCtrl.create({dismissOnPageChange: true});
-    this.loading.present();
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
 
     this.firebaseService.excludeChallenge(challenge, this.club)
     .then((_) => {
@@ -196,8 +211,8 @@ export class ClubChallenge {
           this.challengesAccepted.splice(index);
           break;
       }
-      this.loading.dismiss();
-    }, (err) => {this.loading.dismiss();});
+      loading.dismiss();
+    }, (err) => {loading.dismiss();});
   }
 
 }

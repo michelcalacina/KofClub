@@ -1,0 +1,44 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Lançar resultado</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-item no-lines>
+    <ion-avatar item-left>
+      <img src={{loggedUser.thumbnailUrl}}>
+    </ion-avatar>
+    <H2>{{loggedUser.displayName}}</H2>
+  </ion-item>
+
+  <ion-item no-lines>
+    <ion-input style="width: 8%; float: left; direction:rtl;" 
+      type="number" min="0" max="999" placeholder="000"></ion-input>
+
+    <ion-input style="max-width: 35px; float: center;" 
+      type="text" placeholder="VS" readonly></ion-input>
+
+    <ion-input style="width: 8%; float: right;  direction:ltr;"
+      type="number" min="0" max="999" placeholder="000"></ion-input>
+  </ion-item>
+
+  <ion-item no-lines>
+    <ion-avatar item-right>
+      <img src={{challenge.opponent.thumbnailUrl}}>
+    </ion-avatar>
+    <H2 style="text-align: right;">{{challenge.opponent.displayName}}</H2>
+  </ion-item>
+
+  <ion-buttons>
+    <button ion-button full (click)="launchResult()">
+      LANÇAR RESULTADO
+    </button>
+    <button ion-button full color="danger" (click)="cancel()">
+      CANCELAR
+    </button>
+  </ion-buttons>
+</ion-content>

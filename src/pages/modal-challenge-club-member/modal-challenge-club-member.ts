@@ -44,9 +44,10 @@ export class ModalChallengeClubMember {
     this.loading = this.loadingCtrl.create({
       dismissOnPageChange: true
     });
+    this.loading.present();
 
-    this.firebaseService.createChallenge(this.club
-      , this.challenge).then((_) => {
+    this.firebaseService.createChallenge(this.club, this.challenge)
+    .then((_) => {
         this.loading.dismiss().then(() => {
           this.showToast("Desafio lançado, aguardando confirmação do adversário!", true);
       });

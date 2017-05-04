@@ -74,7 +74,7 @@ export class FirebaseService {
         .once('value', usnapshot => {
           if (usnapshot.val() !== null) {
             let userProfile = new UserProfileModel();
-            userProfile.setUid = usnapshot.key;
+            userProfile.setUid(usnapshot.key);
             userProfile.creationDate = usnapshot.val().creationDate;
             userProfile.displayName = usnapshot.val().displayName;
             userProfile.email = usnapshot.val().email;

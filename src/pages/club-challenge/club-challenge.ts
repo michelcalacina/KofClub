@@ -84,15 +84,16 @@ export class ClubChallenge {
       {club: this.club, challenge: challenge, loggedUser: this.loggedUser
         , isLoggedAdmin: this.isAdminLogged});
     
-    modalLaunchResult.onDidDismiss((success: boolean, challengeUpdated: ChallengeModel) => {
-      if (success) {
+    modalLaunchResult.onDidDismiss((result) => {
+      if (result.success) {
         let index = this.challengesAccepted.indexOf(challenge);
-          this.challengesAccepted.splice(index, 1);
+        this.challengesAccepted.splice(index, 1);
+
         // Admins can save challenges without need of opponent confirmation.
         if (this.isAdminLogged) {
-          this.challengesCompleted.push(challengeUpdated);
+          this.challengesCompleted.push(result.challengeUpdated);
         } else {
-          this.challengesLoggedUserAccomplished.push(challengeUpdated);
+          this.challengesLoggedUserAccomplished.push(result.challengeUpdated);
         }
       }
     });

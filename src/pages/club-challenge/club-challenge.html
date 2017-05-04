@@ -8,6 +8,51 @@
 
 <ion-content no-padding>
 
+<!-- Accomplished waiting my confirmation -->
+<ion-list *ngIf="challengesOtherUserAccomplished.length > 0">
+  <ion-list-header><H2>CONFIRMAR RESULTADO</H2></ion-list-header>
+  <ion-item *ngFor="let c of challengesOtherUserAccomplished">
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-avatar item-left>
+            <img src={{c.userChallenger.thumbnailUrl}}>
+          </ion-avatar>
+          <H2>{{c.userChallenger.displayName}}</H2>
+        </ion-item>
+        <ion-item>
+          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+            type="number" readonly></ion-input>
+          <ion-input style="max-width: 35px; float: center;" 
+            type="text" placeholder="VS" readonly></ion-input>
+          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+            type="number" readonly></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-avatar item-right>
+            <img src={{c.userChallenged.thumbnailUrl}}>
+          </ion-avatar>
+          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
+        </ion-item>
+        <ion-item>
+          <ion-buttons class="buttons-card">
+            <button ion-button outline medium icon-left 
+              (click)="confirmAccomplishedChallenge(c)">
+              <ion-icon name="ios-thumbs-up"></ion-icon>
+              CONFIRMAR
+            </button>
+            <button ion-button color="danger" medium outline icon-left 
+              (click)="refuseAccomplishedChallenge(c)">
+              <ion-icon name="ios-thumbs-down"></ion-icon>
+              RECUSAR
+            </button>
+          </ion-buttons>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ion-item>
+</ion-list>
+
 <!-- Pending waiting my confirmation -->
 <ion-list *ngIf="otherChallengesPending.length > 0">
   <ion-list-header><H2>ME DESAFIOU</H2></ion-list-header>
@@ -33,35 +78,6 @@
             <button ion-button color="danger" medium outline icon-left (click)="excludeChallenge(c)">
               <ion-icon name="ios-thumbs-down"></ion-icon>
               RECUSAR
-            </button>
-          </ion-buttons>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-  </ion-item>
-</ion-list>
-
-<!-- Pending waiting my opponents -->
-<ion-list *ngIf="myChallengesPending.length > 0">
-  <ion-list-header><H2>AGUARDANDO OPONENTE</H2></ion-list-header>
-  <ion-item *ngFor="let c of myChallengesPending">
-    <ion-card>
-      <ion-card-content>
-        <ion-item>
-          <ion-avatar item-left>
-            <img src={{c.userChallenged.thumbnailUrl}}>
-          </ion-avatar>
-          <H2>{{c.userChallenged.displayName}}</H2>
-        </ion-item>
-        <ion-item class="local-time">
-          <h3>Local: {{c.local}}</h3>
-          <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
-        </ion-item>
-        <ion-item>
-          <ion-buttons class="buttons-card">
-            <button ion-button color="danger" outline medium icon-left (click)="excludeChallenge(c)">
-              <ion-icon name="trash"></ion-icon>
-              EXCLUIR
             </button>
           </ion-buttons>
         </ion-item>
@@ -105,43 +121,27 @@
   </ion-item>
 </ion-list>
 
-<!-- Accomplished waiting my confirmation -->
-<ion-list *ngIf="challengesOtherUserAccomplished.length > 0">
-  <ion-list-header><H2>CONFIRMAR RESULTADO</H2></ion-list-header>
-  <ion-item *ngFor="let c of challengesOtherUserAccomplished">
+<!-- Pending waiting my opponents -->
+<ion-list *ngIf="myChallengesPending.length > 0">
+  <ion-list-header><H2>AGUARDANDO OPONENTE</H2></ion-list-header>
+  <ion-item *ngFor="let c of myChallengesPending">
     <ion-card>
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img src={{c.userChallenger.thumbnailUrl}}>
-          </ion-avatar>
-          <H2>{{c.userChallenger.displayName}}</H2>
-        </ion-item>
-        <ion-item>
-          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
-            type="number" readonly></ion-input>
-          <ion-input style="max-width: 35px; float: center;" 
-            type="text" placeholder="VS" readonly></ion-input>
-          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
-            type="number" readonly></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-avatar item-right>
             <img src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
+          <H2>{{c.userChallenged.displayName}}</H2>
+        </ion-item>
+        <ion-item class="local-time">
+          <h3>Local: {{c.local}}</h3>
+          <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button outline medium icon-left 
-              (click)="confirmAccomplishedChallenge(c)">
-              <ion-icon name="ios-thumbs-up"></ion-icon>
-              CONFIRMAR
-            </button>
-            <button ion-button color="danger" medium outline icon-left 
-              (click)="refuseAccomplishedChallenge(c)">
-              <ion-icon name="ios-thumbs-down"></ion-icon>
-              RECUSAR
+            <button ion-button color="danger" outline medium icon-left (click)="excludeChallenge(c)">
+              <ion-icon name="trash"></ion-icon>
+              EXCLUIR
             </button>
           </ion-buttons>
         </ion-item>

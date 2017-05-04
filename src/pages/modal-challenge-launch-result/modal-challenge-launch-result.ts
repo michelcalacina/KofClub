@@ -17,8 +17,6 @@ export class ModalChallengeLaunchResult {
   loggedUser: UserProfileModel;
   challenge: ChallengeModel;
   private isLoggedAdim: boolean;
-  challengerWins: number = 0;
-  challengedWins: number = 0;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
   public firebaseService: FirebaseService, public loadingCtrl: LoadingController,

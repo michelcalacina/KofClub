@@ -10,7 +10,7 @@ import { ChallengeProfileModel } from '../model/challenge-profile-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
-const DB_ROOT_RANK = "/rank/";
+const DB_ROOT_CLUBS_RANK = "/clubs-rank/";
 
 const DB_ROOT_CLUB_MEMBERS = "/club-members/";
 const DB_ROOT_MEMBER_CLUBS = "/member-clubs/";
@@ -108,6 +108,8 @@ export class FirebaseService {
             let update = {};
             update[DB_ROOT_USERS + newUser.uid] = userProfile.toJSON();
             
+
+
             // Update user profile db.
             firebase.database().ref().update(update).then( _ => {
               // after update login with new user.
@@ -153,6 +155,15 @@ export class FirebaseService {
           updates[DB_ROOT_MEMBER_CLUBS + uid + '/' + newClubKey] = true;
           // Update/Crete clubs-members with the new Club and default admin current user.
           updates[DB_ROOT_CLUB_MEMBERS + newClubKey + '/' + uid] = true;
+
+          // Create the rank for the admin user.
+          updates[DB_ROOT_CLUBS_RANK + newClubKey 
+          + '/' + uid] = {
+                          totalWins: 0, 
+                          totalLoses: 0, 
+                          totalChallenges: 0,
+                          experience: 0
+                         };
           firebase.database().ref().update(updates).then( () => {
             resolve(true);
           }).catch( err => {reject(err)});
@@ -294,6 +305,15 @@ export class FirebaseService {
           DB_ROOT_JOIN_MEMBER_CLUBS
           + user.getUid()
           + "/" + club.getClubKey()] = null;
+
+          // Add to rank
+          commands[DB_ROOT_CLUBS_RANK + club.getClubKey() 
+          + '/' + user.getUid()] = {
+                          totalWins: 0, 
+                          totalLoses: 0, 
+                          totalChallenges: 0,
+                          experience: 0
+                         };
       });
 
       firebase.database().ref().update(commands)

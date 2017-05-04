@@ -16,9 +16,9 @@
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img src={{c.opponent.thumbnailUrl}}>
+            <img src={{c.userChallenger.thumbnailUrl}}>
           </ion-avatar>
-          <H2>{{c.opponent.displayName}}</H2>
+          <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
         <ion-item class="local-time">
           <h3>Local: {{c.local}}</h3>
@@ -49,9 +49,9 @@
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img src={{c.opponent.thumbnailUrl}}>
+            <img src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2>{{c.opponent.displayName}}</H2>
+          <H2>{{c.userChallenged.displayName}}</H2>
         </ion-item>
         <ion-item class="local-time">
           <h3>Local: {{c.local}}</h3>
@@ -78,9 +78,15 @@
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img src={{c.opponent.thumbnailUrl}}>
+            <img *ngIf="loggedUser.getUid().valueOf() !== c.userChallenger.getUid().valueOf()" 
+              src={{c.userChallenger.thumbnailUrl}}>
+            <img *ngIf="loggedUser.getUid().valueOf() !== c.userChallenged.getUid().valueOf()" 
+              src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2>{{c.opponent.displayName}}</H2>
+          <H2 *ngIf="loggedUser.getUid().valueOf() !== c.userChallenger.getUid().valueOf()">
+            {{c.userChallenger.displayName}}</H2>
+          <H2 *ngIf="loggedUser.getUid().valueOf() !== c.userChallenged.getUid().valueOf()">
+            {{c.userChallenged.displayName}}</H2>
         </ion-item>
         <ion-item class="local-time">
           <h3>Local: {{c.local}}</h3>
@@ -105,44 +111,26 @@
   <ion-item *ngFor="let c of challengesOtherUserAccomplished">
     <ion-card>
       <ion-card-content>
-
         <ion-item>
           <ion-avatar item-left>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
+            <img src={{c.userChallenger.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()">
-            {{loggedUser.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()">
-            {{c.opponent.displayName}}</H2>
+          <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
-
         <ion-item>
           <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
-
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-
           <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-avatar item-right>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
+            <img src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()"
-            style="text-align: right;">{{c.opponent.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-            style="text-align: right;">{{loggedUser.displayName}}</H2>
+          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
         </ion-item>
-
         <ion-item>
           <ion-buttons class="buttons-card">
             <button ion-button outline medium icon-left 
@@ -170,39 +158,23 @@
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
+            <img src={{c.userChallenger.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()">
-            {{loggedUser.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()">
-            {{c.opponent.displayName}}</H2>
+          <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
-
         <ion-item>
           <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
-
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-
           <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-avatar item-right>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
+            <img src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()"
-            style="text-align: right;">{{c.opponent.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-            style="text-align: right;">{{loggedUser.displayName}}</H2>
+          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
         </ion-item>
       </ion-card-content>
     </ion-card>
@@ -217,39 +189,23 @@
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
+            <img src={{c.userChallenger.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()">
-            {{loggedUser.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()">
-            {{c.opponent.displayName}}</H2>
+          <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
-
         <ion-item>
           <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
-
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-
           <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-avatar item-right>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
+            <img src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()"
-            style="text-align: right;">{{c.opponent.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-            style="text-align: right;">{{loggedUser.displayName}}</H2>
+          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
         </ion-item>
       </ion-card-content>
     </ion-card>
@@ -264,41 +220,24 @@
       <ion-card-content>
         <ion-item>
           <ion-avatar item-left>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
+            <img src={{c.userChallenger.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()">
-            {{loggedUser.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()">
-            {{c.opponent.displayName}}</H2>
+          <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
-
         <ion-item>
           <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
-
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-
           <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
-
         <ion-item>
           <ion-avatar item-right>
-            <img *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()" 
-              src={{c.opponent.thumbnailUrl}}>
-            <img *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-              src={{loggedUser.thumbnailUrl}}>
+            <img src={{c.userChallenged.thumbnailUrl}}>
           </ion-avatar>
-          <H2 *ngIf="c.challenger.valueOf() === loggedUser.getUid().valueOf()"
-            style="text-align: right;">{{c.opponent.displayName}}</H2>
-          <H2 *ngIf="c.challenger.valueOf() !== loggedUser.getUid().valueOf()" 
-            style="text-align: right;">{{loggedUser.displayName}}</H2>
+          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
         </ion-item>
-
         <ion-item>
           <ion-buttons class="buttons-card">
             <button ion-button outline medium icon-left 

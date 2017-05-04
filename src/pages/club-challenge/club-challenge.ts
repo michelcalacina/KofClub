@@ -57,15 +57,19 @@ export class ClubChallenge {
     let runningChallenges = new Array<string>();
 
     this.myChallengesPending.forEach(mcp => {
-      runningChallenges.push(mcp.opponent.getUid());
+      runningChallenges.push(mcp.userChallenged.getUid());
     });
 
     this.challengesAccepted.forEach(mcp => {
-      runningChallenges.push(mcp.opponent.getUid());
+      if (mcp.userChallenger.getUid().valueOf() !== this.loggedUser.getUid().valueOf()) {
+        runningChallenges.push(mcp.userChallenger.getUid());
+      } else {
+        runningChallenges.push(mcp.userChallenged.getUid());
+      }
     });
 
     this.otherChallengesPending.forEach(mcp => {
-      runningChallenges.push(mcp.opponent.getUid());
+      runningChallenges.push(mcp.userChallenger.getUid());
     });
 
     this.navCtrl.push('ClubChallengeCreateNew', 
@@ -147,7 +151,7 @@ export class ClubChallenge {
             this.challengesAccepted.push(c);
             break;
           case ChallengeStatus.ACCOMPLISHED:
-            if (c.isResultLaunchedByChallenger) {
+            if (c.isResultByChallenger) {
               this.challengesLoggedUserAccomplished.push(c);
             } else {
               this.challengesOtherUserAccomplished.push(c);
@@ -171,7 +175,7 @@ export class ClubChallenge {
             this.challengesAccepted.push(c);
             break;
           case ChallengeStatus.ACCOMPLISHED:
-            if (c.isResultLaunchedByChallenger) {
+            if (c.isResultByChallenger) {
               this.challengesOtherUserAccomplished.push(c);
             } else {
               this.challengesLoggedUserAccomplished.push(c);

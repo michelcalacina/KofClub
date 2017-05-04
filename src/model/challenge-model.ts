@@ -9,30 +9,32 @@ export enum ChallengeStatus {
 }
 export class ChallengeModel {
     public dbKey: string;
-    public challenger: string;
-    public challenged: string;
+    public userChallengerId: string;
+    public userChallengedId: string;
+    public userChallenger: UserProfileModel;
+    public userChallenged: UserProfileModel;
     public challengerWins: number;
     public challengedWins: number;
     public local: string;
     public date: string;
     public status: ChallengeStatus;
-    public isResultLaunchedByChallenger: boolean;
-    public opponent: UserProfileModel;
+    public isResultByChallenger: boolean;
+    //public opponent: UserProfileModel;
 
     constructor() {
-        this.isResultLaunchedByChallenger = false;
+        this.isResultByChallenger = false;
         this.challengerWins = -1;
         this.challengedWins = -1;
     }
 
     toJson(): any {
         let jcm = {};
-        jcm["challenger"] = this.challenger;
-        jcm["challenged"] = this.challenged;
+        jcm["challenger"] = this.userChallenger.getUid();
+        jcm["challenged"] = this.userChallenged.getUid();
         jcm["local"] = this.local.valueOf();
         jcm["date"] = this.date.valueOf();
         jcm["status"] = this.status;
-        jcm["isResultByChallenger"] = this.isResultLaunchedByChallenger;
+        jcm["isResultByChallenger"] = this.isResultByChallenger;
         jcm["challengerWins"] = this.challengerWins;
         jcm["challengedWins"] = this.challengedWins;
 

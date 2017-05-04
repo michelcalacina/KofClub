@@ -26,8 +26,9 @@ export class ModalChallengeLaunchResult {
     this.challenge = navParams.get("challenge");
     this.isLoggedAdim = navParams.get("isLoggedAdmin");
 
-    if (this.loggedUser.getUid().valueOf() === this.challenge.challenger.valueOf()) {
-      this.challenge.isResultLaunchedByChallenger = true;
+    if (this.loggedUser.getUid().valueOf() 
+        === this.challenge.userChallenger.getUid().valueOf()) {
+      this.challenge.isResultByChallenger = true;
     }
   }
 

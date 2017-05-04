@@ -357,25 +357,30 @@ export class FirebaseService {
       Promise.all([
         this.getUserChallengerList(club),
         this.getUserChallengedList(club),
-        this.getClubOtherMembers(club)
+        this.getClubOtherMembers(club),
+        this.getUserProfile()
       ]).then(data => {
         let myChallenges = data[0];
         let otherChallenges = data[1];
         let opponents = data[2];
+        let loggedUser = data[3];
         
-        // Configure the opponents in challenge, to easy view render.
+        // Logged user has created this challenges, configure the opponents.
         myChallenges.forEach( mc => {
+          mc.userChallenger = loggedUser;
           opponents.forEach(o => {
-            if (mc.challenged.valueOf() === o.getUid().valueOf()) {
-              mc.opponent = o;
+            if (mc.userChallengedId.valueOf() === o.getUid().valueOf()) {
+              mc.userChallenged = o;
             }
           });
         });
 
+        // Other users has created this challenges, they challenges me.
         otherChallenges.forEach( oc => {
+          oc.userChallenged = loggedUser;
           opponents.forEach(o => {
-            if (oc.challenger.valueOf() === o.getUid().valueOf()) {
-              oc.opponent = o;
+            if (oc.userChallengerId.valueOf() === o.getUid().valueOf()) {
+              oc.userChallenger = o;
             }
           });
         });
@@ -383,9 +388,34 @@ export class FirebaseService {
         let result = new Array<Array<ChallengeModel>>();
         result.push(myChallenges);
         result.push(otherChallenges);
+        
         if (isAdmin) {
           this.getChallengeAdminValidation(club)
           .then(challengesValidation => {
+            challengesValidation.forEach(cv => {
+              // Search first for challenger
+              if (cv.userChallengerId.valueOf() === loggedUser.getUid().valueOf()) {
+                cv.userChallenger = loggedUser;
+              } else {
+                opponents.forEach(o => {
+                  if (cv.userChallengerId.valueOf() === o.getUid().valueOf()) {
+                    cv.userChallenger = o;
+                  }
+                });
+              }
+
+              // Search for challenged
+              if (cv.userChallengedId.valueOf() === loggedUser.getUid().valueOf()) {
+                cv.userChallenged = loggedUser;
+              } else {
+                opponents.forEach(o => {
+                  if (cv.userChallengedId.valueOf() === o.getUid().valueOf()) {
+                    cv.userChallenged = o;
+                  }
+                });
+              }
+            });
+
             result.push(challengesValidation);
             resolve(result);
           });
@@ -404,11 +434,11 @@ export class FirebaseService {
          // Update the challenger relashionships.
          // The challenger.
          updateCommand[DB_ROOT_CLUB_CHALLENGER + club.getClubKey() + '/'
-         + challenge.challenger + '/'
+         + challenge.userChallenger.getUid() + '/'
          + snapshot.key] = true;
          // Update the opponent.
          updateCommand[DB_ROOT_CLUB_CHALLENGED + club.getClubKey() + '/'
-         + challenge.challenged + '/'
+         + challenge.userChallenged.getUid() + '/'
          + snapshot.key] = true;
 
          firebase.database().ref().update(updateCommand).then((_) => {
@@ -440,11 +470,11 @@ export class FirebaseService {
       let commands = {};
       // Remove the challenger
       commands[DB_ROOT_CLUB_CHALLENGER + club.getClubKey() 
-      +'/'+ challenge.challenger +'/'+ challenge.dbKey] = null;
+      +'/'+ challenge.userChallenger.getUid() +'/'+ challenge.dbKey] = null;
 
       // Remove the challenged
       commands[DB_ROOT_CLUB_CHALLENGED + club.getClubKey() 
-      +'/'+ challenge.challenged +'/'+ challenge.dbKey] = null;
+      +'/'+ challenge.userChallenged.getUid() +'/'+ challenge.dbKey] = null;
 
       // Remove the event if it is confirmed.
       commands[DB_ROOT_EVENT_CHALLENGES + club.getClubKey() 
@@ -473,7 +503,7 @@ export class FirebaseService {
       }
       commands['challengerWins'] = challenge.challengerWins;
       commands['challengedWins'] = challenge.challengedWins;
-      if (challenge.isResultLaunchedByChallenger) {
+      if (challenge.isResultByChallenger) {
         commands['isResultByChallenger'] = true;
       }
       this.challengesRef.child(club.getClubKey()).child(challenge.dbKey).update(commands)
@@ -701,15 +731,15 @@ export class FirebaseService {
           snapshots.forEach(snapshot => {
             let challenge = new ChallengeModel();
             challenge.dbKey = snapshot.key;
-            challenge.challenger = snapshot.val().challenger;
-            challenge.challenged = snapshot.val().challenged;
+            challenge.userChallengerId = snapshot.val().challenger;
+            challenge.userChallengedId = snapshot.val().challenged;
             challenge.date = snapshot.val().date;
             challenge.local = snapshot.val().local;
             // Set the currect enum val, from string.
             challenge.status = snapshot.val().status;
             challenge.challengerWins = snapshot.val().challengerWins;
             challenge.challengedWins = snapshot.val().challengedWins;
-            challenge.isResultLaunchedByChallenger = snapshot.val().isResultByChallenger;
+            challenge.isResultByChallenger = snapshot.val().isResultByChallenger;
 
             challenges.push(challenge);
           });
@@ -744,15 +774,15 @@ export class FirebaseService {
           snapshots.forEach(snapshot => {
             let challenge = new ChallengeModel();
             challenge.dbKey = snapshot.key;
-            challenge.challenger = snapshot.val().challenger;
-            challenge.challenged = snapshot.val().challenged;
+            challenge.userChallengerId = snapshot.val().challenger;
+            challenge.userChallengedId = snapshot.val().challenged;
             challenge.date = snapshot.val().date;
             challenge.local = snapshot.val().local;
             // Set the currect enum val, from string.
             challenge.status = snapshot.val().status;
             challenge.challengerWins = snapshot.val().challengerWins;
             challenge.challengedWins = snapshot.val().challengedWins;
-            challenge.isResultLaunchedByChallenger = snapshot.val().isResultByChallenger;
+            challenge.isResultByChallenger = snapshot.val().isResultByChallenger;
             challenges.push(challenge);
           });
           resolve(challenges);
@@ -786,15 +816,15 @@ export class FirebaseService {
           snapshots.forEach(snapshot => {
             let challenge = new ChallengeModel();
             challenge.dbKey = snapshot.key;
-            challenge.challenger = snapshot.val().challenger;
-            challenge.challenged = snapshot.val().challenged;
+            challenge.userChallengerId = snapshot.val().challenger;
+            challenge.userChallengedId = snapshot.val().challenged;
             challenge.date = snapshot.val().date;
             challenge.local = snapshot.val().local;
             // Set the currect enum val, from string.
             challenge.status = snapshot.val().status;
             challenge.challengerWins = snapshot.val().challengerWins;
             challenge.challengedWins = snapshot.val().challengedWins;
-            challenge.isResultLaunchedByChallenger = snapshot.val().isResultByChallenger;
+            challenge.isResultByChallenger = snapshot.val().isResultByChallenger;
             challenges.push(challenge);
           });
           resolve(challenges);

@@ -28,9 +28,9 @@ export class ModalChallengeClubMember {
     this.challenge.date = new Date().toISOString();
     // Get the current logged user, as challenger.
     this.firebaseService.getUserProfile().then( (loggedUser) => {
-      this.challenge.challenger = loggedUser.getUid();
+      this.challenge.userChallenger = loggedUser;
     });
-    this.challenge.challenged = opponent.getUid();
+    this.challenge.userChallenged = opponent;
     this.challenge.status = ChallengeStatus.PENDING;
 }
 

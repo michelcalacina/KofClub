@@ -1,20 +1,15 @@
 <ion-header>
-
   <ion-navbar>
     <ion-title>Lançar resultado</ion-title>
   </ion-navbar>
-
 </ion-header>
-
 
 <ion-content padding>
   <ion-item no-lines>
     <ion-avatar item-left>
-      <img *ngIf="challenge.isResultLaunchedByChallenger" src={{loggedUser.thumbnailUrl}}>
-      <img *ngIf="!challenge.isResultLaunchedByChallenger" src={{challenge.opponent.thumbnailUrl}}>
+      <img src={{challenge.userChallenger.thumbnailUrl}}>
     </ion-avatar>
-    <H2 *ngIf="challenge.isResultLaunchedByChallenger">{{loggedUser.displayName}}</H2>
-    <H2 *ngIf="!challenge.isResultLaunchedByChallenger">{{challenge.opponent.displayName}}</H2>
+    <H2>{{challenge.userChallenger.displayName}}</H2>
   </ion-item>
 
   <ion-item no-lines>
@@ -30,13 +25,9 @@
 
   <ion-item no-lines>
     <ion-avatar item-right>
-      <img *ngIf="challenge.isResultLaunchedByChallenger" src={{challenge.opponent.thumbnailUrl}}>
-      <img *ngIf="!challenge.isResultLaunchedByChallenger" src={{loggedUser.thumbnailUrl}}>
+      <img src={{challenge.userChallenged.thumbnailUrl}}>
     </ion-avatar>
-    <H2 *ngIf="challenge.isResultLaunchedByChallenger"
-      style="text-align: right;">{{challenge.opponent.displayName}}</H2>
-    <H2 *ngIf="!challenge.isResultLaunchedByChallenger" 
-      style="text-align: right;">{{loggedUser.displayName}}</H2>
+    <H2 style="text-align: right;">{{challenge.userChallenged.displayName}}</H2>
   </ion-item>
 
   <ion-buttons>

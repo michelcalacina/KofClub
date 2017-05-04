@@ -40,11 +40,15 @@ export class ModalChallengeLaunchResult {
     this.firebaseService.launchChallengeResult(this.club, this.challenge, this.isLoggedAdim)
     .then((_) => {
       loading.dismiss().then(() => {
-        this.showToast("Aguardando confirmação do oponente", true);
+        if (this.isLoggedAdim) {
+          this.showToast("Resultado lançado!", true);
+        } else {
+          this.showToast("Aguardando confirmação do oponente.", true);
+        }
       });
     }, (err) => {
       loading.dismiss();
-      this.showToast("Falha de comunicação com o serviço de dados!", false);
+      this.showToast("Falha de comunicação com o serviço de dados.", false);
     });
   }
 

@@ -36,12 +36,12 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button outline medium icon-left 
+            <button ion-button outline icon-left 
               (click)="confirmAccomplishedChallenge(c)">
               <ion-icon name="ios-thumbs-up"></ion-icon>
               CONFIRMAR
             </button>
-            <button ion-button color="danger" medium outline icon-left 
+            <button ion-button color="danger" outline icon-left 
               (click)="refuseAccomplishedChallenge(c)">
               <ion-icon name="ios-thumbs-down"></ion-icon>
               RECUSAR
@@ -71,11 +71,11 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button outline medium icon-left (click)="acceptChallenge(c)">
+            <button ion-button outline icon-left (click)="acceptChallenge(c)">
               <ion-icon name="ios-thumbs-up"></ion-icon>
               ACEITAR
             </button>
-            <button ion-button color="danger" medium outline icon-left (click)="excludeChallenge(c)">
+            <button ion-button color="danger" outline icon-left (click)="excludeChallenge(c)">
               <ion-icon name="ios-thumbs-down"></ion-icon>
               RECUSAR
             </button>
@@ -110,7 +110,7 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button outline medium icon-left (click)="openLaunchResult(c)">
+            <button ion-button outline icon-left (click)="openLaunchResult(c)">
               <ion-icon name="game-controller-a"></ion-icon>
               LANÇAR RESULTADO
             </button>
@@ -139,7 +139,7 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button color="danger" outline medium icon-left (click)="excludeChallenge(c)">
+            <button ion-button color="danger" outline icon-left (click)="excludeChallenge(c)">
               <ion-icon name="trash"></ion-icon>
               EXCLUIR
             </button>
@@ -209,12 +209,12 @@
         </ion-item>
         <ion-item *ngIf="isAdminLogged">
           <ion-buttons class="buttons-card">
-            <button ion-button outline medium icon-left 
+            <button ion-button outline icon-left 
               (click)="confirmAccomplishedChallenge(c)">
               <ion-icon name="ios-thumbs-up"></ion-icon>
               APROVAR
             </button>
-            <button ion-button color="danger" medium outline icon-left 
+            <button ion-button color="danger" outline icon-left 
               (click)="excludeChallenge(c)">
               <ion-icon name="ios-thumbs-down"></ion-icon>
               EXCLUIR

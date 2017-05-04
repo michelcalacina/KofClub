@@ -17,6 +17,8 @@ export class ModalChallengeLaunchResult {
   loggedUser: UserProfileModel;
   challenge: ChallengeModel;
   private isLoggedAdim: boolean;
+  challengerWins: number = 0;
+  challengedWins: number = 0;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
   public firebaseService: FirebaseService, public loadingCtrl: LoadingController,
@@ -33,8 +35,10 @@ export class ModalChallengeLaunchResult {
   }
 
   launchResult() {
+
     let loading = this.loadingCtrl.create({dismissOnPageChange: true});
     loading.present();
+
     this.firebaseService.launchChallengeResult(this.club, this.challenge, this.isLoggedAdim)
     .then((_) => {
       loading.dismiss().then(() => {
@@ -47,7 +51,7 @@ export class ModalChallengeLaunchResult {
   }
 
   cancel() {
-    this.viewCtrl.dismiss({success: false});
+    this.viewCtrl.dismiss(false);
   }
 
   ionViewDidLoad() {

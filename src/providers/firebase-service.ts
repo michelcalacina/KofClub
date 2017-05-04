@@ -163,12 +163,16 @@ export class FirebaseService {
   /**
    * Get the clubs that logged user belong on it.
    */
-  listCurrentUserClubs(): any {
+  listCurrentUserClubs(): Promise<Array<ClubModel>> {
     return new Promise((resolve,reject) => {
         let currentUid = firebase.auth().currentUser.uid;
         this.getUserClubKeys(currentUid)
         .then (clubKeys => {
-          return this.getClubsByKeys(clubKeys)
+          if (clubKeys.length > 0) {
+            return this.getClubsByKeys(clubKeys);
+          } else {
+            resolve(new Array<ClubModel>())
+          }
         }).then( clubs => {
           return resolve(clubs);
         }).catch (err => {reject(err)});
@@ -497,16 +501,26 @@ export class FirebaseService {
     return new Promise((resolve,reject) => {
       let commands = {};
       if (isAdmin) {
-        commands['status'] = ChallengeStatus.COMPLETED;
+        commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/status'] = ChallengeStatus.COMPLETED;
       } else {
-        commands['status'] = ChallengeStatus.ACCOMPLISHED;
+        commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/status'] = ChallengeStatus.ACCOMPLISHED;
       }
-      commands['challengerWins'] = challenge.challengerWins;
-      commands['challengedWins'] = challenge.challengedWins;
+      commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/challengerWins'] = challenge.challengerWins;
+      commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/challengedWins'] = challenge.challengedWins;
       if (challenge.isResultByChallenger) {
-        commands['isResultByChallenger'] = true;
+        commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/isResultByChallenger'] = true;
       }
-      this.challengesRef.child(club.getClubKey()).child(challenge.dbKey).update(commands)
+
+      // Remove event challenge.
+      commands[DB_ROOT_EVENT_CHALLENGES + club.getClubKey() 
+      + '/' + challenge.dbKey] = null;
+
+      firebase.database().ref('/').update(commands)
       .then((_) => {
         resolve(true);
       }, (err) => {reject(err);});

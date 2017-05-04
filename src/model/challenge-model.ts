@@ -19,12 +19,11 @@ export class ChallengeModel {
     public date: string;
     public status: ChallengeStatus;
     public isResultByChallenger: boolean;
-    //public opponent: UserProfileModel;
 
     constructor() {
         this.isResultByChallenger = false;
-        this.challengerWins = -1;
-        this.challengedWins = -1;
+        this.challengedWins = 0;
+        this.challengerWins = 0;
     }
 
     toJson(): any {

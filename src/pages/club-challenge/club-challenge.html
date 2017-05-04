@@ -238,7 +238,7 @@
           </ion-avatar>
           <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
         </ion-item>
-        <ion-item>
+        <ion-item *ngIf="isAdminLogged">
           <ion-buttons class="buttons-card">
             <button ion-button outline medium icon-left 
               (click)="confirmAccomplishedChallenge(c)">

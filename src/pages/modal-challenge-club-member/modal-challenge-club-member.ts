@@ -58,7 +58,7 @@ export class ModalChallengeClubMember {
   }
 
   cancel() {
-    this.viewCtrl.dismiss({success: false});
+    this.viewCtrl.dismiss(false);
   }
 
   private showToast(message: string, showButton: boolean) {
@@ -74,7 +74,7 @@ export class ModalChallengeClubMember {
       }
 
       toast.onDidDismiss(() => {
-        this.viewCtrl.dismiss({success: true});
+        this.viewCtrl.dismiss(true);
       });
 
       toast.present();

@@ -169,13 +169,13 @@ export class FirebaseService {
         this.getUserClubKeys(currentUid)
         .then (clubKeys => {
           if (clubKeys.length > 0) {
-            return this.getClubsByKeys(clubKeys);
+            this.getClubsByKeys(clubKeys).then(clubs => {
+              resolve(clubs);
+            });
           } else {
             resolve(new Array<ClubModel>())
           }
-        }).then( clubs => {
-          return resolve(clubs);
-        }).catch (err => {reject(err)});
+        })
     });
   }
 

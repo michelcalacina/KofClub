@@ -21,12 +21,11 @@ export class ClubHome {
   , public firebaseService: FirebaseService) {
     
     this.club = navParams.get("club");
-
     this.verifyIsLoggedOnAdmin();
     this.pendingUserKeys = new Array<string>();
   }
 
-  verifyIsLoggedOnAdmin() {    let result: boolean = false;
+  verifyIsLoggedOnAdmin() {
     this.firebaseService.getUserProfile().then((user) => {
       if (this.club.admins.indexOf(user.getUid().valueOf()) > -1) {
         this.isLoggedOnAdmin = true;
@@ -34,7 +33,7 @@ export class ClubHome {
     });
   }
 
-  ionViewWillEnter() {
+  ionViewDidEnter() {
     if (this.isLoggedOnAdmin) {
       this.firebaseService.getPendingRequestToEnterClub(this.club)
       .then((pendingUserKeys) => {

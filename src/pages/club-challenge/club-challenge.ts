@@ -245,11 +245,17 @@ export class ClubChallenge {
   confirmAccomplishedChallenge(challenge: ChallengeModel) {
     let loading = this.loadingCtrl.create({dismissOnPageChange: true});
     loading.present();
-    this.firebaseService.confirmAccomplishedChallenge(challenge, this.club)
+    this.firebaseService.confirmAccomplishedChallenge(challenge, this.club, this.isAdminLogged)
     .then((_) => {
         let index = this.challengesOtherUserAccomplished.indexOf(challenge);
-        this.challengesOtherUserAccomplished.splice(index);
-        this.challengesCompleted.push(challenge);
+        if (this.isAdminLogged && index < 0) {
+          let i = this.challengesAdminValidation.indexOf(challenge);
+          this.challengesAdminValidation.splice(i);
+        } else {
+          this.challengesOtherUserAccomplished.splice(index);
+          this.challengesCompleted.push(challenge);
+        }
+
         loading.dismiss();
     }, (err) => {
       console.log(err);

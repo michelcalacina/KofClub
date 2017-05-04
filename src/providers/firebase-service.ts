@@ -527,11 +527,21 @@ export class FirebaseService {
     });
   }
 
-  confirmAccomplishedChallenge(challenge: ChallengeModel, club: ClubModel): Promise<boolean> {
+  confirmAccomplishedChallenge(challenge: ChallengeModel, club: ClubModel, isAdmin: boolean): Promise<boolean> {
     return new Promise((resolve, reject) => {
       let command = {}
-      command['status'] = ChallengeStatus.COMPLETED;
-      this.challengesRef.child(club.getClubKey()).child(challenge.dbKey).update(command)
+      command[DB_ROOT_CHALLENGES + club.getClubKey()
+      + '/' + challenge.dbKey + '/status'] = ChallengeStatus.COMPLETED;
+      if (isAdmin) {
+        command[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/challengerWins'] = challenge.challengerWins;
+        command[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/challengedWins'] = challenge.challengedWins;
+        command[DB_ROOT_CHALLENGES_ADMIN_VALIDATION + club.getClubKey()
+        + '/' + challenge.dbKey] = null;
+      }
+
+      firebase.database().ref('/').update(command)
       .then((_) => {
         resolve(true);
       }, (err) => {reject(err);});

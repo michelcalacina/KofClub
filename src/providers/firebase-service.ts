@@ -162,7 +162,8 @@ export class FirebaseService {
                           totalWins: 0, 
                           totalLoses: 0, 
                           totalChallenges: 0,
-                          experience: 0
+                          experience: 0,
+                          lvl: 0
                          };
           firebase.database().ref().update(updates).then( () => {
             resolve(true);
@@ -312,7 +313,8 @@ export class FirebaseService {
                           totalWins: 0, 
                           totalLoses: 0, 
                           totalChallenges: 0,
-                          experience: 0
+                          experience: 0,
+                          lvl: 0
                          };
       });
 

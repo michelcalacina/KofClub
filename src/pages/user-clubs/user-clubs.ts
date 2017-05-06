@@ -12,31 +12,39 @@ import { ClubModel } from '../../model/club-model';
 })
 export class UserClubs {
 
-  loading: any;
-  clubs: Array<ClubModel> = new Array;
+  clubs: Array<ClubModel>;
+  private hasEnterCreateClub: boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController) {
     
-    this.loadClubsList();
+    this.clubs = new Array<ClubModel>();
+    this.hasEnterCreateClub = false;
+  }
+
+  ionViewDidEnter() {
+    if (this.clubs.length === 0 || this.hasEnterCreateClub) {
+      this.hasEnterCreateClub = false;
+      this.loadClubsList();  
+    }
   }
 
   loadClubsList() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+
     this.firebaseService.listCurrentUserClubs()
       .then( clubList => {
         this.clubs = clubList;
-        this.loading.dismiss();
+        loading.dismiss();
       }, (err) => {
-        this.loading.dismiss();
+        console.log(err);
+        loading.dismiss();
       });
-
-      this.loading = this.loadingCtrl.create({
-        dismissOnPageChange: true,
-      });
-      this.loading.present();
   }
 
   createClub() {
+    this.hasEnterCreateClub = true;
     this.navCtrl.push('ClubCreateNew');
   }
 

@@ -159,9 +159,10 @@ export class FirebaseService {
           // Create the rank for the admin user.
           updates[DB_ROOT_CLUBS_RANK + newClubKey 
           + '/' + uid] = {
-                          totalWins: 0, 
-                          totalLoses: 0, 
-                          totalChallenges: 0,
+                          matchWins: 0, 
+                          matchLoses: 0,
+                          challengeWins: 0, 
+                          challengeLoses: 0,
                           experience: 0,
                           lvl: 0
                          };
@@ -310,9 +311,10 @@ export class FirebaseService {
           // Add to rank
           commands[DB_ROOT_CLUBS_RANK + club.getClubKey() 
           + '/' + user.getUid()] = {
-                          totalWins: 0, 
-                          totalLoses: 0, 
-                          totalChallenges: 0,
+                          matchWins: 0, 
+                          matchLoses: 0,
+                          challengeWins: 0, 
+                          challengeLoses: 0, 
                           experience: 0,
                           lvl: 0
                          };

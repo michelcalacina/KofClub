@@ -65,7 +65,7 @@
           </ion-avatar>
           <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
-        <ion-item class="local-time">
+        <ion-item>
           <h3>Local: {{c.local}}</h3>
           <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
         </ion-item>
@@ -104,7 +104,7 @@
           <H2 *ngIf="loggedUser.getUid().valueOf() !== c.userChallenged.getUid().valueOf()">
             {{c.userChallenged.displayName}}</H2>
         </ion-item>
-        <ion-item class="local-time">
+        <ion-item>
           <h3>Local: {{c.local}}</h3>
           <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
         </ion-item>
@@ -133,7 +133,7 @@
           </ion-avatar>
           <H2>{{c.userChallenged.displayName}}</H2>
         </ion-item>
-        <ion-item class="local-time">
+        <ion-item>
           <h3>Local: {{c.local}}</h3>
           <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
         </ion-item>

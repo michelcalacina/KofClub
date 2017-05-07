@@ -5,5 +5,29 @@
 </ion-header>
 
 <ion-content padding>
-
+<ion-list *ngIf="challengeEvents.length > 0">
+  <ion-list-header><H3>DESAFIOS CONFIRMADOS</H3></ion-list-header>
+  <ion-item *ngFor="let c of challengeEvents">
+    <ion-card>
+      <ion-card-content>
+        <ion-item>
+          <ion-avatar item-left>
+            <img src={{c.userChallenger.thumbnailUrl}}>
+          </ion-avatar>
+          <H2>{{c.userChallenger.displayName}}</H2>
+        </ion-item>
+        <ion-item>
+          <h3>Local: {{c.local}}</h3>
+          <h3>Dia: {{c.date | date: "dd/MM - HH:mm"}}</h3>
+        </ion-item>
+        <ion-item>
+          <ion-avatar item-right>
+            <img src={{c.userChallenged.thumbnailUrl}}>
+          </ion-avatar>
+          <H2 style="text-align: right;">{{c.userChallenged.displayName}}</H2>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+  </ion-item>
+</ion-list>
 </ion-content>

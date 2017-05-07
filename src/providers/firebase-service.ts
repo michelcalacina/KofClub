@@ -601,6 +601,37 @@ export class FirebaseService {
   }
   // ------------------------------------------------
 
+  // Club Events Control
+  loadClubEvents(club: ClubModel): Promise<Array<Array<any>>> {
+    return new Promise((resolve,reject) => {
+      Promise.all([
+        this.loadClubConfirmedEvents(club),
+        this.getClubOtherMembers(club),
+        this.getUserProfile()
+      ])
+      .then(data => {
+        let resultData = new Array<Array<any>>();
+        // Add current logged user for opponents list.
+        data[1].push(data[2]);
+        // Iterate over confirmed challenges.
+        data[0].forEach( challenge => {
+          // Iterate over possible opponents.
+          data[1].forEach(member => {
+            if (challenge.userChallengerId.valueOf() === member.getUid().valueOf()) {
+              challenge.userChallenger = member;
+            } else if (challenge.userChallengedId.valueOf() === member.getUid().valueOf()) {
+              challenge.userChallenged = member;
+            }
+          });
+        });
+        // There will be another kind of events ok! for now only challenges.
+        resultData.push(data[0]);
+        resolve(resultData);
+      }, (err) => {reject(err);});
+    });
+  } 
+
+  // -------------------------------------------------
   // Util Control
   // Taken from: http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
   private b64toBlob(b64Data): Promise<Blob> {
@@ -878,6 +909,33 @@ export class FirebaseService {
           resolve(challenges);
         });
       }, (err) => {reject(err)});
+    });
+  }
+
+  private loadClubConfirmedEvents(club: ClubModel): Promise<Array<ChallengeModel>> {
+    return new Promise((resolve,reject) => {
+      this.eventChallengesRef.child(club.getClubKey()).once('value')
+      .then(snapshots => {
+        let commands = [];
+        snapshots.forEach(snapshot => {
+          let command = this.challengesRef.child(club.getClubKey())
+          .child(snapshot.key).once('value');
+          commands.push(command);
+        });
+
+        Promise.all(commands).then(snapChallenges => {
+          let challenges = new Array<ChallengeModel>();
+          snapChallenges.forEach(snapChallenge => {
+            let challenge = new ChallengeModel();
+            challenge.local = snapChallenge.val().local;
+            challenge.date = snapChallenge.val().date;
+            challenge.userChallengerId = snapChallenge.val().challenger;
+            challenge.userChallengedId = snapChallenge.val().challenged;
+            challenges.push(challenge);
+          });
+          resolve(challenges);
+        }, (err) => {reject(err);});
+      });
     });
   }
 

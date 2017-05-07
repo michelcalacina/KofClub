@@ -50,4 +50,16 @@ export class ClubHome {
     this.navCtrl.push("ClubChallenge", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
   }
 
+  openEventChallenge() {
+    this.navCtrl.push("ClubEvents", {"club": this.club});
+  }
+
+  openRank() {
+    this.navCtrl.push("ClubRank", {"club": this.club});
+  }
+
+  openVideos() {
+    this.navCtrl.push("ClubVideos", {"club": this.club});
+  }
+
 }

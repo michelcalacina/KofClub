@@ -7,6 +7,7 @@ import { ClubModel, CLUB_USER_STATUS } from '../model/club-model';
 import { UserProfileModel } from '../model/user-profile-model';
 import { ChallengeModel, ChallengeStatus } from '../model/challenge-model';
 import { ChallengeProfileModel } from '../model/challenge-profile-model';
+import { RankProfileModel } from '../model/rank-profile-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
@@ -47,6 +48,7 @@ export class FirebaseService {
   private clubChallengedRef: any;
   private challengesAdminValidationRef: any;
   private eventChallengesRef: any;
+  private clubsRankRef: any;
 
   // Common
   private userProfile: UserProfileModel;
@@ -62,6 +64,7 @@ export class FirebaseService {
     this.clubChallengedRef = firebase.database().ref(DB_ROOT_CLUB_CHALLENGED);
     this.challengesAdminValidationRef = firebase.database().ref(DB_ROOT_CHALLENGES_ADMIN_VALIDATION);
     this.eventChallengesRef = firebase.database().ref(DB_ROOT_EVENT_CHALLENGES);
+    this.clubsRankRef = firebase.database().ref(DB_ROOT_CLUBS_RANK);
   }
 
   // Login control.
@@ -632,6 +635,54 @@ export class FirebaseService {
   } 
 
   // -------------------------------------------------
+
+  // Rank Control
+  loadClubRank(club: ClubModel): Promise<Array<RankProfileModel>> {
+    return new Promise((resolve,reject) => {
+      Promise.all([
+        this.loadClubRankInfo(club),
+        this.getClubOtherMembers(club),
+        this.getUserProfile()
+      ])
+      .then(data => {
+        data[1].push(data[2]);
+
+        data[0].forEach( rankProfile => {
+          // Iterate over possible opponents.
+          data[1].forEach(member => {
+            if (rankProfile.uid.valueOf() === member.getUid().valueOf()) {
+              rankProfile.displayName = member.displayName;
+              rankProfile.avatar = member.thumbnailUrl;
+              return false;
+            }
+          });
+        });
+        // Sort from high to low
+        let sortedRankProfile = data[0].sort((item2, item1) => {
+          if (item1.lvl > item2.lvl) {
+            return 1;
+          } else if (item2.lvl > item1.lvl) {
+            return -1;
+          } else if (item1.experience > item2.experience) {
+            return 1;
+          } else if (item2.experience > item1.experience) {
+            return -1;
+          } else if (item1.getChallengeEfficiency() > item2.getChallengeEfficiency()) {
+            return 1;
+          } else if (item2.getChallengeEfficiency() > item1.getChallengeEfficiency()) {
+            return -1;
+          }
+
+          return 0;
+        });
+        
+        resolve(sortedRankProfile);
+      }, (err) => {reject(err);});
+    });
+  }
+
+  // -------------------------------------------------
+
   // Util Control
   // Taken from: http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
   private b64toBlob(b64Data): Promise<Blob> {
@@ -936,6 +987,27 @@ export class FirebaseService {
           resolve(challenges);
         }, (err) => {reject(err);});
       });
+    });
+  }
+
+  loadClubRankInfo(club: ClubModel): Promise<Array<RankProfileModel>> {
+    return new Promise((resolve,reject) => {
+      this.clubsRankRef.child(club.getClubKey()).once('value')
+      .then(snapshots => {
+        let rankProfiles = new Array<RankProfileModel>();
+        snapshots.forEach(snapshot => {
+          let rankProfile = new RankProfileModel();
+          rankProfile.uid = snapshot.key;
+          rankProfile.challengeLoses = snapshot.val().challengeLoses;
+          rankProfile.challengeWins = snapshot.val().challengeWins;
+          rankProfile.experience = snapshot.val().experience;
+          rankProfile.lvl = snapshot.val().lvl;
+          rankProfile.matchLoses = snapshot.val().matchLoses;
+          rankProfile.matchWins = snapshot.val().matchWins;
+          rankProfiles.push(rankProfile);
+        });
+        resolve(rankProfiles);
+      }, (err) => {reject(err);});
     });
   }
 

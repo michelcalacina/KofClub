@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams
+, LoadingController } from 'ionic-angular';
 
-/**
- * Generated class for the ClubRank page.
- *
- * See http://ionicframework.com/docs/components/#navigation for more info
- * on Ionic pages and navigation.
- */
+import { FirebaseService } from '../../providers/firebase-service';
+import { ClubModel } from '../../model/club-model';
+import { RankProfileModel } from '../../model/rank-profile-model';
+
 @IonicPage()
 @Component({
   selector: 'page-club-rank',
@@ -14,11 +13,28 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class ClubRank {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  private club: ClubModel;
+  rankProfiles: Array<RankProfileModel>;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams
+  , public loadingCtrl: LoadingController, public firebaseService: FirebaseService) {
+
+    this.rankProfiles = new Array<RankProfileModel>();
+    this.club = navParams.get("club");
+    this.loadClubRank();
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad ClubRank');
+  loadClubRank() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+    this.firebaseService.loadClubRank(this.club)
+    .then(rankProfiles => {
+      this.rankProfiles = rankProfiles;
+      loading.dismiss();
+    }, (err) => {
+      console.log(err);
+      loading.dismiss();
+    });
   }
 
 }

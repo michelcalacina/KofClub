@@ -1,18 +1,37 @@
-<!--
-  Generated template for the ClubRank page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
   <ion-navbar>
-    <ion-title>ClubRank</ion-title>
+    <ion-title>Rank</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
-
+<ion-content>
+<ion-list>
+  <ion-item *ngFor="let rp of rankProfiles">
+    <ion-avatar item-left>
+      <img src={{rp.avatar}}>
+    </ion-avatar>
+    <ion-item no-lines style="background: #263238;">
+      <h2>{{rp.displayName}}</h2>
+    </ion-item>
+    <ion-item no-lines style="background: #37474f">
+      <h3>Nível: <span style="float: right;">{{rp.lvl}}</span></h3>
+      <h3>XP: <span style="float: right;">{{rp.experience | number : '1.2-2'}}</span></h3>
+    </ion-item>
+    <ion-item no-lines style="background: #455a64">
+      <h3>Desafios: <span style="float: right;">{{rp.getTotalChallenges()}}</span></h3>
+      <h3>Vitórias: <span style="float: right;">{{rp.challengeWins}}</span></h3>
+      <h3>Derrotas: <span style="float: right;">{{rp.challengeLoses}}</span></h3>
+      <h3>Eficiência: <span style="float: right;">{{rp.getChallengeEfficiency() | number : '1.2-2'}}%</span></h3>
+    </ion-item>
+    <ion-item no-lines style="background: #546e7a">
+      <h3>Partidas: <span style="float: right;">{{rp.getTotalMatches()}}</span></h3>
+      <h3>Vitórias: <span style="float: right;">{{rp.matchWins}}</span></h3>
+      <h3>Derrotas: <span style="float: right;">{{rp.matchLoses}}</span></h3>
+      <h3>Eficiência: <span style="float: right;">{{rp.getMatchEfficiency() | number : '1.2-2'}}%</span></h3>
+    </ion-item>
+  </ion-item>
+</ion-list>
 </ion-content>

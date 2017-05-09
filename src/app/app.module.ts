@@ -10,6 +10,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { FirebaseService } from '../providers/firebase-service';
 import { CameraService } from '../providers/camera-service';
 import { Camera } from '@ionic-native/camera';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { Camera } from '@ionic-native/camera';
     Camera,
     FirebaseService,
     CameraService,
+    ScreenOrientation,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

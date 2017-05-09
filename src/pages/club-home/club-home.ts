@@ -59,7 +59,7 @@ export class ClubHome {
   }
 
   openVideos() {
-    this.navCtrl.push("ClubVideos", {"club": this.club});
+    this.navCtrl.push("ClubVideos", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
   }
 
 }

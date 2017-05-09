@@ -8,6 +8,7 @@ import { UserProfileModel } from '../model/user-profile-model';
 import { ChallengeModel, ChallengeStatus } from '../model/challenge-model';
 import { ChallengeProfileModel } from '../model/challenge-profile-model';
 import { RankProfileModel } from '../model/rank-profile-model';
+import { VideoModel } from '../model/video-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
@@ -27,6 +28,7 @@ const DB_ROOT_CLUB_CHALLENGER = "/club-challenger/";
 const DB_ROOT_CLUB_CHALLENGED = "/club-challenged/";
 const DB_ROOT_CHALLENGES_ADMIN_VALIDATION = "/challenges-admin-validation/";
 const DB_ROOT_EVENT_CHALLENGES = "/event-challenges/";
+const DB_ROOT_CLUB_VIDEOS = "/club-videos/";
 
 // Storage
 const ST_ROOT_IMAGES = "/images/";
@@ -49,6 +51,7 @@ export class FirebaseService {
   private challengesAdminValidationRef: any;
   private eventChallengesRef: any;
   private clubsRankRef: any;
+  private clubVideosRef: any;
 
   // Common
   private userProfile: UserProfileModel;
@@ -65,6 +68,7 @@ export class FirebaseService {
     this.challengesAdminValidationRef = firebase.database().ref(DB_ROOT_CHALLENGES_ADMIN_VALIDATION);
     this.eventChallengesRef = firebase.database().ref(DB_ROOT_EVENT_CHALLENGES);
     this.clubsRankRef = firebase.database().ref(DB_ROOT_CLUBS_RANK);
+    this.clubVideosRef = firebase.database().ref(DB_ROOT_CLUB_VIDEOS);
   }
 
   // Login control.
@@ -681,6 +685,35 @@ export class FirebaseService {
     });
   }
 
+  // -------------------------------------------------
+
+  // Videos Control
+  loadClubVideos(club: ClubModel): Promise<Array<VideoModel>> {
+    return new Promise((resolve,reject) => {
+      this.clubVideosRef.child(club.getClubKey()).once('value')
+      .then(snapshots => {
+        let videos = new Array<VideoModel>();
+        snapshots.forEach(snapshot => {
+          let video = new VideoModel();
+          video.key = snapshot.key;
+          video.videoId = snapshot.val().videoId;
+          videos.push(video);
+        });
+        resolve(videos);
+      }, err => reject(err));
+    });
+  }
+
+  CreateClubVideo(club: ClubModel, video: VideoModel): Promise<VideoModel> {
+    return new Promise((resolve, reject) => {
+      this.clubVideosRef.child(club.getClubKey())
+      .push({videoId: video.videoId})
+      .then(snapshot => {
+        video.key = snapshot.key;
+        resolve(video);
+      }, (err) => {reject(err)});
+    });
+  }
   // -------------------------------------------------
 
   // Util Control

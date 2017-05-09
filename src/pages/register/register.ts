@@ -19,6 +19,9 @@ export class Register {
 
   avatarUrl: string;
 
+  private avatares: Array<string>;
+  private currentAvatarIndex: number;
+
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
   , public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
@@ -30,7 +33,13 @@ export class Register {
       , password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
 
-    this.avatarUrl = "assets/img/profile-kusanagi.png";
+    this.avatarUrl = "assets/img/profile-unknow-man.png";
+    this.avatares = ["avatar-unknow-man.png", "profile-akuma.png", "profile-alba.png", "profile-chun-li.png",
+    "profile-clark.png","profile-elena-sf4.png","profile-goro-daimon.png",
+    "profile-hugo.png","profile-ken-master.png","profile-kusanagi.png","profile-leona.png",
+    "profile-lin-xiang-feing.png","profile-makoto.png","profile-ralf-jhones.png","profile-rolento.png",
+    "profile-sie-kensou.png"];
+    this.currentAvatarIndex = 0;
   }
 
   elementChanged(input){
@@ -70,6 +79,25 @@ export class Register {
       dismissOnPageChange: true,
     });
     this.loading.present();
+  }
+
+  changeAvatar($event) {
+    // From center to left
+    if ($event.direction === 2) {
+      if (this.currentAvatarIndex < this.avatares.length - 1) {
+        this.currentAvatarIndex++;
+      } else {
+        this.currentAvatarIndex = 0;
+      }
+    } else if ($event.direction === 4) { // From center to right
+      if (this.currentAvatarIndex > 0) {
+        this.currentAvatarIndex--;
+      } else {
+        this.currentAvatarIndex = this.avatares.length - 1;
+      }
+    }
+
+    this.avatarUrl = "assets/img/"+this.avatares[this.currentAvatarIndex];
   }
 
 }

@@ -714,6 +714,15 @@ export class FirebaseService {
       }, (err) => {reject(err)});
     });
   }
+
+  removeVideo(club: ClubModel, video: VideoModel): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.clubVideosRef.child(club.getClubKey()).child(video.key).remove()
+      .then(snapshot => {
+        resolve(true);
+      }, (err) => {reject(err);});
+    });
+  }
   // -------------------------------------------------
 
   // Util Control

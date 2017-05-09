@@ -64,7 +64,7 @@ export class ClubVideos {
       ],
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Cancelar',
           role: 'cancel',
           handler: data => {
             console.log('Cancel clicked');
@@ -96,4 +96,39 @@ export class ClubVideos {
     alert.present();
   }
 
+  removeVideo(video: VideoModel) {
+    let alert = this.alertCtrl.create({
+      title: 'Deseja excluir esse vídeo?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Excluir',
+          handler: data => {
+            let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+            loading.present();
+            
+            this.firebaseService.removeVideo(this.club, video)
+            .then(v => {
+              let index = this.videos.indexOf(video);
+              if (index > -1) {
+                this.videos.splice(index,1);
+              }
+              
+              loading.dismiss();
+            }, (err) => {
+              console.log(err);
+              loading.dismiss();
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
 }

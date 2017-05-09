@@ -207,7 +207,7 @@ export class ClubChallenge {
     this.firebaseService.acceptUserChallenge(challenge, this.club)
     .then((_) => {
       let index = this.otherChallengesPending.indexOf(challenge);
-      this.otherChallengesPending.splice(index, 1);
+      this.otherChallengesPending.splice(index,1);
       this.challengesAccepted.push(challenge);
       loading.dismiss();
     }, (err) => {
@@ -227,15 +227,15 @@ export class ClubChallenge {
           // Verify it was created by me.
           let index = this.myChallengesPending.indexOf(challenge);
           if (index > -1) {
-            this.myChallengesPending.splice(index);
+            this.myChallengesPending.splice(index,1);
           } else { // Otherwise remove from received challenges.
             index = this.otherChallengesPending.indexOf(challenge);
-            this.otherChallengesPending.splice(index);
+            this.otherChallengesPending.splice(index,1);
           }
           break;
         case ChallengeStatus.ACCEPTED:
           index = this.challengesAccepted.indexOf(challenge);
-          this.challengesAccepted.splice(index);
+          this.challengesAccepted.splice(index,1);
           break;
       }
       loading.dismiss();
@@ -250,9 +250,9 @@ export class ClubChallenge {
         let index = this.challengesOtherUserAccomplished.indexOf(challenge);
         if (this.isAdminLogged && index < 0) {
           let i = this.challengesAdminValidation.indexOf(challenge);
-          this.challengesAdminValidation.splice(i);
+          this.challengesAdminValidation.splice(i,1);
         } else {
-          this.challengesOtherUserAccomplished.splice(index);
+          this.challengesOtherUserAccomplished.splice(index,1);
           this.challengesCompleted.push(challenge);
         }
 
@@ -269,7 +269,7 @@ export class ClubChallenge {
     this.firebaseService.refuseAccomplishedChallenge(challenge, this.club, this.isAdminLogged)
     .then((_) => {
         let index = this.challengesOtherUserAccomplished.indexOf(challenge);
-        this.challengesOtherUserAccomplished.splice(index);
+        this.challengesOtherUserAccomplished.splice(index,1);
         // If logged is admin, the challenge was removed on service, other wise still remain for validation.
         if (!this.isAdminLogged) {
           this.challengesAdminValidation.push(challenge);

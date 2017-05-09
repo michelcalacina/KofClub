@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, 
+  AlertController, ToastController } from 'ionic-angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { FirebaseService } from '../../providers/firebase-service';
 
@@ -15,7 +16,6 @@ export class Register {
   passwordChanged: boolean = false;
   fullnameChanged: boolean = false;
   submitAttempt: boolean = false;
-  loading: any;
 
   avatarUrl: string;
 
@@ -24,7 +24,8 @@ export class Register {
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
-  , public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  , public alertCtrl: AlertController, public loadingCtrl: LoadingController
+  , public toastCtrl: ToastController) {
   
     let EMAIL_REGEXP = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
     this.registerForm = formBuilder.group({
@@ -33,13 +34,13 @@ export class Register {
       , password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
     });
 
-    this.avatarUrl = "assets/img/profile-unknow-man.png";
-    this.avatares = ["avatar-unknow-man.png", "profile-akuma.png", "profile-alba.png", "profile-chun-li.png",
+    this.avatarUrl = "assets/img/flick-right.png";
+    this.avatares = ["profile-akuma.png", "profile-alba.png", "profile-chun-li.png",
     "profile-clark.png","profile-elena-sf4.png","profile-goro-daimon.png",
     "profile-hugo.png","profile-ken-master.png","profile-kusanagi.png","profile-leona.png",
     "profile-lin-xiang-feing.png","profile-makoto.png","profile-ralf-jhones.png","profile-rolento.png",
     "profile-sie-kensou.png"];
-    this.currentAvatarIndex = 0;
+    this.currentAvatarIndex = -1;
   }
 
   elementChanged(input){
@@ -50,18 +51,32 @@ export class Register {
   register() {
     this.submitAttempt = true;
 
+    if (this.currentAvatarIndex === -1) {
+      this.toastCtrl.create({
+        duration: 3000,
+        message: "Selecione um avatar deslizando o dedo!"
+      }).present();
+      this.submitAttempt = false;
+      return;
+    }
+
     if (!this.registerForm.valid){
       return;
     }
+
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+
     this.firebaseService.register(
     this.registerForm.value.email
     , this.registerForm.value.password
     , this.registerForm.value.fullname
     , this.avatarUrl
     ).then( authService => {
+      loading.dismiss();
       this.navCtrl.setRoot('Home');
     }, error => {
-      this.loading.dismiss().then( () => {
+      loading.dismiss().then( () => {
         let alert = this.alertCtrl.create({
           message: error.message,
           buttons: [
@@ -74,11 +89,6 @@ export class Register {
         alert.present();
       });
     });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
   }
 
   changeAvatar($event) {

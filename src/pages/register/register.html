@@ -8,11 +8,8 @@
   <ion-avatar (swipe)="changeAvatar($event)" class="profile-avatar-custom">
       <img src={{avatarUrl}}>
   </ion-avatar>
-  <!--<ion-fab center style="margin-top:8%">
-    <button ion-fab mini (click)="chooseAvatar()">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-fab>-->
+  <ion-label style="margin-left: 50%; margin-top: 0;" stacked>avatar</ion-label>
+
   <form [formGroup]="registerForm" (submit)="register()" novalidate>
     <!-- Name -->
     <ion-item>

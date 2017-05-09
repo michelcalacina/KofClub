@@ -22,10 +22,17 @@ export class RankProfileModel {
     }
 
     public getChallengeEfficiency(): number {
+        if (this.getTotalChallenges() === 0) {
+            return 0;
+        }
+
         return (this.challengeWins * 100)/this.getTotalChallenges();
     }
 
     public getMatchEfficiency(): number {
+        if (this.getTotalMatches() === 0) {
+            return 0;
+        }
         return (this.matchWins * 100)/this.getTotalMatches();
     }
 }

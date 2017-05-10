@@ -55,11 +55,11 @@ export class ClubVideos {
 
   addVideo() {
     let alert = this.alertCtrl.create({
-      title: 'ID do vídeo no Youtube',
+      title: 'YouTube',
       inputs: [
         {
-          name: 'id',
-          placeholder: 'exemplo: vUsly6gXbPQ'
+          name: 'contentUrl',
+          placeholder: 'URL ou ID do Vídeo.'
         },
       ],
       buttons: [
@@ -76,9 +76,15 @@ export class ClubVideos {
             let loading = this.loadingCtrl.create({dismissOnPageChange: true});
             loading.present();
             
-            if (data.id != undefined && data.id.trim().length > 0) {
+            if (data.contentUrl != undefined && data.contentUrl.trim().length > 0) {
               let video = new VideoModel();
-              video.videoId = data.id;
+              let i = data.contentUrl.indexOf("?v=");
+              if (i > -1) {
+                video.videoId = (<string>data.contentUrl).substr(i+3, data.contentUrl.length-1);
+              } else {
+                video.videoId = data.contentUrl;
+              }
+              
               this.firebaseService.CreateClubVideo(this.club, video)
               .then(v => {
                 v.videoUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.baseURL + v.videoId);

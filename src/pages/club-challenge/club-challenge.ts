@@ -280,4 +280,8 @@ export class ClubChallenge {
       loading.dismiss();
     });
   }
+
+  refresh() {
+    this.loadChallengesCurrentUser();
+  }
 }

@@ -4,24 +4,30 @@ page-clubs {
         background-color: #0d47a1;
     }
 
-    div.text-main-info {
-        ion-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        h2 {
-            display: block;
-            margin-left: 12px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .buttons-card {
+        display: table;
+        margin: 0 auto;
+        margin-top: 10px;
     }
 
-    div.right-dynamic-fab {
-        button {
-            margin-bottom: 10px;
-        }
-    }
+    // div.text-main-info {
+    //     ion-title {
+    //         white-space: nowrap;
+    //         overflow: hidden;
+    //         text-overflow: ellipsis;
+    //     }
+    //     h2 {
+    //         display: block;
+    //         margin-left: 12px;
+    //         white-space: nowrap;
+    //         overflow: hidden;
+    //         text-overflow: ellipsis;
+    //     }
+    // }
+
+    // div.right-dynamic-fab {
+    //     button {
+    //         margin-bottom: 10px;
+    //     }
+    // }
 }

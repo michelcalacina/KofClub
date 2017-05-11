@@ -139,7 +139,7 @@ export class FirebaseService {
   //-------------------------------------------
 
   // Club Control
-  createClub(clubName: string, clubDescription: string
+  createClub(clubName: string, clubDescription: string, maxMembers: number
   , dataBase64: any): any {
     let fileName = clubName + ".png";
     return new Promise((resolve, reject) => {
@@ -152,6 +152,7 @@ export class FirebaseService {
           club.description = clubDescription;
           club.creationDate = firebase.database.ServerValue.TIMESTAMP;
           club.thumbnailURL = downloadURL;
+          club.maxMembers = maxMembers;
           club.admins.push(uid);
 
           let newClubKey = this.clubsRef.push().key;
@@ -202,46 +203,56 @@ export class FirebaseService {
   /**
    * Get all clubs.
    */
-  listClubsForUser(): any {
-    let uid = firebase.auth().currentUser.uid;
-    return new Promise( (resolve, reject) => {
-      Promise.all([this.getAllClubs(), 
-                  this.getUserClubKeys(uid),
-                  this.getUserPendingJoinClubs(uid)])
-      .then(data => {
-        let allClubs = data[0];
-        let userClubsKeys = data[1];
-        let pendingUserJoinClubs = data[2];
+  // listClubsForUser(): any {
+  //   let uid = firebase.auth().currentUser.uid;
+  //   return new Promise( (resolve, reject) => {
+  //     Promise.all([this.getAllClubs(), 
+  //                 this.getUserClubKeys(uid),
+  //                 this.getUserPendingJoinClubs(uid)])
+  //     .then(data => {
+  //       let allClubs = data[0];
+  //       let userClubsKeys = data[1];
+  //       let pendingUserJoinClubs = data[2];
 
-        for (let c of allClubs) {
-          let clubKey = c.getClubKey().valueOf();
-          // current user belong to this club.
-          if (userClubsKeys.length > 0 && userClubsKeys.indexOf(clubKey) > -1) {
-            c.setClubUserStatus(CLUB_USER_STATUS.MEMBER);
-          } // current user wait for aproval to became member of clube.
-          else if (pendingUserJoinClubs.length > 0 
-                      && pendingUserJoinClubs.indexOf(clubKey) > -1) {
-            c.setClubUserStatus(CLUB_USER_STATUS.PENDING);
-          } else {
-            c.setClubUserStatus(CLUB_USER_STATUS.NOT_MEMBER);
-          }
-        }
-        resolve(allClubs);
-      }, err => {reject(err)});
-    });
-  }
+  //       for (let c of allClubs) {
+  //         let clubKey = c.getClubKey().valueOf();
+  //         // current user belong to this club.
+  //         if (userClubsKeys.length > 0 && userClubsKeys.indexOf(clubKey) > -1) {
+  //           c.setClubUserStatus(CLUB_USER_STATUS.MEMBER);
+  //         } // current user wait for aproval to became member of clube.
+  //         else if (pendingUserJoinClubs.length > 0 
+  //                     && pendingUserJoinClubs.indexOf(clubKey) > -1) {
+  //           c.setClubUserStatus(CLUB_USER_STATUS.PENDING);
+  //         } else {
+  //           c.setClubUserStatus(CLUB_USER_STATUS.NOT_MEMBER);
+  //         }
+  //       }
+  //       resolve(allClubs);
+  //     }, err => {reject(err)});
+  //   });
+  // }
 
-  requestAccessToClub(club: ClubModel): Promise<any> {
-    return new Promise( (resolve, reject) => {
-      let uid = firebase.auth().currentUser.uid;
-      let clubKey = club.getClubKey();
-      // Uses update to keep the structe on db: root/clubkey/uid: true.
-      let update = {};
-      update[DB_ROOT_JOIN_CLUB_MEMBERS + club.getClubKey() + '/' + uid] = true;
-      update[DB_ROOT_JOIN_MEMBER_CLUBS + uid + '/' + club.getClubKey()] = true; 
-      firebase.database().ref().update(update).then( _ => {
-        resolve(true)
-      }).catch( err => reject(err) );
+  // requestAccessToClub(club: ClubModel): Promise<any> {
+  //   return new Promise( (resolve, reject) => {
+  //     let uid = firebase.auth().currentUser.uid;
+  //     let clubKey = club.getClubKey();
+  //     // Uses update to keep the structe on db: root/clubkey/uid: true.
+  //     let update = {};
+  //     update[DB_ROOT_JOIN_CLUB_MEMBERS + club.getClubKey() + '/' + uid] = true;
+  //     update[DB_ROOT_JOIN_MEMBER_CLUBS + uid + '/' + club.getClubKey()] = true; 
+  //     firebase.database().ref().update(update).then( _ => {
+  //       resolve(true)
+  //     }).catch( err => reject(err) );
+  //   });
+  // }
+
+  requestAccessToClub(clubKey: string): Promise<number> {
+    return new Promise((resolve, reject) => {
+      let commands = [];
+      commands[0] = this.clubsRef.child(clubKey).child('maxMembers').once('value');
+      commands[1] = this.memberClubsRef.child(this.userProfile.getUid()).child(clubKey).once('value');
+
+      // TODO, waiting for feature max number of members in club.
     });
   }
 

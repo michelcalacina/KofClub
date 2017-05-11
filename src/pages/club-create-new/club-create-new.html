@@ -1,7 +1,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Novo Club</ion-title>
+    <ion-title>Crie seu clube</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -15,10 +15,10 @@
       </ion-fab>
       <ion-item>
         <ion-thumbnail>
-          <img *ngIf="!isPictureTaken" src="assets/img/default-placeholder-picture.png">
+          <img *ngIf="!isPictureTaken" src="assets/img/joker-logo.png">
           <img *ngIf="isPictureTaken" src={{getPicture()}} >
         </ion-thumbnail>
-        <span style="margin-left: 25%; font-size: 1.6rem;">escolha a logomarca</span>
+        <span style="margin-left: 25%; font-size: 1.4rem;">logomarca</span>
       </ion-item>
       
       <ion-fab center *ngIf="!isPictureTaken" >
@@ -28,7 +28,7 @@
       </ion-fab>
   </div>
   
-  <form [formGroup]="createClubForm" (submit)="createClub()" novalidate>
+  <form [formGroup]="createClubForm" novalidate>
     <!-- Name -->
     <ion-item>
       <ion-label stacked>Nome</ion-label>
@@ -53,10 +53,17 @@
       && (descriptionChanged || submitAttempt)">
       <p>Descrição válida.</p>
     </ion-item>
-    <button ion-button block bottom type="submit">
-      SALVAR
-    </button>
   </form>
-
+  <ion-item>
+      <ion-label stacked style="color: gray">Membros = {{maxMembers}}</ion-label>
+      <ion-range [(ngModel)]="maxMembers" color="secondary" snaps="true" pin="true"
+      min="8" max="48" step="8"></ion-range>
+  </ion-item>
+  <button ion-button block bottom (click)="createClub()">
+      SALVAR
+  </button>
+  <button ion-button block color="danger" bottom (click)="back()">
+      VOLTAR
+  </button>
   
 </ion-content>

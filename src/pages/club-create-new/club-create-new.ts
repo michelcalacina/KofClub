@@ -19,6 +19,7 @@ export class ClubCreateNew {
   isPictureTaken: boolean = false;
   pictureTaken: any;
   public base64declaration = "data:image/png;base64,";
+  public maxMembers = 24;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
@@ -72,6 +73,7 @@ export class ClubCreateNew {
     this.firebaseService.createClub(
     this.createClubForm.value.name
     , this.createClubForm.value.description
+    , this.maxMembers
     , this.pictureTaken
     ).then( _ => {
       this.loading.dismiss().then(()=>{
@@ -114,6 +116,10 @@ export class ClubCreateNew {
     });
 
     toast.present();
+  }
+
+  back() {
+    this.navCtrl.pop();
   }
 
 }

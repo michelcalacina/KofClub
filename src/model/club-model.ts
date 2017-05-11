@@ -11,6 +11,8 @@ export class ClubModel {
     public thumbnailURL: string;
     public creationDate: object;
     public admins: Array<string>;
+    public maxMembers: number;
+    public qntdMembers: number;
 
     private _clubKey: string;
     private clubUserStatus: CLUB_USER_STATUS;
@@ -19,6 +21,8 @@ export class ClubModel {
     constructor() {
         this.clubUserStatus = CLUB_USER_STATUS.NOT_MEMBER;
         this.admins = new Array<string>();
+        // There is always at least one admin.
+        this.qntdMembers = 1;
     }
 
     getClubKey = function(): string {
@@ -43,6 +47,8 @@ export class ClubModel {
         club.description = jsonLike.description;
         club.thumbnailURL = jsonLike.thumbnailURL;
         club.creationDate = jsonLike.creationDate;
+        club.maxMembers = jsonLike.maxMembers;
+        club.qntdMembers = jsonLike.qntdMembers;
         let admins = jsonLike.admins;
         for(let ua in admins) {
             club.admins.push(ua);
@@ -60,6 +66,8 @@ export class ClubModel {
                 "description": this.description,
                 "thumbnailURL": this.thumbnailURL,
                 "creationDate": this.creationDate,
+                "maxMembers": this.maxMembers,
+                "qntdMembers": this.qntdMembers,
                 "admins": jua};
     }
 }

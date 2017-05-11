@@ -14,74 +14,81 @@ import { FirebaseService } from '../../providers/firebase-service';
 })
 export class Clubs {
 
-  loading: any;
-  clubs: Array<ClubModel> = new Array;
+  //clubs: Array<ClubModel> = new Array;
+  clubKey: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public loadingCtrl: LoadingController, public firebaseService: FirebaseService
   , public toastCtrl: ToastController ) {
 
-    this.loadClubs();
+    //this.loadClubs();
   }
 
-  loadClubs() {
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
-
-    this.firebaseService.listClubsForUser()
-    .then( clubs => {
-      this.clubs = clubs;
-      this.loading.dismiss();
-    }, err => {
-      this.loading.dismiss();
-    });
+  back() {
+    this.navCtrl.pop();
   }
 
-  requireAccessToClub(club: ClubModel) {
-    this.firebaseService.requestAccessToClub(club)
-    .then( res => {
-      this.presentToast("Solicitação enviada!");
-      club.setClubUserStatus(CLUB_USER_STATUS.PENDING);
-    }, (err) => {
-      this.presentToast("Não foi possível solicitar acesso ao club!", true);
-    });
+  requestAccess() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+
+    // TODO After refactory club quantity members.
   }
 
-  openUserClub(club) {
-    this.navCtrl.push('ClubHome', {"club": club});
-  }
+  // loadClubs() {
+  //   this.loading = this.loadingCtrl.create({
+  //     dismissOnPageChange: true,
+  //   });
+  //   this.loading.present();
 
-  private presentToast(message: string, isShowButton: boolean = false) {
-    let toast = this.toastCtrl.create({
-      message: message,
-      closeButtonText: "OK",
-      dismissOnPageChange: true,
-      position: "bottom",
-      duration: 3000
-    });
-    if (isShowButton) {
-      toast.setShowCloseButton(true);
-    }
+  //   this.firebaseService.listClubsForUser()
+  //   .then( clubs => {
+  //     this.clubs = clubs;
+  //     this.loading.dismiss();
+  //   }, err => {
+  //     this.loading.dismiss();
+  //   });
+  // }
 
-    toast.present();
-  }
+  // requireAccessToClub(club: ClubModel) {
+  //   this.firebaseService.requestAccessToClub(club)
+  //   .then( res => {
+  //     this.presentToast("Solicitação enviada!");
+  //     club.setClubUserStatus(CLUB_USER_STATUS.PENDING);
+  //   }, (err) => {
+  //     this.presentToast("Não foi possível solicitar acesso ao club!", true);
+  //   });
+  // }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad Clubs');
-  }
+  // openUserClub(club) {
+  //   this.navCtrl.push('ClubHome', {"club": club});
+  // }
 
-  isUserClubMember(club: ClubModel): boolean {
-    return club.getClubUserStatus() === CLUB_USER_STATUS.MEMBER;
-  }
+  // private presentToast(message: string, isShowButton: boolean = false) {
+  //   let toast = this.toastCtrl.create({
+  //     message: message,
+  //     closeButtonText: "OK",
+  //     dismissOnPageChange: true,
+  //     position: "bottom",
+  //     duration: 3000
+  //   });
+  //   if (isShowButton) {
+  //     toast.setShowCloseButton(true);
+  //   }
 
-  isUserClubNotMember(club: ClubModel): boolean {
-    return club.getClubUserStatus() === CLUB_USER_STATUS.NOT_MEMBER;
-  }
+  //   toast.present();
+  // }
 
-  isUserClubPendingMember(club: ClubModel): boolean {
-    return club.getClubUserStatus() === CLUB_USER_STATUS.PENDING;
-  }
+  // isUserClubMember(club: ClubModel): boolean {
+  //   return club.getClubUserStatus() === CLUB_USER_STATUS.MEMBER;
+  // }
+
+  // isUserClubNotMember(club: ClubModel): boolean {
+  //   return club.getClubUserStatus() === CLUB_USER_STATUS.NOT_MEMBER;
+  // }
+
+  // isUserClubPendingMember(club: ClubModel): boolean {
+  //   return club.getClubUserStatus() === CLUB_USER_STATUS.PENDING;
+  // }
 
 }

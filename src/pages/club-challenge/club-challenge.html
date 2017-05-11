@@ -25,7 +25,16 @@
           </ion-avatar>
           <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
-        <ion-item>
+        <!--Admin can change any value-->
+        <ion-item *ngIf="isAdminLogged">
+          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+            type="number"></ion-input>
+          <ion-input style="max-width: 35px; float: center;" 
+            type="text" placeholder="VS" readonly></ion-input>
+          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+            type="number"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="!isAdminLogged">
           <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
           <ion-input style="max-width: 35px; float: center;" 

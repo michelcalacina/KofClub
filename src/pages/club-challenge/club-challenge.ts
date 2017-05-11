@@ -18,6 +18,7 @@ export class ClubChallenge {
   isAdminLogged: boolean;
   private loggedUser: UserProfileModel;
   private hasEnterCreateNew: boolean;
+  private isRefresh: boolean;
 
   // Challenges that I receive
   otherChallengesPending: Array<ChallengeModel>;
@@ -50,6 +51,7 @@ export class ClubChallenge {
 
     this.getLoggedUser();
     this.hasEnterCreateNew = false;
+    this.isRefresh = false;
   }
 
   openChallengeCreateView() {
@@ -115,7 +117,7 @@ export class ClubChallenge {
   // second array contais challenge against me.
   loadChallengesCurrentUser() {
     // To avoid duplicity, clear all arrays.
-    if (this.hasEnterCreateNew) {
+    if (this.hasEnterCreateNew || this.isRefresh) {
       this.myChallengesPending = new Array<ChallengeModel>();
       this.otherChallengesPending = new Array<ChallengeModel>();
       
@@ -125,6 +127,7 @@ export class ClubChallenge {
       this.challengesLoggedUserAccomplished = new Array<ChallengeModel>();
       this.challengesOtherUserAccomplished = new Array<ChallengeModel>();
       this.hasEnterCreateNew = false;
+      this.isRefresh = false;
     }
 
     let loading = this.loadingCtrl.create({
@@ -282,6 +285,7 @@ export class ClubChallenge {
   }
 
   refresh() {
+    this.isRefresh = true;
     this.loadChallengesCurrentUser();
   }
 }

@@ -5,7 +5,7 @@ import { IonicPage, NavController, NavParams,
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';
 import { UserProfileModel } from '../../model/user-profile-model';
-import { ChallengeModel, ChallengeStatus } from '../../model/challenge-model';
+import { ChallengeModel } from '../../model/challenge-model';
 
 @IonicPage()
 @Component({

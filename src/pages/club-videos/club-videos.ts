@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController} from 'ionic-angular';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
-import {SafeResourceUrl, DomSanitizer} from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';

@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Solicitar acesso a clube</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-item>
+    <ion-label color="primary" stacked>Chave do clube</ion-label>
+    <ion-input type="text" [(ngModel)]="clubKey" placeholder="ex.: -KjTMiAyqh21rwsTB6Gx"></ion-input>
+  </ion-item>
+
+  <ion-buttons class="buttons-card">
+    <button ion-button color="danger" 
+      (click)="back()">
+      VOLTAR
+    </button>
+    <button ion-button 
+      (click)="requestAccess()">
+      ENVIAR
+    </button>
+  </ion-buttons>
+</ion-content>

@@ -29,7 +29,7 @@ export class MyApp {
 
     this.pages = [
       { title: 'Meus Clubes', component: 'UserClubs' },
-      { title: 'Acesso por chave', component: 'Clubs' },
+      { title: 'Acesso por chave', component: 'ClubRequestAccess' },
       { title: 'Perfil', component: 'UserProfile' }
     ];
 

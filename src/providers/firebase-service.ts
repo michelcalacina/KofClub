@@ -3,24 +3,19 @@ import 'rxjs/add/operator/map';
 
 import firebase from 'firebase';
 
-import { ClubModel, CLUB_USER_STATUS } from '../model/club-model';
+import { ClubModel } from '../model/club-model';
 import { UserProfileModel } from '../model/user-profile-model';
 import { ChallengeModel, ChallengeStatus } from '../model/challenge-model';
-import { ChallengeProfileModel } from '../model/challenge-profile-model';
 import { RankProfileModel } from '../model/rank-profile-model';
 import { VideoModel } from '../model/video-model';
 
 const DB_ROOT_CLUBS = "/clubs/";
 const DB_ROOT_USERS = "/users/";
 const DB_ROOT_CLUBS_RANK = "/clubs-rank/";
-
 const DB_ROOT_CLUB_MEMBERS = "/club-members/";
 const DB_ROOT_MEMBER_CLUBS = "/member-clubs/";
 // List all pending users by club, useful for admin.
 const DB_ROOT_JOIN_CLUB_MEMBERS = "/join-club-members/";
-// List all pending clubs by user, useful for user join view.
-const DB_ROOT_JOIN_MEMBER_CLUBS = "/join-member-clubs/";
-
 const DB_ROOT_CHALLENGES = "/challenges/";
 // Store from challenger to challenged. Get that who, I do wish to challenge.
 const DB_ROOT_CLUB_CHALLENGER = "/club-challenger/";
@@ -52,6 +47,7 @@ export class FirebaseService {
   private eventChallengesRef: any;
   private clubsRankRef: any;
   private clubVideosRef: any;
+  private joinClubMembers: any;
 
   // Common
   private userProfile: UserProfileModel;
@@ -69,6 +65,7 @@ export class FirebaseService {
     this.eventChallengesRef = firebase.database().ref(DB_ROOT_EVENT_CHALLENGES);
     this.clubsRankRef = firebase.database().ref(DB_ROOT_CLUBS_RANK);
     this.clubVideosRef = firebase.database().ref(DB_ROOT_CLUB_VIDEOS);
+    this.joinClubMembers = firebase.database().ref(DB_ROOT_JOIN_CLUB_MEMBERS);
   }
 
   // Login control.
@@ -201,58 +198,56 @@ export class FirebaseService {
   }
 
   /**
-   * Get all clubs.
+   * Status result: 1 - OK; 2 - Club full; 3 - club not exists; 4 - user already belong.
+   *                5 - already have a pending request.
    */
-  // listClubsForUser(): any {
-  //   let uid = firebase.auth().currentUser.uid;
-  //   return new Promise( (resolve, reject) => {
-  //     Promise.all([this.getAllClubs(), 
-  //                 this.getUserClubKeys(uid),
-  //                 this.getUserPendingJoinClubs(uid)])
-  //     .then(data => {
-  //       let allClubs = data[0];
-  //       let userClubsKeys = data[1];
-  //       let pendingUserJoinClubs = data[2];
-
-  //       for (let c of allClubs) {
-  //         let clubKey = c.getClubKey().valueOf();
-  //         // current user belong to this club.
-  //         if (userClubsKeys.length > 0 && userClubsKeys.indexOf(clubKey) > -1) {
-  //           c.setClubUserStatus(CLUB_USER_STATUS.MEMBER);
-  //         } // current user wait for aproval to became member of clube.
-  //         else if (pendingUserJoinClubs.length > 0 
-  //                     && pendingUserJoinClubs.indexOf(clubKey) > -1) {
-  //           c.setClubUserStatus(CLUB_USER_STATUS.PENDING);
-  //         } else {
-  //           c.setClubUserStatus(CLUB_USER_STATUS.NOT_MEMBER);
-  //         }
-  //       }
-  //       resolve(allClubs);
-  //     }, err => {reject(err)});
-  //   });
-  // }
-
-  // requestAccessToClub(club: ClubModel): Promise<any> {
-  //   return new Promise( (resolve, reject) => {
-  //     let uid = firebase.auth().currentUser.uid;
-  //     let clubKey = club.getClubKey();
-  //     // Uses update to keep the structe on db: root/clubkey/uid: true.
-  //     let update = {};
-  //     update[DB_ROOT_JOIN_CLUB_MEMBERS + club.getClubKey() + '/' + uid] = true;
-  //     update[DB_ROOT_JOIN_MEMBER_CLUBS + uid + '/' + club.getClubKey()] = true; 
-  //     firebase.database().ref().update(update).then( _ => {
-  //       resolve(true)
-  //     }).catch( err => reject(err) );
-  //   });
-  // }
-
   requestAccessToClub(clubKey: string): Promise<number> {
     return new Promise((resolve, reject) => {
+      let uid = firebase.auth().currentUser.uid;
       let commands = [];
-      commands[0] = this.clubsRef.child(clubKey).child('maxMembers').once('value');
-      commands[1] = this.memberClubsRef.child(this.userProfile.getUid()).child(clubKey).once('value');
+      commands[0] = this.clubsRef.child(clubKey).once('value');
+      commands[1] = this.memberClubsRef.child(uid).child(clubKey).once('value');
+      commands[2] = this.joinClubMembers.child(clubKey).child(uid).once('value');
 
-      // TODO, waiting for feature max number of members in club.
+      Promise.all(commands).then(results => {
+        let snapClub = results[0];
+        let snapHasClub = results[1];
+        let snapJoinClubMembers = results[2];
+
+        // Club does not exist.
+        if (snapClub.val() === null) {
+          resolve(3);
+          return;
+        }
+
+        // User already belong to this club.
+        if (snapHasClub.val() !== null) {
+          resolve(4);
+          return;
+        }
+
+        // Already have a pending request.
+        if (snapJoinClubMembers.val() !== null) {
+          resolve(5)
+          return;
+        }
+
+        //let club = ClubModel.toClubModel(snapClub.val());
+        // Max quantity members reached.
+        if (snapClub.val().maxMembers === snapClub.val().qntdMembers) {
+          resolve(2);
+          return;
+        }
+
+        // All right, can request access.
+        let update = {};
+        update[DB_ROOT_JOIN_CLUB_MEMBERS + clubKey + '/' + uid] = true;
+        firebase.database().ref('/').update(update)
+        .then( _ => {
+          resolve(1);
+        });
+
+      }, (err) => {reject(err)});
     });
   }
 
@@ -301,6 +296,12 @@ export class FirebaseService {
 
   acceptPendingUsersToClub(users: Array<UserProfileModel>, club: ClubModel): Promise<any> {
     return new Promise((resolve, reject) => {
+      // Can not proceed, exceed the max allowed number of members.
+      if ((club.qntdMembers + users.length) > club.maxMembers) {
+        resolve(false);
+        return;
+      }
+        
       // Update each user in db user and db clubs
       let commands = {};      
       users.forEach(user => {
@@ -315,16 +316,17 @@ export class FirebaseService {
           + club.getClubKey()
           + "/" + user.getUid()] = true;
 
-        //Remove
+        // Update
+        commands[
+          DB_ROOT_CLUBS 
+          + club.getClubKey()
+          + '/qntdMembers'] = club.qntdMembers + users.length;
+
+        // Remove
         commands[
           DB_ROOT_JOIN_CLUB_MEMBERS
           + club.getClubKey()
           + "/" + user.getUid()] = null;
-
-        commands[
-          DB_ROOT_JOIN_MEMBER_CLUBS
-          + user.getUid()
-          + "/" + club.getClubKey()] = null;
 
           // Add to rank
           commands[DB_ROOT_CLUBS_RANK + club.getClubKey() 
@@ -355,11 +357,6 @@ export class FirebaseService {
           DB_ROOT_JOIN_CLUB_MEMBERS
           + club.getClubKey()
           +"/"+ user.getUid()] = null;
-
-        commands[
-          DB_ROOT_JOIN_MEMBER_CLUBS
-          + user.getUid()
-          +"/"+ club.getClubKey()] = null;
       });
 
       firebase.database().ref().update(commands)
@@ -805,34 +802,6 @@ export class FirebaseService {
             resolve(this.userProfile);
           }, (err) => {reject(err)});
         }
-    });
-  }
-
-  private getUserPendingJoinClubs(uid: string): Promise<Array<string>> {
-    return new Promise( (resolve, reject) => {
-      firebase.database().ref(DB_ROOT_JOIN_MEMBER_CLUBS).child(uid)
-      .once('value', snapshot => {
-        let joinClubKeys: string[] = [];
-        // Convert Object Like {key: true, key: true}, to array of keys.
-        for (let key in snapshot.val()) {
-          joinClubKeys.push(key);
-        } 
-        resolve(joinClubKeys);
-      }, err => {reject(err)});
-    });
-  }
-
-  private getAllClubs(): Promise<Array<ClubModel>> {
-    return new Promise( (resolve, reject) => {
-      this.clubsRef.once('value', snapshots => {
-        let clubs: Array<ClubModel> = new Array;
-        snapshots.forEach(snapshot => {
-          let club: ClubModel = ClubModel.toClubModel(snapshot.val());
-          club.setClubKey(snapshot.key);
-          clubs.push(club);
-        });
-        resolve(clubs);
-      });
     });
   }
 

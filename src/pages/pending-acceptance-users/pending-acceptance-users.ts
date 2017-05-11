@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
-import { ClubModel, CLUB_USER_STATUS } from '../../model/club-model';
+import { ClubModel } from '../../model/club-model';
 import { UserProfileModel } from '../../model/user-profile-model';
 
 import { FirebaseService } from '../../providers/firebase-service';

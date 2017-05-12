@@ -35,11 +35,11 @@
             type="number"></ion-input>
         </ion-item>
         <ion-item *ngIf="!isAdminLogged">
-          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+          <ion-input [ngModel]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+          <ion-input [ngModel]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
         <ion-item>
@@ -50,15 +50,15 @@
         </ion-item>
         <ion-item>
           <ion-buttons class="buttons-card">
-            <button ion-button outline icon-left 
-              (click)="confirmAccomplishedChallenge(c)">
-              <ion-icon name="ios-thumbs-up"></ion-icon>
-              CONFIRMAR
-            </button>
             <button ion-button color="danger" outline icon-left 
               (click)="refuseAccomplishedChallenge(c)">
               <ion-icon name="ios-thumbs-down"></ion-icon>
               RECUSAR
+            </button>
+            <button ion-button outline icon-left 
+              (click)="confirmAccomplishedChallenge(c)">
+              <ion-icon name="ios-thumbs-up"></ion-icon>
+              CONFIRMAR
             </button>
           </ion-buttons>
         </ion-item>
@@ -177,11 +177,11 @@
           <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
         <ion-item>
-          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+          <ion-input [ngModel]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+          <ion-input [ngModel]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
         <ion-item>
@@ -253,11 +253,11 @@
           <H2>{{c.userChallenger.displayName}}</H2>
         </ion-item>
         <ion-item>
-          <ion-input [(ngModel)]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
+          <ion-input [ngModel]="c.challengerWins" style="width: 8%; float: left; direction:rtl;" 
             type="number" readonly></ion-input>
           <ion-input style="max-width: 35px; float: center;" 
             type="text" placeholder="VS" readonly></ion-input>
-          <ion-input [(ngModel)]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
+          <ion-input [ngModel]="c.challengedWins" style="width: 8%; float: right;  direction:ltr;"
             type="number" readonly></ion-input>
         </ion-item>
         <ion-item>

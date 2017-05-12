@@ -28,8 +28,8 @@ export class MyApp {
     });
 
     this.pages = [
-      { title: 'Meus Clubes', component: 'UserClubs' },
-      { title: 'Acesso por chave', component: 'ClubRequestAccess' },
+      { title: 'Meus Clãs', component: 'UserClubs' },
+      { title: 'Integrar Clã', component: 'ClubRequestAccess' },
       { title: 'Perfil', component: 'UserProfile' }
     ];
 

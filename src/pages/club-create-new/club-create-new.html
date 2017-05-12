@@ -1,7 +1,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Crie seu clube</ion-title>
+    <ion-title>Crie seu clã</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -51,7 +51,7 @@
     </ion-item>
     <ion-item class="error-message" *ngIf="!createClubForm.controls.description.valid  
       && (descriptionChanged || submitAttempt)">
-      <p>Descrição válida.</p>
+      <p>Descrição inválida.</p>
     </ion-item>
   </form>
   <ion-item>

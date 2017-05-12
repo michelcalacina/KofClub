@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, LoadingController } from 'ionic-angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { FirebaseService } from '../../providers/firebase-service';
 
@@ -14,13 +14,12 @@ export class Login {
   emailChanged: boolean = false;
   passwordChanged: boolean = false;
   submitAttempt: boolean = false;
-  loading: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams
-  , public firebaseService: FirebaseService, public formBuilder: FormBuilder
-  , public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+  constructor(private navCtrl: NavController, private navParams: NavParams
+  , private firebaseService: FirebaseService, private formBuilder: FormBuilder
+  , private toastCtrl: ToastController, private loadingCtrl: LoadingController) {
   
-    let EMAIL_REGEXP = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
+    let EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     this.loginForm = formBuilder.group({
       email: ['', Validators.compose([Validators.required, Validators.pattern(EMAIL_REGEXP)])],
       password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
@@ -42,35 +41,29 @@ export class Login {
 
   loginUser() {
     this.submitAttempt = true;
-
     if (!this.loginForm.valid) {
       return;
     }
 
+    let loading = this.loadingCtrl.create({
+      dismissOnPageChange: true,
+    });
+    loading.present();
+
     this.firebaseService.login(
       this.loginForm.value.email,
       this.loginForm.value.password
-    ).then( FirebaseService => {
+    ).then( () => {
+      loading.dismiss();
       this.navCtrl.setRoot('Home');
-    }, error => {
-      this.loading.dismiss().then( () => {
-        let alert = this.alertCtrl.create({
-          message: error.message,
-          buttons: [
-            {
-              text: "OK",
-              role: 'cancel'
-            }
-          ]
-        });
-        alert.present();
-      })
+    }, (err) => {
+      this.submitAttempt = false;
+      loading.dismiss();
+      this.toastCtrl.create({
+        message: "Falha, certifique-se de estar conectado e que suas credenciais estão corretas!",
+        duration: 5000,
+        dismissOnPageChange: true
+      }).present();
     });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    })
-
-    this.loading.present();
   }
 }

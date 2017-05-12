@@ -69,7 +69,7 @@ export class FirebaseService {
   }
 
   // Login control.
-  login(email: string, password: string): any {
+  login(email: string, password: string): Promise<boolean> {
     return new Promise((resolve,reject) => {
       this.fireAuth.signInWithEmailAndPassword(email, password)
       .then((snapshot) => {
@@ -112,8 +112,6 @@ export class FirebaseService {
             let update = {};
             update[DB_ROOT_USERS + newUser.uid] = userProfile.toJSON();
             
-
-
             // Update user profile db.
             firebase.database().ref().update(update).then( _ => {
               // after update login with new user.
@@ -128,6 +126,31 @@ export class FirebaseService {
 
   resetPassword(email: string): any {
     return this.fireAuth.sendPasswordResetEmail(email);
+  }
+
+  changePassword(email: string, currentPassword: string, newPassword: string): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+      this.login(email, currentPassword)
+      .then(result => {
+        if (result) {
+          this.fireAuth.currentUser.updatePassword(newPassword)
+          .then(() => {
+            resolve(true);
+          },(err) => reject(err));
+        } else {
+          reject(result);
+        }
+      });
+    });
+  }
+
+  changeEmail(newEmail: string): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+      this.fireAuth.currentUser.updateEmail(newEmail)
+      .then(() => {
+        resolve(true);
+      }, (err) => {reject(err)});
+    });
   }
 
   logout(): any {

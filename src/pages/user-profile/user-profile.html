@@ -2,11 +2,44 @@
 
   <ion-navbar>
     <ion-title>Meu Perfil</ion-title>
+    <ion-buttons end>
+      <ion-toggle [(ngModel)]="isEditMode"></ion-toggle>
+    </ion-buttons>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-<h2>Em breve!</h2>
+  <ion-avatar (swipe)="changeAvatar($event)" *ngIf="isEditMode">
+    <img src={{newAvatarUrl}}>
+  </ion-avatar>
+  <ion-avatar *ngIf="!isEditMode">
+    <img src={{profile.thumbnailUrl}}>
+  </ion-avatar>
+
+  <ion-item no-lines *ngIf="isEditMode">
+    <ion-label stacked>Nome</ion-label>
+    <ion-input [(ngModel)]="newName" 
+              type="text"></ion-input>
+  </ion-item>
+  <ion-item no-lines *ngIf="!isEditMode">
+    <ion-label stacked>Nome</ion-label>
+    <ion-input [ngModel]="profile.displayName" 
+              type="text" readonly></ion-input>
+  </ion-item>
+
+  <ion-item no-lines *ngIf="isEditMode">
+    <ion-label stacked>E-mail</ion-label>
+    <ion-input [(ngModel)]="newEmail" 
+              type="email"></ion-input>
+  </ion-item>
+  <ion-item no-lines *ngIf="!isEditMode">
+    <ion-label stacked>E-mail</ion-label>
+    <ion-input [ngModel]="profile.email" 
+              type="email" readonly></ion-input>
+  </ion-item>
+
+  <button ion-button full [disabled]="!isEditMode" (click)="saveChanges()">Aplicar</button>
+  <button ion-button round [disabled]="isEditMode" (click)="changePassword()">Trocar Senha</button>
 </ion-content>

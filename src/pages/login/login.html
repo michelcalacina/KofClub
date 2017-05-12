@@ -4,11 +4,11 @@
     <ion-item>
       <ion-label stacked>E-mail</ion-label>
       <ion-input #email formControlName="email" type="email" (change)="elementChanged(email)"
-        placeholder="Digite seu e-mail"
+        placeholder="exemplo@mail.com"
         [class.invalid]="!loginForm.controls.email.valid && (emailChanged || submitAttempt)"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!loginForm.controls.email.valid  && (emailChanged || submitAttempt)">
-      <p>Por favor insira um e-mail válido.</p>
+      <p>E-mail inválido.</p>
     </ion-item>
     <ion-item>
       <ion-label stacked>Senha</ion-label>
@@ -17,7 +17,7 @@
         [class.invalid]="!loginForm.controls.password.valid && (passwordChanged || submitAttempt)"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!loginForm.controls.password.valid  && (passwordChanged || submitAttempt)">
-      <p>A senha precisa ter 6 no mínimo 6 caracteres</p>
+      <p>Mínimo de 6 caracteres</p>
     </ion-item>
     <button ion-button block type="submit">
       Enviar

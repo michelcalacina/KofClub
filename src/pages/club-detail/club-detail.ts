@@ -20,8 +20,10 @@ export class ClubDetail {
   public base64declaration = "data:image/png;base64,";
 
   private newPicture = null;
-  private newName = null;
+  private newTitle = null;
   private newDescription = null;
+  private newMaxMembers = 0;
+  private minMembersQntd = 8;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
     private firebaseService: FirebaseService, private cameraService: CameraService,
@@ -31,8 +33,13 @@ export class ClubDetail {
     this.club = navParams.get("club");
     this.isAdmin = navParams.get("isAdmin");
     this.isEditMode = false;
-    this.newName = this.club.title;
+    this.newTitle = this.club.title;
     this.newDescription = this.club.description;
+    this.newMaxMembers = this.club.maxMembers;
+
+    if (this.club.qntdMembers > this.minMembersQntd) {
+      this.minMembersQntd = this.club.qntdMembers;
+    }
   }
 
   takePictureGallery() {
@@ -57,7 +64,82 @@ export class ClubDetail {
   }
 
   saveChanges() {
-    // TODO
+    if (this.newTitle.trim().length === 0) {
+      this.showToastMessage("Nome do clã não pode estar em branco!", false);
+      return;
+    }
+
+    if (this.newDescription.trim().length === 0) {
+      this.showToastMessage("Descrição do clã não pode estar em branco!", false);
+      return;
+    }
+    
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+
+    let paramTitle = null;
+    let paramDescription = null;
+    let paramMaxMembers = 0;
+
+    if (this.newTitle.valueOf() !== this.club.title) {
+      paramTitle = this.newTitle.trim();
+    }
+
+    if (this.newDescription.valueOf() !== this.club.description) {
+      paramDescription = this.newDescription.trim();
+    }
+
+    if (this.newMaxMembers !== this.club.maxMembers) {
+      paramMaxMembers = this.newMaxMembers;
+    }
+
+    this.firebaseService.updateClub(paramTitle, paramDescription, paramMaxMembers
+    , this.newPicture, this.club).then(objectResult => {
+      // Update club
+      if (paramTitle) {
+        this.club.title = paramTitle;
+      }
+
+      if (paramDescription) {
+        this.club.description = paramDescription;
+      }
+
+      if (paramMaxMembers > 0) {
+        this.club.maxMembers = paramMaxMembers;
+      }
+
+      if (this.newPicture != null) {
+        this.club.thumbnailURL = objectResult.newURL;
+        this.club.logoName = objectResult.newLogoName;
+      }
+
+      loading.dismiss();
+      this.showToastMessage("Alterações realizadas com sucesso!", true);
+    }, (err) => {
+      console.log(err);
+      this.showToastMessage("Falha ao aplicar alterações!", false);
+    });
+  }
+
+  private showToastMessage(message: string, showClose: boolean) {
+    let toast = this.toastCtrl.create({
+      message: message,
+      dismissOnPageChange: true,
+      closeButtonText: "OK"
+    });
+    if (showClose) {
+      toast.setShowCloseButton(true);
+    } else {
+      toast.setDuration(3000);
+    }
+
+    toast.onDidDismiss(() => {
+      if (showClose) {
+        this.navCtrl.pop();
+      }
+    });
+
+    toast.present();
   }
 
 }

@@ -9,7 +9,7 @@
 
 <ion-content padding>
   <div class="picture-frame">
-      <ion-item>
+      <ion-item no-lines>
         <ion-thumbnail>
           <img *ngIf="!isEditMode" src={{club.thumbnailURL}}>
           <img *ngIf="isEditMode && newPicture !== null" src={{getPicture()}} >
@@ -26,7 +26,7 @@
 
   <ion-item no-lines *ngIf="isEditMode">
     <ion-label stacked>Nome</ion-label>
-    <ion-input [(ngModel)]="newName" 
+    <ion-input [(ngModel)]="newTitle" 
               type="text"></ion-input>
   </ion-item>
   <ion-item no-lines *ngIf="!isEditMode">
@@ -46,13 +46,26 @@
               type="text" readonly></ion-input>
   </ion-item>
 
+  <ion-item no-lines *ngIf="!isEditMode">
+    <h4 style="color: darkgray">Membros</h4>
+    <h3>{{club.qntdMembers}}/{{club.maxMembers}}</h3>
+  </ion-item>
+  <ion-item no-lines *ngIf="isEditMode">
+    <h4 style="color: darkgray">Membros</h4>
+    <h3>{{club.qntdMembers}}/{{newMaxMembers}}</h3>
+    <ion-item>
+      <ion-range [(ngModel)]="newMaxMembers" color="secondary" snaps="true" pin="true"
+        min={{minMembersQntd}} max="48" step="8"></ion-range>
+    </ion-item>
+  </ion-item>
+
   <ion-item no-lines>
     <ion-fab right>
         <button ion-fab mini (click)="shareKey()">
           <ion-icon name="md-share"></ion-icon>
         </button>
     </ion-fab>
-    <h3 style="color: darkgray">Chave de acesso</h3>
+    <h4 style="color: darkgray">Chave de acesso</h4>
     <h3>{{club.getClubKey()}}</h3>
   </ion-item>
 

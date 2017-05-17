@@ -161,7 +161,7 @@ export class FirebaseService {
   // Club Control
   createClub(clubName: string, clubDescription: string, maxMembers: number
   , dataBase64: any): any {
-    let fileName = clubName + ".png";
+    let fileName = clubName.trim() + ".png";
     return new Promise((resolve, reject) => {
       this.uploadBlob(dataBase64, fileName, ST_PATH_LOGOS)
         .then((downloadURL) => {
@@ -173,6 +173,7 @@ export class FirebaseService {
           club.creationDate = firebase.database.ServerValue.TIMESTAMP;
           club.thumbnailURL = downloadURL;
           club.maxMembers = maxMembers;
+          club.logoName = fileName;
           club.admins.push(uid);
 
           let newClubKey = this.clubsRef.push().key;
@@ -198,6 +199,58 @@ export class FirebaseService {
             resolve(true);
           }).catch( err => {reject(err)});
       })
+    });
+  }
+
+  /**
+   * Update Club
+   */
+  updateClub(newTitle: string, newDescription: string, newMaxMembers: number,
+    newLogoBase64: any, club: ClubModel): Promise<any> {
+    return new Promise((resolve,reject) => {
+
+      let currentFileName = club.title.trim() + '.png';
+      // Update club.
+      let objUpdate = {};
+
+      if (newTitle !== null) {
+        objUpdate["title"] = newTitle;
+      }
+
+      if (newDescription !== null) {
+        objUpdate["description"] = newDescription;
+      }
+
+      if (newMaxMembers > 0) {
+        objUpdate["maxMembers"] = newMaxMembers;
+      }
+
+      // Update File
+      if (newLogoBase64 !== null) {
+        // Delete old logo.
+        let currentLogoRef = firebase.storage().ref(ST_PATH_LOGOS + club.logoName);
+        currentLogoRef.delete().then(() => {
+          let fileName = null;
+          if (newTitle !== null) {
+            fileName = newTitle.trim() + '.png';
+          } else {
+            fileName = currentFileName;
+          }
+          this.uploadBlob(newLogoBase64, fileName, ST_PATH_LOGOS).then((newUrlFile) => {
+            objUpdate["thumbnailURL"] = newUrlFile;
+            objUpdate["logoName"] = fileName;
+            club.thumbnailURL = newUrlFile;
+            this.clubsRef.child(club.getClubKey()).update(objUpdate).then(() => {
+              resolve({"newURL": newUrlFile, "newLogoName": fileName});
+            });
+          }, (err) => {reject(err);});
+        });
+      } else {
+        this.clubsRef.child(club.getClubKey()).update(objUpdate).then(() => {
+           resolve({});
+        }, (err) => {reject(err);});
+      }
+
     });
   }
 

@@ -13,6 +13,7 @@ export class ClubModel {
     public admins: Array<string>;
     public maxMembers: number;
     public qntdMembers: number;
+    public logoName: string;
 
     private _clubKey: string;
     private clubUserStatus: CLUB_USER_STATUS;
@@ -49,6 +50,7 @@ export class ClubModel {
         club.creationDate = jsonLike.creationDate;
         club.maxMembers = jsonLike.maxMembers;
         club.qntdMembers = jsonLike.qntdMembers;
+        club.logoName = jsonLike.logoName;
         let admins = jsonLike.admins;
         for(let ua in admins) {
             club.admins.push(ua);
@@ -68,6 +70,7 @@ export class ClubModel {
                 "creationDate": this.creationDate,
                 "maxMembers": this.maxMembers,
                 "qntdMembers": this.qntdMembers,
+                "logoName": this.logoName,
                 "admins": jua};
     }
 }

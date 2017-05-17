@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Informações</ion-title>
+    <ion-buttons end *ngIf="isAdmin">
+      <ion-toggle [(ngModel)]="isEditMode"></ion-toggle>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div class="picture-frame">
+      <ion-item>
+        <ion-thumbnail>
+          <img *ngIf="!isEditMode" src={{club.thumbnailURL}}>
+          <img *ngIf="isEditMode && newPicture !== null" src={{getPicture()}} >
+          <img *ngIf="isEditMode && newPicture === null" src={{club.thumbnailURL}}>
+        </ion-thumbnail>
+      </ion-item>
+      
+      <ion-fab center *ngIf="isEditMode" >
+        <button ion-fab mini (click)="takePictureGallery()">
+          <ion-icon name="images"></ion-icon>
+        </button>
+      </ion-fab>
+  </div>
+
+  <ion-item no-lines *ngIf="isEditMode">
+    <ion-label stacked>Nome</ion-label>
+    <ion-input [(ngModel)]="newName" 
+              type="text"></ion-input>
+  </ion-item>
+  <ion-item no-lines *ngIf="!isEditMode">
+    <ion-label stacked>Nome</ion-label>
+    <ion-input [ngModel]="club.title" 
+              type="text" readonly></ion-input>
+  </ion-item>
+
+  <ion-item no-lines *ngIf="isEditMode">
+    <ion-label stacked>Descrição</ion-label>
+    <ion-input [(ngModel)]="newDescription" 
+              type="text"></ion-input>
+  </ion-item>
+  <ion-item no-lines *ngIf="!isEditMode">
+    <ion-label stacked>Descrição</ion-label>
+    <ion-input [ngModel]="club.description" 
+              type="text" readonly></ion-input>
+  </ion-item>
+
+  <ion-item no-lines>
+    <ion-fab right>
+        <button ion-fab mini (click)="shareKey()">
+          <ion-icon name="md-share"></ion-icon>
+        </button>
+    </ion-fab>
+    <h3 style="color: darkgray">Chave de acesso</h3>
+    <h3>{{club.getClubKey()}}</h3>
+  </ion-item>
+
+  <button ion-button full [disabled]="!isEditMode" (click)="saveChanges()">Aplicar</button>
+
+</ion-content>

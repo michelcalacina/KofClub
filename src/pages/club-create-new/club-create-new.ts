@@ -40,7 +40,6 @@ export class ClubCreateNew {
   takePictureGallery() {
     this.cameraService.getPicture(false).then( (imageData) => {
       this.loading.dismiss().then( () => {
-        //this.pictureTaken = 'data:image/png;base64,' + imageData;
         this.pictureTaken = imageData;
         this.isPictureTaken = true;
       });

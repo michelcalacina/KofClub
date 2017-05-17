@@ -11,6 +11,7 @@ import { FirebaseService } from '../providers/firebase-service';
 import { CameraService } from '../providers/camera-service';
 import { Camera } from '@ionic-native/camera';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { SocialSharing } from '@ionic-native/social-sharing';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
     FirebaseService,
     CameraService,
     ScreenOrientation,
+    SocialSharing,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

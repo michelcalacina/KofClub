@@ -23,7 +23,7 @@ export class ClubRequestAccess {
 
   requestAccess() {
     if (this.clubKey === undefined || this.clubKey.trim().length === 0) {
-      this.presentToast("Informe a chave do clube");
+      this.presentToast("Informe a chave do clã");
       return;
     }
 
@@ -37,11 +37,11 @@ export class ClubRequestAccess {
       if (status === 1) {
         this.presentToast("Feito, aguardando validação.", true);
       } else if (status === 2) {
-        this.presentToast("Desculpe, o clube está cheio!");
+        this.presentToast("Desculpe, o clã está cheio!");
       } else if (status === 3) {
-        this.presentToast("Desculpe, esse clube não existe!");
+        this.presentToast("Desculpe, esse clã não existe!");
       } else if (status === 4) {
-        this.presentToast("Você já faz parte desse clube!");
+        this.presentToast("Você já faz parte desse clã!");
       } else if (status === 5) {
         this.presentToast("Já existe uma solicitação em avaliação!");
       }

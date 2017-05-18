@@ -13,18 +13,22 @@ import { ClubModel } from '../../model/club-model';
 export class Home {
   
   clubs: Array<ClubModel>;
-  private hasLoadedUser = false;
+  private haveNoClub: boolean;
+  private userName: string;
   
   constructor(public navCtrl: NavController, private firebaseService: FirebaseService
   , private loadingCtrl: LoadingController) {
     
     this.clubs = new Array<ClubModel>();
-    
+    this.haveNoClub = false;
     firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
         navCtrl.setRoot('Login'); 
       } else {
         this.loadClubsList();
+        this.firebaseService.getUserProfile().then(user => {
+          this.userName = user.displayName;
+        });
       }
     });
   }
@@ -33,7 +37,7 @@ export class Home {
     this.firebaseService.logout();
   }
 
-  ionViewWillLoad() {
+  ionViewWillEnter() {
     if (firebase.auth().currentUser !== null) {
       this.loadClubsList();
     }
@@ -45,7 +49,11 @@ export class Home {
 
     this.firebaseService.listCurrentUserClubs()
       .then( clubList => {
-        this.clubs = clubList;
+        if (clubList.length === 0) {
+          this.haveNoClub = true;
+        } else {
+          this.clubs = clubList;
+        }
         loading.dismiss();
       }, (err) => {
         console.log(err);
@@ -57,4 +65,11 @@ export class Home {
     this.navCtrl.push('ClubHome', {"club": club});
   }
 
+  openEnterKey() {
+    this.navCtrl.push('ClubRequestAccess');
+  }
+
+  openCreateNew() {
+    this.navCtrl.push('ClubCreateNew');
+  }
 }

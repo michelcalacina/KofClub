@@ -81,7 +81,7 @@ export class ClubCreateNew {
     }, error => {
       this.loading.dismiss().then( () => {
         this.showToastMessage(
-          "Não consegui criar o club, talvez esteja com problema de conexão no momento!"
+          "Falha, por favor verifique a conexão com a internet, ou tente novamente mais tarde!"
           , false);
       });
     });

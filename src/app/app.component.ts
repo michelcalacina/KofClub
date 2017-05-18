@@ -28,7 +28,7 @@ export class MyApp {
     });
 
     this.pages = [
-      { title: 'MEUS CLÃS', component: 'UserClubs' },
+      { title: 'CRIAR CLÃ', component: 'ClubCreateNew' },
       { title: 'ACESSAR CLÃ', component: 'ClubRequestAccess' },
       { title: 'PERFIL', component: 'UserProfile' }
     ];

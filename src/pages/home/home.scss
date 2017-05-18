@@ -1,10 +1,35 @@
 page-home {
+    .toolbar-background {
+        background-color: #e65100;
+    }
+
+    ion-list-header {
+        margin: 0px !important;
+    }
+
+    .warning-buttons {
+        text-align: center;
+
+        button {
+            width: 14rem;
+        } 
+    }
+
+    .warning-no-club {
+        font-weight: bold;
+        text-align: center;
+        color: #009688;
+        margin-bottom: 10px;
+    }
+
     ion-item{
         background-color: transparent;
         padding: 0px !important;
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
         ion-card {
             display: flex;
-            background-color: #000000 !important;
+            background-color: #283593 !important;
 
             .left-side {
                 float: left;
@@ -14,7 +39,7 @@ page-home {
                     min-width: 12rem;    
                     min-height: 9rem;
                     img {
-                        max-height: 9rem;    
+                        max-height: 9rem;
                         min-width: 12rem;
                         width: 12rem;
                         height: 9rem;

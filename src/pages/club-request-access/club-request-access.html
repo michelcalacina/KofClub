@@ -1,23 +1,25 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Integrar Clã</ion-title>
+    <ion-title>ACESSAR CLÃ</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
   <ion-item>
     <ion-label color="primary" stacked>Chave do clã</ion-label>
-    <ion-input type="text" [(ngModel)]="clubKey" placeholder="ex.: -KjTMiAyqh21rwsTB6Gx"></ion-input>
+    <ion-input type="text" [(ngModel)]="clubKey" 
+      placeholder="ex.: -KjTMiAyqh21rwsTB6Gx"></ion-input>
   </ion-item>
-
-  <ion-buttons class="buttons-card">
-    <button ion-button color="danger" 
-      (click)="back()">
-      VOLTAR
-    </button>
-    <button ion-button 
-      (click)="requestAccess()">
-      ENVIAR
-    </button>
-  </ion-buttons>
+  <ion-item no-lines>
+    <ion-buttons>
+      <button ion-button left round color="danger" 
+        (click)="back()">
+        VOLTAR
+      </button>
+      <button ion-button right round
+        (click)="requestAccess()">
+        ENVIAR
+      </button>
+    </ion-buttons>
+  </ion-item>
 </ion-content>

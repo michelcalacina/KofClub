@@ -12,11 +12,24 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding>
+  <ion-item text-wrap no-lines *ngIf="haveNoClub">
+    <h2 class="warning-no-club">Bem vindo {{userName}}</h2> 
+    <p class="warning-no-club"> Você pode solicitar acesso a um 
+      clã, para isso é necessário conhecer a chave de acesso do clã, 
+      caso já tenha solicitado acesso, ela pode estar aguardando aprovação, 
+      você também pode criar clãs, e compartilhar com seus amigos a chave de acesso.</p>
+    <p class="warning-no-club">O que você deseja?</p>
+    <ion-buttons class="warning-buttons">
+      <button ion-button round medium left (click)="openEnterKey()">
+        INSERIR CHAVE
+      </button>
+      <button ion-button round medium medium (click)="openCreateNew()">
+        CRIAR CLÃ
+      </button>
+    </ion-buttons>
+  </ion-item>
   <ion-list>
-    <ion-list-header>
-    Meus Clãs
-  </ion-list-header>
     <ion-item *ngFor="let club of clubs" (click)="openClub(club)">
       <ion-card>
         <div class="left-side">

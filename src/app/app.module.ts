@@ -37,7 +37,7 @@ import { SocialSharing } from '@ionic-native/social-sharing';
     CameraService,
     ScreenOrientation,
     SocialSharing,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
 export class AppModule {}

@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { NavController, IonicPage } from 'ionic-angular';
+import { NavController, IonicPage, LoadingController } from 'ionic-angular';
 
 import { FirebaseService } from '../../providers/firebase-service'
 import firebase from 'firebase';
+import { ClubModel } from '../../model/club-model';
 
 @IonicPage()
 @Component({
@@ -11,18 +12,49 @@ import firebase from 'firebase';
 })
 export class Home {
   
-  users: any;
+  clubs: Array<ClubModel>;
+  private hasLoadedUser = false;
   
-  constructor(public navCtrl: NavController, private firebaseService: FirebaseService) {
-    firebase.auth().onAuthStateChanged(function(user){
+  constructor(public navCtrl: NavController, private firebaseService: FirebaseService
+  , private loadingCtrl: LoadingController) {
+    
+    this.clubs = new Array<ClubModel>();
+    
+    firebase.auth().onAuthStateChanged((user) => {
       if (!user) {
-        navCtrl.setRoot('Login');
+        navCtrl.setRoot('Login'); 
+      } else {
+        this.loadClubsList();
       }
     });
   }
 
   logout() {
     this.firebaseService.logout();
+  }
+
+  ionViewWillLoad() {
+    if (firebase.auth().currentUser !== null) {
+      this.loadClubsList();
+    }
+  }
+
+  loadClubsList() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+
+    this.firebaseService.listCurrentUserClubs()
+      .then( clubList => {
+        this.clubs = clubList;
+        loading.dismiss();
+      }, (err) => {
+        console.log(err);
+        loading.dismiss();
+      });
+  }
+
+  openClub(club: ClubModel) {
+    this.navCtrl.push('ClubHome', {"club": club});
   }
 
 }

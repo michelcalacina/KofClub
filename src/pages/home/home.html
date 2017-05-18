@@ -12,6 +12,27 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <h2>Em breve esta tela terá atualizações dos clubes.</h2>
-</ion-content>
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+    Meus Clãs
+  </ion-list-header>
+    <ion-item *ngFor="let club of clubs" (click)="openClub(club)">
+      <ion-card>
+        <div class="left-side">
+          <ion-thumbnail>
+            <img src={{club.thumbnailURL}}>
+          </ion-thumbnail>
+        </div>
+        <div class="right-side">
+          <h2>{{club.title}}</h2>
+          <hr>
+          <h3>{{club.description}}</h3>
+          <hr>
+          <h3 *ngIf="club.qntdMembers == 1">{{club.qntdMembers}} membro</h3>
+          <h3 *ngIf="club.qntdMembers > 1">{{club.qntdMembers}} membros</h3>
+        </div>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+</ion-content> 

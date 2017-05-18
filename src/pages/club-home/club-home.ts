@@ -66,4 +66,8 @@ export class ClubHome {
     this.navCtrl.push("ClubDetail", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
   }
 
+  openMembers() {
+    this.navCtrl.push("ClubMembers", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
+  }
+
 }

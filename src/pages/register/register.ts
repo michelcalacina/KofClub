@@ -35,11 +35,17 @@ export class Register {
     });
 
     this.avatarUrl = "assets/img/flick-right.png";
-    this.avatares = ["profile-akuma.png", "profile-alba.png", "profile-chun-li.png",
-    "profile-clark.png","profile-elena-sf4.png","profile-goro-daimon.png",
-    "profile-hugo.png","profile-ken-master.png","profile-kusanagi.png","profile-leona.png",
-    "profile-lin-xiang-feing.png","profile-makoto.png","profile-ralf-jhones.png","profile-rolento.png",
-    "profile-sie-kensou.png"];
+    this.avatares = ["profile-abel.png","profile-akuma.png","profile-alba.png","profile-amaterasu.png",
+    "profile-athena.png","profile-chun-li.png","profile-clark.png","profile-cris.png","profile-daimon.png",
+    "profile-dante.png","profile-deadpool.png","profile-elena.png","profile-ermac.png","profile-gambit.png",
+    "profile-gogeta.png","profile-hades.png","profile-hugo.png","profile-ikki.png","profile-jill.png","profile-ken.png",
+    "profile-kurama.png","profile-kusanagi.png","profile-leona.png","profile-lin-xiangfei.png",
+    "profile-link.png","profile-lucky.png","profile-mai.png","profile-makoto.png","profile-morrigan.png",
+    "profile-mr-karate.png","profile-nameless.png","profile-naruto.png","profile-orochi-iori.png",
+    "profile-raidenn.png","profile-ralf.png","profile-ramon.png","profile-rolento.png","profile-ryu.png",
+    "profile-saitama.png","profile-saysiu.png","profile-sie.png","profile-smoke.png","profile-strider.png",
+    "profile-subzero.png","profile-vegeto.png","profile-vice.png","profile-wesker.png",
+    "profile-wolverine.png","profile-yashiro.png"];
     this.currentAvatarIndex = -1;
   }
 

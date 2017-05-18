@@ -16,7 +16,6 @@ export class PendingAcceptanceUsers {
   public pendingUsers: Array<UserProfileModel>;
   public users: Array<UserProfileModel>;
   private attemptActionUsers: Array<UserProfileModel>;
-  private loading: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController
@@ -47,9 +46,10 @@ export class PendingAcceptanceUsers {
   }
 
   acceptSelectedUsers() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
     this.firebaseService.acceptPendingUsersToClub(this.attemptActionUsers, this.club)
     .then((res) => {
-      this.loading.dismiss();
       if (this.attemptActionUsers.length === this.users.length) {
         this.navCtrl.pop();
       } else {
@@ -62,22 +62,20 @@ export class PendingAcceptanceUsers {
         this.attemptActionUsers = new Array<UserProfileModel>();
         this.showToastMessage("Feito!");
       }
+      loading.dismiss();
     }, (err) => {
       console.log(err);
-      this.loading.dismiss();
+      loading.dismiss();
       this.showToastMessage("Falha ao adicionar");
     });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
   }
 
   refuseSelectedUsers() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
     this.firebaseService.rejectPendingUsersToClub(this.attemptActionUsers, this.club)
       .then((res) => {
-        this.loading.dismiss();
+        loading.dismiss();
         if (this.attemptActionUsers.length === this.users.length) {
           this.navCtrl.pop();
         } else {
@@ -92,14 +90,9 @@ export class PendingAcceptanceUsers {
        }
       }, (err) => {
         console.log(err);
-        this.loading.dismiss();
+        loading.dismiss();
         this.showToastMessage("Falha ao excluir solicitação!");
     });
-
-    this.loading = this.loadingCtrl.create({
-    dismissOnPageChange: true,
-    });
-    this.loading.present();
   }
 
   showToastMessage(message: string) {

@@ -14,12 +14,19 @@ export class UserProfile {
 
   profile: UserProfileModel;
   isEditMode: boolean;
+  private currentPassword: string;
 
-  private avatares = ["profile-akuma.png", "profile-alba.png", "profile-chun-li.png",
-    "profile-clark.png","profile-elena-sf4.png","profile-goro-daimon.png",
-    "profile-hugo.png","profile-ken-master.png","profile-kusanagi.png","profile-leona.png",
-    "profile-lin-xiang-feing.png","profile-makoto.png","profile-ralf-jhones.png","profile-rolento.png",
-    "profile-sie-kensou.png"];
+  private avatares = ["profile-abel.png","profile-akuma.png","profile-alba.png","profile-amaterasu.png",
+    "profile-athena.png","profile-chun-li.png","profile-clark.png","profile-cris.png","profile-daimon.png",
+    "profile-dante.png","profile-deadpool.png","profile-elena.png","profile-ermac.png","profile-gambit.png",
+    "profile-gogeta.png","profile-hades.png","profile-hugo.png","profile-ikki.png","profile-jill.png","profile-ken.png",
+    "profile-kurama.png","profile-kusanagi.png","profile-leona.png","profile-lin-xiangfei.png",
+    "profile-link.png","profile-lucky.png","profile-mai.png","profile-makoto.png","profile-morrigan.png",
+    "profile-mr-karate.png","profile-nameless.png","profile-naruto.png","profile-orochi-iori.png",
+    "profile-raidenn.png","profile-ralf.png","profile-ramon.png","profile-rolento.png","profile-ryu.png",
+    "profile-saitama.png","profile-saysiu.png","profile-sie.png","profile-smoke.png","profile-strider.png",
+    "profile-subzero.png","profile-vegeto.png","profile-vice.png","profile-wesker.png",
+    "profile-wolverine.png","profile-yashiro.png"];
   private currentAvatarIndex: number;
   
   private newAvatarUrl: string;
@@ -142,7 +149,55 @@ export class UserProfile {
       return;
     }
 
-    // TODO
+    let paramName = null;
+    let paramEmail = null;
+    let paramThumbnailUrl = null;
+    let somethingChanged = false;
+
+    if (this.newName.valueOf() !== this.profile.displayName.valueOf()) {
+      paramName = this.newName;
+      somethingChanged = true;
+    }
+    if (this.newEmail.valueOf() !== this.profile.email.valueOf()) {
+      paramEmail = this.newEmail;
+      somethingChanged = true;
+    }
+    if (this.newAvatarUrl.valueOf() !== this.profile.thumbnailUrl.valueOf()) {
+      paramThumbnailUrl;
+      somethingChanged = true;
+    }
+
+    if (!somethingChanged) {
+      this.showToast("Nada para alterar!");
+      return;
+    }
+
+    if (this.currentPassword === undefined || this.currentPassword.trim().length < 6) {
+      this.showToast("Confirme as alterações digitando a sua senha de usuário!");
+      return;
+    }
+
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
+
+    this.firebaseService.updateUserProfile(paramName, paramEmail
+      , paramThumbnailUrl, this.profile, this.currentPassword).then(() => {
+        if (paramName) {
+          this.profile.displayName = paramName;
+        }
+        if (paramEmail) {
+          this.profile.email = paramEmail;
+        }
+        if (paramThumbnailUrl) {
+          this.profile.thumbnailUrl = paramThumbnailUrl;
+        }
+        loading.dismiss();
+        this.showToast("Perfil atualizado com sucesso!");
+        this.isEditMode = false;
+    }, (err) => {
+      console.log(err);
+      loading.dismiss();
+    });
   }
 
 }

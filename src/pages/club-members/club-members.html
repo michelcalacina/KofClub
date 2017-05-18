@@ -1,0 +1,44 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>MEMBROS</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list no-lines>
+    <ion-item *ngFor="let user of users" (click)="checkUser(user)">
+      <ion-item *ngIf="!user.isChecked">
+        <ion-avatar item-left>
+          <img src={{user.thumbnailUrl}}>
+        </ion-avatar>
+        <h2>{{user.displayName}}</h2>
+        <h2 *ngIf="user.isAdmin">administrador</h2>
+      </ion-item>
+      <ion-item *ngIf="user.isChecked" style="background-color: cornflowerblue">
+        <ion-avatar item-left>
+          <img src={{user.thumbnailUrl}}>
+        </ion-avatar>
+        <h2>{{user.displayName}}</h2>
+        <h2 *ngIf="user.isAdmin">administrador</h2>
+      </ion-item>
+    </ion-item>
+  </ion-list>
+
+  <ion-item no-lines *ngIf="users.length > 0 && isAdmin">
+    <ion-buttons>
+      <button ion-button full
+        [disabled]="attemptActionUsers.length === 0"
+        (click)="giveAdminPower()">
+        TORNAR ADMINISTRADOR
+      </button>
+      <button ion-button full
+        [disabled]="attemptActionUsers.length === 0"
+        (click)="excludeMembers()" color="danger">
+        EXCLUIR
+      </button>
+    </ion-buttons>
+  </ion-item>
+</ion-content>

@@ -17,7 +17,6 @@ export class ClubChallengeCreateNew {
 
   private club: ClubModel;
   challengesProfile: Array<ChallengeProfileModel>;
-  private loading: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public loadingCtrl: LoadingController
@@ -29,10 +28,8 @@ export class ClubChallengeCreateNew {
   }
 
   private loadOpponents() {
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
 
     this.firebaseService.getClubOtherMembers(this.club)
     .then((users: Array<UserProfileModel>) => {
@@ -52,9 +49,9 @@ export class ClubChallengeCreateNew {
         this.challengesProfile.push(challengeProfile);
       });
 
-      this.loading.dismiss();
+      loading.dismiss();
     }, (err) => {
-      this.loading.dismiss();
+      loading.dismiss();
       console.log(err);
     });
   }

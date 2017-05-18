@@ -1,0 +1,15 @@
+page-club-members {
+    .toolbar-background {
+        background-color: #4a148c;
+    }
+
+    h2 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        float: left;
+    }
+
+    ion-icon {
+        float: right;
+    }    
+}

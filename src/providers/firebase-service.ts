@@ -156,6 +156,48 @@ export class FirebaseService {
   logout(): any {
     return this.fireAuth.signOut();
   }
+
+  updateUserProfile(newName: string, newEmail: string, newAvatarUrl: string
+    , profile: UserProfileModel, userPassword: string): Promise<any> {
+    return new Promise((resolve,reject) => {
+      this.login(profile.email, userPassword).then(() => {
+        let objectUpdate = {};
+        if (newName) {
+          objectUpdate["displayName"] = newName;
+        }
+
+        if (newAvatarUrl) {
+          objectUpdate["thumbnailUrl"] = newAvatarUrl;
+        }
+
+        if (newEmail) {
+          objectUpdate["email"] = newEmail;
+          this.changeEmail(newEmail).then(() => {
+            this.usersRef.child(profile.getUid()).update(objectUpdate).then(() => {
+              this.userProfile.email = newEmail;
+              if (newName) {
+                this.userProfile.displayName = newName;
+              }
+              if (newAvatarUrl) {
+                this.userProfile.thumbnailUrl = newAvatarUrl;
+              }
+              resolve(true);
+            });
+          }, (err) => {reject(err);});
+        } else {
+          this.usersRef.child(profile.getUid()).update(objectUpdate).then(() => {
+            if (newName) {
+              this.userProfile.displayName = newName;
+            }
+            if (newAvatarUrl) {
+              this.userProfile.thumbnailUrl = newAvatarUrl;
+            }
+            resolve(true);
+          }, (err) => {reject(err);});
+        }
+      }, (err) => {reject(err);});
+    });
+  }
   //-------------------------------------------
 
   // Club Control

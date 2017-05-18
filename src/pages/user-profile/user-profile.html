@@ -39,6 +39,11 @@
     <ion-input [ngModel]="profile.email" 
               type="email" readonly></ion-input>
   </ion-item>
+  <ion-item no-lines *ngIf="isEditMode">
+    <ion-label stacked>senha</ion-label>
+    <ion-input [(ngModel)]="currentPassword" 
+              type="password" placeholder="Digite sua senha"></ion-input>
+  </ion-item>
 
   <button ion-button full [disabled]="!isEditMode" (click)="saveChanges()">Aplicar</button>
   <button ion-button round [disabled]="isEditMode" (click)="changePassword()">Trocar Senha</button>

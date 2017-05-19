@@ -109,6 +109,7 @@ export class ClubChallenge {
   }
 
   ionViewWillEnter() {
+    this.emptyChallenges = false;
     this.loadChallengesCurrentUser();
   }
 

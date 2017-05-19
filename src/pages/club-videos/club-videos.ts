@@ -94,6 +94,9 @@ export class ClubVideos {
               .then(v => {
                 v.videoUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.baseURL + v.videoId);
                 this.videos.push(v);
+                if (this.emptyVideos) {
+                  this.emptyVideos = false;
+                }
                 loading.dismiss();
               }, (err) => {
                 console.log(err);

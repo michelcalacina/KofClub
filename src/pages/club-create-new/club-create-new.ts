@@ -12,7 +12,6 @@ import { CameraService } from '../../providers/camera-service';
 export class ClubCreateNew {
 
   public createClubForm;
-  loading: any;
   submitAttempt: boolean = false;
   nameChanged: boolean = false;
   descriptionChanged: boolean = false;
@@ -20,6 +19,7 @@ export class ClubCreateNew {
   pictureTaken: any;
   public base64declaration = "data:image/png;base64,";
   public maxMembers = 24;
+  private isClubCreated = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public firebaseService: FirebaseService, public formBuilder: FormBuilder
@@ -38,19 +38,15 @@ export class ClubCreateNew {
   }
 
   takePictureGallery() {
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
     this.cameraService.getPicture(false).then( (imageData) => {
-      this.loading.dismiss().then( () => {
-        this.pictureTaken = imageData;
-        this.isPictureTaken = true;
-      });
+      this.pictureTaken = imageData;
+      this.isPictureTaken = true;
+      loading.dismiss();
     }, (err) => {
-      this.loading.dismiss();
+      loading.dismiss();
     });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present(); 
   }
 
   removeTakenPicture() {
@@ -59,15 +55,19 @@ export class ClubCreateNew {
   }
 
   createClub() {
-    this.submitAttempt = true;
+    if (!this.isPictureTaken) {
+      this.showToastMessage("Logomarca não selecionada!", false);
+      return;
+    }
 
     if (!this.createClubForm.valid) {
+      this.showToastMessage("Preenchimento incorreto!", false);
       return;
     }
-    if (!this.isPictureTaken) {
-      this.showToastMessage("Nenhuma logomarca selecionada!", false);
-      return;
-    }
+    
+    this.submitAttempt = true;
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
 
     this.firebaseService.createClub(
     this.createClubForm.value.name
@@ -75,21 +75,17 @@ export class ClubCreateNew {
     , this.maxMembers
     , this.pictureTaken
     ).then( _ => {
-      this.loading.dismiss().then(()=>{
+      this.isClubCreated = true;
+      loading.dismiss().then(()=>{
         this.showToastMessage(this.createClubForm.value.name + " criado com sucesso!", true);
       })
     }, error => {
-      this.loading.dismiss().then( () => {
+      loading.dismiss().then(() => {
         this.showToastMessage(
           "Falha, por favor verifique a conexão com a internet, ou tente novamente mais tarde!"
           , false);
       });
     });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
   }
 
   public getPicture(): string {

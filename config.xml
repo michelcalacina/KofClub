@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.michnnick.hybrid.kofclub" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>KofClub</name>
+<widget id="com.michnnick.hybrid.match" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Match</name>
     <description>An awesome Ionic/Cordova app.</description>
     <author email="michel.calacina@gmail.com" href="https://www.linkedin.com/in/michel-calacina-10650869/">Developer Contact</author>
     <content src="index.html" />

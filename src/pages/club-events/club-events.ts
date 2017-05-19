@@ -15,6 +15,7 @@ export class ClubEvents {
 
   private club: ClubModel;
   public challengeEvents: Array<ChallengeModel>;
+  private emptyEvents = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public loadingCtrl: LoadingController, public firebaseService: FirebaseService) {
@@ -31,8 +32,10 @@ export class ClubEvents {
 
     this.firebaseService.loadClubEvents(this.club)
     .then((resultData) => {
-      if (resultData.length > 0) {
+      if (resultData[0].length > 0) {
         this.challengeEvents = resultData[0];
+      } else {
+        this.emptyEvents = true;
       }
       loading.dismiss();
     }, (err) => {

@@ -150,21 +150,25 @@ export class ClubMembers {
   private actionSheetMakeAdminExclude(user: UserProfileModel) {
     let actionSheet = this.actionSheetCtrl.create({
       title: 'Alterar/Excluir',
+      cssClass: 'action-sheets-basic-page',
       buttons: [
         {
           text: 'EXCLUIR',
           role: 'destructive',
+          icon: 'trash',
           handler: () => {
             this.showAlertConfirmation(user);
           }
         },{
           text: 'TORNAR ADMINISTRADOR',
+          icon: 'ionitron',
           handler: () => {
             this.giveAdminPower();
           }
         },{
           text: 'CANCELAR',
           role: 'cancel',
+          icon: 'arrow-back',
           handler: () => {
             this.checkUser(user);
           }
@@ -177,22 +181,26 @@ export class ClubMembers {
   actionSheetRemoveAdminExclude(user: UserProfileModel) {
     let actionSheet = this.actionSheetCtrl.create({
       title: 'Alterar/Excluir',
+      cssClass: 'action-sheets-basic-page',
       buttons: [
         {
           text: 'EXCLUIR',
           role: 'destructive',
+          icon: 'trash',
           handler: () => {
             this.showAlertConfirmation(user);
           }
         },{
           text: 'REMOVER PRIVILÉGIO',
-          role: 'destructive',
+          role: 'Destructive',
+          icon: 'remove-circle',
           handler: () => {
             this.removeAdminRole();
           }
         },{
           text: 'CANCELAR',
           role: 'cancel',
+          icon: 'arrow-back',
           handler: () => {
             this.checkUser(user);
           }

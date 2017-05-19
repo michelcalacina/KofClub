@@ -19,6 +19,7 @@ export class ClubChallenge {
   private loggedUser: UserProfileModel;
   private hasEnterCreateNew: boolean;
   private isRefresh: boolean;
+  private emptyChallenges = false;
 
   // Challenges that I receive
   otherChallengesPending: Array<ChallengeModel>;
@@ -142,6 +143,12 @@ export class ClubChallenge {
         dataArray[2].forEach(c => {
           this.challengesAdminValidation.push(c);
         });
+      }
+
+      if (myChallenges.length === 0 
+      && otherChallenges.length === 0 
+      && this.challengesAdminValidation.length === 0) {
+        this.emptyChallenges = true;
       }
 
       myChallenges.forEach(c => {

@@ -19,18 +19,19 @@ export class MyApp {
     , public splashScreen: SplashScreen) {
     //Initialize Firebase
     firebase.initializeApp({
-      apiKey: "AIzaSyAHDEjrqVFI0ko98ShvPVxoTLVYmxLokoo",
-      authDomain: "kof-club.firebaseapp.com",
-      databaseURL: "https://kof-club.firebaseio.com",
-      projectId: "kof-club",
-      storageBucket: "kof-club.appspot.com",
-      messagingSenderId: "696218730032"
+      apiKey: "AIzaSyBNiA4FFyeZJCHi6TveSxxY1hTxrwLCau8",
+      authDomain: "match-dca2f.firebaseapp.com",
+      databaseURL: "https://match-dca2f.firebaseio.com",
+      projectId: "match-dca2f",
+      storageBucket: "match-dca2f.appspot.com",
+      messagingSenderId: "105226965000"
     });
 
     this.pages = [
       { title: 'CRIAR CLÃ', component: 'ClubCreateNew' },
       { title: 'ACESSAR CLÃ', component: 'ClubRequestAccess' },
-      { title: 'PERFIL', component: 'UserProfile' }
+      { title: 'PERFIL', component: 'UserProfile' },
+      { title: 'SOBRE', component: 'About' }
     ];
 
     this.initializeApp();

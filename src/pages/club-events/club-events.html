@@ -1,10 +1,13 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Eventos</ion-title>
+    <ion-title>EVENTOS</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
+<ion-item wrap-text no-lines *ngIf="emptyEvents">
+  <h2>Nenhum evento confirmado!</h2>
+</ion-item>
 <ion-list *ngIf="challengeEvents.length > 0">
   <ion-list-header><H3>DESAFIOS CONFIRMADOS</H3></ion-list-header>
   <ion-item *ngFor="let c of challengeEvents">

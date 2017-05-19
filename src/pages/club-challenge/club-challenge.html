@@ -1,18 +1,18 @@
 <ion-header>
-
   <ion-navbar>
-    <ion-title>Desafios</ion-title>
+    <ion-title>DESAFIOS</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="refresh()">
         <ion-icon name="refresh-circle"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
 <ion-content no-padding>
-
+<ion-item no-lines wrap-text *ngIf="emptyChallenges">
+  <h2>Crie um novo desafio no botão abaixo!</h2>
+</ion-item>
 <!-- Accomplished waiting my confirmation -->
 <ion-list *ngIf="challengesOtherUserAccomplished.length > 0">
   <ion-list-header><H3>CONFIRMAR RESULTADO</H3></ion-list-header>

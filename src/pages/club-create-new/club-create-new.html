@@ -1,7 +1,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>Crie seu clã</ion-title>
+    <ion-title>CRIAR CLÃ</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -59,11 +59,7 @@
       <ion-range [(ngModel)]="maxMembers" color="secondary" snaps="true" pin="true"
       min="8" max="48" step="8"></ion-range>
   </ion-item>
-  <button ion-button block bottom (click)="createClub()">
+  <button [disabled]="isClubCreated" ion-button block bottom (click)="createClub()">
       SALVAR
   </button>
-  <button ion-button block color="danger" bottom (click)="back()">
-      VOLTAR
-  </button>
-  
 </ion-content>

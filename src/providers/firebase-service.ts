@@ -261,8 +261,8 @@ export class FirebaseService {
   // Club Control
   createClub(clubName: string, clubDescription: string, maxMembers: number
   , dataBase64: any): any {
-    let fileName = clubName.trim() + ".png";
     return new Promise((resolve, reject) => {
+      let fileName = clubName.trim() + ".png";
       this.uploadBlob(dataBase64, fileName, ST_PATH_LOGOS)
         .then((downloadURL) => {
           let uid = firebase.auth().currentUser.uid;

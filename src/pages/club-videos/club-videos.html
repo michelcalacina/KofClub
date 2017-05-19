@@ -1,24 +1,27 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Vídeos</ion-title>
+    <ion-title>VÍDEOS</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
+<ion-item text-wrap no-lines *ngIf="emptyVideos">
+  <h2>Não existem vídeos disponíveis para visualização</h2>
+</ion-item>
 <ion-list>
-  <ion-item *ngFor="let video of videos">
-    <ion-fab right *ngIf="isAdmin">
+    <ion-item *ngFor="let video of videos">
+      <ion-fab right *ngIf="isAdmin">
         <button ion-fab mini color="danger" (click)="removeVideo(video)">
           <ion-icon name="trash"></ion-icon>
         </button>
-    </ion-fab>
-    <iframe width="100%" max-height="360" [src]="video.videoUrl" frameborder="0" allowfullscreen>
-    </iframe>
-  </ion-item>
+      </ion-fab>
+      <iframe width="100%" max-height="360" [src]="video.videoUrl" frameborder="0" allowfullscreen>
+      </iframe>
+    </ion-item>
 </ion-list>
-<ion-fab *ngIf="isAdmin" right bottom>
+  <ion-fab *ngIf="isAdmin" right bottom>
     <button ion-fab (click)="addVideo()">
      <ion-icon name="add"></ion-icon>
     </button>
- </ion-fab>
+  </ion-fab>
 </ion-content>

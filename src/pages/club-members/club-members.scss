@@ -3,6 +3,22 @@ page-club-members {
         background-color: #4a148c;
     }
 
+    .action-sheets-basic-page {
+        .ion-md-share {
+            color: #ED4248;
+        }
+        .ion-md-arrow-dropright-circle {
+            color: #508AE4;
+        }
+        .ion-md-heart-outline {
+            color: #31D55F;
+        }
+        .action-sheet-cancel ion-icon,
+        .action-sheet-destructive ion-icon {
+            color: #757575;
+        }
+    }
+
     h2 {
         overflow: hidden;
         text-overflow: ellipsis;

@@ -17,6 +17,7 @@ export class ClubVideos {
 
   private club: ClubModel;
   public isAdmin: boolean;
+  private emptyVideos = false;
   videos: Array<VideoModel>;
   private baseURL = "https://www.youtube.com/embed/";
 
@@ -38,10 +39,14 @@ export class ClubVideos {
 
     this.firebaseService.loadClubVideos(this.club)
     .then(videos => {
-      videos.forEach(video => {
-        video.videoUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.baseURL + video.videoId);
-      });
-      this.videos = videos;
+      if (videos.length === 0) {
+        this.emptyVideos = true;
+      } else {
+        videos.forEach(video => {
+          video.videoUrl = this.domSanitizer.bypassSecurityTrustResourceUrl(this.baseURL + video.videoId);
+        });
+        this.videos = videos;
+      }
       loading.dismiss();
     }, (err) => {
       console.log(err);

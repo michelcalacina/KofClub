@@ -16,6 +16,7 @@ import { ChallengeProfileModel } from '../../model/challenge-profile-model';
 export class ClubChallengeCreateNew {
 
   private club: ClubModel;
+  private loggedUser: UserProfileModel;
   challengesProfile: Array<ChallengeProfileModel>;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
@@ -23,6 +24,7 @@ export class ClubChallengeCreateNew {
   , public modalCtrl: ModalController, public toastCtrl: ToastController) {
     
     this.club = navParams.get("club");
+    this.loggedUser = navParams.get("loggedUser");
     this.challengesProfile = new Array<ChallengeProfileModel>();
     this.loadOpponents();
   }
@@ -31,11 +33,13 @@ export class ClubChallengeCreateNew {
     let loading = this.loadingCtrl.create({dismissOnPageChange: true});
     loading.present();
 
-    this.firebaseService.getClubOtherMembers(this.club)
+    let runningChallenges: Array<string> = this.navParams.get("runningChallenges");
+    this.firebaseService.getClubMembers(this.club)
     .then((users: Array<UserProfileModel>) => {
-      let runningChallenges: Array<string> = this.navParams.get("runningChallenges");
-
       users.forEach(user => {
+        if (this.loggedUser.getUid().valueOf() === user.getUid().valueOf()) {
+          return;
+        }
         let challengeProfile = new ChallengeProfileModel();
         challengeProfile.user = user;
 

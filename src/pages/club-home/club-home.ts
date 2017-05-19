@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 import { FirebaseService } from '../../providers/firebase-service';
 import { ClubModel } from '../../model/club-model';
+import { UserProfileModel } from '../../model/user-profile-model';
 
 @IonicPage()
 @Component({
@@ -13,6 +14,7 @@ export class ClubHome {
 
   public club: ClubModel;
   public isLoggedOnAdmin: boolean = false;
+  private loggedUser: UserProfileModel; 
   
   // For users admin control pending users request to enter on club.
   public pendingUserKeys: Array<string>;
@@ -21,13 +23,16 @@ export class ClubHome {
   , public firebaseService: FirebaseService) {
     
     this.club = navParams.get("club");
-    this.verifyIsLoggedOnAdmin();
+    this.getLoggedUser();
     this.pendingUserKeys = new Array<string>();
   }
 
-  verifyIsLoggedOnAdmin() {
+  getLoggedUser() {
     this.firebaseService.getUserProfile().then((user) => {
+      this.loggedUser = user;
       if (this.club.admins.indexOf(user.getUid().valueOf()) > -1) {
+        this.loggedUser.isAdmin = true;
+        // Refactory, remove this. and foward
         this.isLoggedOnAdmin = true;
       }
     });
@@ -47,7 +52,7 @@ export class ClubHome {
   }
 
   openChallenge() {
-    this.navCtrl.push("ClubChallenge", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
+    this.navCtrl.push("ClubChallenge", {"club": this.club, "isAdmin": this.isLoggedOnAdmin, "loggedUser": this.loggedUser});
   }
 
   openEventChallenge() {
@@ -67,7 +72,7 @@ export class ClubHome {
   }
 
   openMembers() {
-    this.navCtrl.push("ClubMembers", {"club": this.club, "isAdmin": this.isLoggedOnAdmin});
+    this.navCtrl.push("ClubMembers", {"club": this.club, "loggedUser": this.loggedUser});
   }
 
 }

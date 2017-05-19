@@ -38,7 +38,11 @@ export class ClubChallenge {
    public modalCtrl: ModalController) {
 
     this.club = navParams.get("club");
+    this.loggedUser = navParams.get("loggedUser");
+    
+    //Remove after refactory
     this.isAdminLogged = navParams.get("isAdmin");
+    //------------------------------------------------------
 
     this.myChallengesPending = new Array<ChallengeModel>();
     this.otherChallengesPending = new Array<ChallengeModel>();
@@ -49,7 +53,6 @@ export class ClubChallenge {
     this.challengesLoggedUserAccomplished = new Array<ChallengeModel>();
     this.challengesOtherUserAccomplished = new Array<ChallengeModel>();
 
-    this.getLoggedUser();
     this.hasEnterCreateNew = false;
     this.isRefresh = false;
   }
@@ -77,7 +80,8 @@ export class ClubChallenge {
     this.navCtrl.push('ClubChallengeCreateNew', 
     {
       "club": this.club,
-      "runningChallenges": runningChallenges
+      "runningChallenges": runningChallenges,
+      "loggedUser": this.loggedUser
     });
   }
 
@@ -105,12 +109,6 @@ export class ClubChallenge {
 
   ionViewWillEnter() {
     this.loadChallengesCurrentUser();
-  }
-
-  getLoggedUser() {
-    this.firebaseService.getUserProfile().then((user) => {
-      this.loggedUser = user;
-    });
   }
 
   // receive a array with arrays inside, first array contais my challengers,

@@ -198,6 +198,64 @@ export class FirebaseService {
       }, (err) => {reject(err);});
     });
   }
+
+  giveAdminRole(user: UserProfileModel, club: ClubModel): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+      let commandUpdate = {};
+      commandUpdate[user.getUid()] = true;
+      this.clubsRef.child(club.getClubKey()).child('admins')
+      .update(commandUpdate).then(() => {
+        resolve(true);
+      }, (err) => {reject(err);});
+    });
+  }
+
+  removeAdminRole(user: UserProfileModel, club: ClubModel): Promise<boolean> {
+    return new Promise((resolve,reject) => {
+      let commandUpdate = {};
+      commandUpdate[user.getUid()] = null;
+      this.clubsRef.child(club.getClubKey()).child('admins')
+      .update(commandUpdate).then(() => {
+        resolve(true);
+      }, (err) => {reject(err);});
+    });
+  }
+
+  excludeMemberFromClub(user: UserProfileModel, club: ClubModel): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      // Remove all references from excluded user.
+      let command = {}
+      command[DB_ROOT_CLUBS+club.getClubKey()+'/admins/'+user.getUid()] = null;
+      command[DB_ROOT_CLUB_MEMBERS+club.getClubKey()+'/'+user.getUid()] = null;
+      command[DB_ROOT_CLUBS_RANK+club.getClubKey()+'/'+user.getUid()] = null;
+      command[DB_ROOT_MEMBER_CLUBS+user.getUid()+'/'+club.getClubKey()] = null;
+      command[DB_ROOT_CLUB_CHALLENGER+club.getClubKey()+'/'+user.getUid()] = null;
+      command[DB_ROOT_CLUB_CHALLENGED+club.getClubKey()+'/'+user.getUid()] = null;
+      command[DB_ROOT_CLUBS+club.getClubKey()+'/qntdMembers'] = club.qntdMembers-1;
+
+      Promise.all([
+        this.getUserChallengerList(club, user.getUid()),
+        this.getUserChallengedList(club, user.getUid())
+      ]).then(values => {
+        values[0].forEach(element => {
+          command[DB_ROOT_CHALLENGES+club.getClubKey()+'/'+element.dbKey] = null;
+          command[DB_ROOT_CLUB_CHALLENGED+club.getClubKey()+'/'+element.userChallengedId+'/'+element.dbKey] = null;
+          command[DB_ROOT_EVENT_CHALLENGES+club.getClubKey()+'/'+element.dbKey] = null;
+        });
+
+        values[1].forEach(element => {
+          command[DB_ROOT_CHALLENGES+club.getClubKey()+'/'+element.dbKey] = null;
+          command[DB_ROOT_CLUB_CHALLENGER+club.getClubKey()+'/'+element.userChallengerId+'/'+element.dbKey] = null;
+          command[DB_ROOT_EVENT_CHALLENGES+club.getClubKey()+'/'+element.dbKey] = null;
+        });
+        
+        // Bye bye user, thank you for funny! 
+        firebase.database().ref().update(command).then(() => {
+          resolve(true);
+        }, (err) => {reject(err);});
+      });
+    });
+  }
   //-------------------------------------------
 
   // Club Control
@@ -484,11 +542,11 @@ export class FirebaseService {
     });
   }
 
-  getClubOtherMembers(club: ClubModel): Promise<Array<UserProfileModel>> {
+  getClubMembers(club: ClubModel): Promise<Array<UserProfileModel>> {
     return new Promise((resolve,reject) => {
       this.getClubMemberKeys(club).then((userKeys: Array<string>) => {
-        let commands = userKeys.map((val, key) => {
-          return this.usersRef.child(val).once('value');
+        let commands = userKeys.map((k, v) => {
+          return this.usersRef.child(k).once('value');
         });
 
         Promise.all(commands).then(snapshots => {
@@ -518,18 +576,18 @@ export class FirebaseService {
       Promise.all([
         this.getUserChallengerList(club),
         this.getUserChallengedList(club),
-        this.getClubOtherMembers(club),
+        this.getClubMembers(club),
         this.getUserProfile()
       ]).then(data => {
         let myChallenges = data[0];
         let otherChallenges = data[1];
-        let opponents = data[2];
+        let members = data[2];
         let loggedUser = data[3];
         
         // Logged user has created this challenges, configure the opponents.
         myChallenges.forEach( mc => {
           mc.userChallenger = loggedUser;
-          opponents.forEach(o => {
+          members.forEach(o => {
             if (mc.userChallengedId.valueOf() === o.getUid().valueOf()) {
               mc.userChallenged = o;
             }
@@ -539,7 +597,7 @@ export class FirebaseService {
         // Other users has created this challenges, they challenges me.
         otherChallenges.forEach( oc => {
           oc.userChallenged = loggedUser;
-          opponents.forEach(o => {
+          members.forEach(o => {
             if (oc.userChallengerId.valueOf() === o.getUid().valueOf()) {
               oc.userChallenger = o;
             }
@@ -558,7 +616,7 @@ export class FirebaseService {
               if (cv.userChallengerId.valueOf() === loggedUser.getUid().valueOf()) {
                 cv.userChallenger = loggedUser;
               } else {
-                opponents.forEach(o => {
+                members.forEach(o => {
                   if (cv.userChallengerId.valueOf() === o.getUid().valueOf()) {
                     cv.userChallenger = o;
                   }
@@ -569,7 +627,7 @@ export class FirebaseService {
               if (cv.userChallengedId.valueOf() === loggedUser.getUid().valueOf()) {
                 cv.userChallenged = loggedUser;
               } else {
-                opponents.forEach(o => {
+                members.forEach(o => {
                   if (cv.userChallengedId.valueOf() === o.getUid().valueOf()) {
                     cv.userChallenged = o;
                   }
@@ -739,13 +797,10 @@ export class FirebaseService {
     return new Promise((resolve,reject) => {
       Promise.all([
         this.loadClubConfirmedEvents(club),
-        this.getClubOtherMembers(club),
-        this.getUserProfile()
+        this.getClubMembers(club)
       ])
       .then(data => {
         let resultData = new Array<Array<any>>();
-        // Add current logged user for opponents list.
-        data[1].push(data[2]);
         // Iterate over confirmed challenges.
         data[0].forEach( challenge => {
           // Iterate over possible opponents.
@@ -771,12 +826,9 @@ export class FirebaseService {
     return new Promise((resolve,reject) => {
       Promise.all([
         this.loadClubRankInfo(club),
-        this.getClubOtherMembers(club),
-        this.getUserProfile()
+        this.getClubMembers(club)
       ])
       .then(data => {
-        data[1].push(data[2]);
-
         data[0].forEach( rankProfile => {
           // Iterate over possible opponents.
           data[1].forEach(member => {
@@ -967,9 +1019,9 @@ export class FirebaseService {
         snapshot.forEach(element => {
           let currentUid = firebase.auth().currentUser.uid;
           // Remove current user from list.
-          if (new String(currentUid).valueOf() !== new String(element.key).valueOf()) {
-            userKeys.push(element.key);
-          }
+          // if (new String(currentUid).valueOf() !== new String(element.key).valueOf()) {
+          userKeys.push(element.key);
+          // }
         });
         resolve(userKeys);
       }, (err) => {reject(err)});
@@ -977,11 +1029,11 @@ export class FirebaseService {
   }
 
   // Get all challenges created by current user.
-  private getUserChallengerList(club: ClubModel): Promise<Array<ChallengeModel>> {
+  private getUserChallengerList(club: ClubModel, uid = firebase.auth().currentUser.uid): Promise<Array<ChallengeModel>> {
     return new Promise((resolve,reject) => {
       // Get the keys first.
       this.clubChallengerRef.child(club.getClubKey())
-      .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
+      .child(uid).once('value', (snapshots) => {
         let commands = new Array<any>();
         // create the commands with the keys.
         snapshots.forEach(snapshot => {
@@ -1020,11 +1072,11 @@ export class FirebaseService {
   }
 
   // Get challenges create by other users, that mention current user.
-  private getUserChallengedList(club: ClubModel): Promise<Array<ChallengeModel>> {
+  private getUserChallengedList(club: ClubModel, uid = firebase.auth().currentUser.uid): Promise<Array<ChallengeModel>> {
     return new Promise((resolve,reject) => {
       // Get the keys first.
       this.clubChallengedRef.child(club.getClubKey())
-      .child(firebase.auth().currentUser.uid).once('value', (snapshots) => {
+      .child(uid).once('value', (snapshots) => {
         let commands = new Array<any>();
         // create the commands with the keys.
         snapshots.forEach(snapshot => {

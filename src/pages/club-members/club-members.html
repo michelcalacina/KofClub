@@ -15,30 +15,17 @@
           <img src={{user.thumbnailUrl}}>
         </ion-avatar>
         <h2>{{user.displayName}}</h2>
-        <h2 *ngIf="user.isAdmin">administrador</h2>
+        <hr *ngIf="user.isAdmin">
+        <p *ngIf="user.isAdmin">administrador</p>
       </ion-item>
       <ion-item *ngIf="user.isChecked" style="background-color: cornflowerblue">
         <ion-avatar item-left>
           <img src={{user.thumbnailUrl}}>
         </ion-avatar>
         <h2>{{user.displayName}}</h2>
-        <h2 *ngIf="user.isAdmin">administrador</h2>
+        <hr *ngIf="user.isAdmin">
+        <p *ngIf="user.isAdmin">administrador</p>
       </ion-item>
     </ion-item>
   </ion-list>
-
-  <ion-item no-lines *ngIf="users.length > 0 && isAdmin">
-    <ion-buttons>
-      <button ion-button full
-        [disabled]="attemptActionUsers.length === 0"
-        (click)="giveAdminPower()">
-        TORNAR ADMINISTRADOR
-      </button>
-      <button ion-button full
-        [disabled]="attemptActionUsers.length === 0"
-        (click)="excludeMembers()" color="danger">
-        EXCLUIR
-      </button>
-    </ion-buttons>
-  </ion-item>
 </ion-content>

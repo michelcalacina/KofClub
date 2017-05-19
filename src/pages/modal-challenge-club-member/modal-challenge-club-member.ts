@@ -14,18 +14,19 @@ import { ChallengeModel, ChallengeStatus } from '../../model/challenge-model';
 })
 export class ModalChallengeClubMember {
   private club: ClubModel;
-  private loading: any;
-  challenge: ChallengeModel;
+  private challenge: ChallengeModel;
+  private dateModel: Date;
 
   constructor(public navCtrl: NavController, public navParams: NavParams
   , public loadingCtrl: LoadingController, public firebaseService: FirebaseService
-  , public toatCtrl: ToastController, public viewCtrl: ViewController) {
+  , public toastCtrl: ToastController, public viewCtrl: ViewController) {
 
     let opponent: UserProfileModel = navParams.get("member");
     this.club = navParams.get("club");
 
     this.challenge = new ChallengeModel();
-    this.challenge.date = new Date().toISOString();
+    let currentDate = new Date();
+    this.challenge.date = new Date(currentDate.getTime() - (currentDate.getTimezoneOffset() * 60000)).toISOString();
     // Get the current logged user, as challenger.
     this.firebaseService.getUserProfile().then( (loggedUser) => {
       this.challenge.userChallenger = loggedUser;
@@ -41,18 +42,16 @@ export class ModalChallengeClubMember {
       return;
     }
 
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true
-    });
-    this.loading.present();
+    let loading = this.loadingCtrl.create({dismissOnPageChange: true});
+    loading.present();
 
     this.firebaseService.createChallenge(this.club, this.challenge)
     .then((_) => {
-        this.loading.dismiss().then(() => {
+          loading.dismiss().then(() => {
           this.showToast("Desafio lançado, aguardando confirmação do adversário!", true);
       });
     }, (err) => {
-      this.loading.dismiss();
+      loading.dismiss();
       console.log(err);
     });
   }
@@ -62,7 +61,7 @@ export class ModalChallengeClubMember {
   }
 
   private showToast(message: string, showButton: boolean) {
-    let toast = this.toatCtrl.create({
+    let toast = this.toastCtrl.create({
         message: message,
         showCloseButton: showButton,
         closeButtonText: "OK",
@@ -74,9 +73,10 @@ export class ModalChallengeClubMember {
       }
 
       toast.onDidDismiss(() => {
-        this.viewCtrl.dismiss(true);
+        if (showButton) {
+          this.viewCtrl.dismiss(true);
+        }
       });
-
       toast.present();
   }
 }

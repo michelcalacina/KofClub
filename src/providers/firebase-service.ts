@@ -29,6 +29,9 @@ const DB_ROOT_CLUB_VIDEOS = "/club-videos/";
 const ST_ROOT_IMAGES = "/images/";
 const ST_PATH_LOGOS = ST_ROOT_IMAGES + "logos/";
 
+// Same that 7 days or one week.
+const FINISHED_CHALLENGE_KEEP_ALIVE_HOUR = 168;
+
 
 @Injectable()
 export class FirebaseService {
@@ -583,30 +586,80 @@ export class FirebaseService {
         let otherChallenges = data[1];
         let members = data[2];
         let loggedUser = data[3];
+
+        let finalMyChallenges = new Array<ChallengeModel>();
+        let finalOtherChallenges = new Array<ChallengeModel>();
+
+        let challengesToRemove = new Array<ChallengeModel>();
         
         // Logged user has created this challenges, configure the opponents.
         myChallenges.forEach( mc => {
+          // Validate if challenge is completed and if it can be removed after x days.
+          if (mc.status === ChallengeStatus.COMPLETED) {
+            let challengeMilisTime = parseInt(mc.finishedDate);
+            let currentDate = new Date();
+            let challengeDate = new Date(challengeMilisTime);
+            // 36e5 == 60*60*1000
+            let hourPassed = Math.abs(challengeDate.getTime() - currentDate.getTime()) / 36e5 
+            if (hourPassed >= FINISHED_CHALLENGE_KEEP_ALIVE_HOUR) {
+              challengesToRemove.push(mc);
+              // SKIP INTERACTION
+              return;
+            }
+          }
           mc.userChallenger = loggedUser;
           members.forEach(o => {
             if (mc.userChallengedId.valueOf() === o.getUid().valueOf()) {
               mc.userChallenged = o;
+              finalMyChallenges.push(mc);
+              // break Interaction.
+              return false;
             }
           });
         });
+        myChallenges = null;
 
         // Other users has created this challenges, they challenges me.
         otherChallenges.forEach( oc => {
+          // Validate if challenge is completed and if it can be removed after x days.
+          if (oc.status === ChallengeStatus.COMPLETED) {
+            let challengeMilisTime = parseInt(oc.finishedDate);
+            let currentDate = new Date();
+            let challengeDate = new Date(challengeMilisTime);
+            // 36e5 == 60*60*1000
+            let hourPassed = Math.abs(challengeDate.getTime() - currentDate.getTime()) / 36e5 
+            if (hourPassed >= FINISHED_CHALLENGE_KEEP_ALIVE_HOUR) {
+              challengesToRemove.push(oc);
+              // skip interaction
+              return;
+            }
+          }
+
           oc.userChallenged = loggedUser;
           members.forEach(o => {
             if (oc.userChallengerId.valueOf() === o.getUid().valueOf()) {
               oc.userChallenger = o;
+              finalOtherChallenges.push(oc);
+              // Break iteraction
+              return false;
             }
           });
         });
+        otherChallenges = null;
 
         let result = new Array<Array<ChallengeModel>>();
-        result.push(myChallenges);
-        result.push(otherChallenges);
+        result.push(finalMyChallenges);
+        result.push(finalOtherChallenges);
+
+        // Remove unseless finishedChallenges;
+        if (challengesToRemove.length > 0) {
+          let commands = [];
+          challengesToRemove.forEach(ctr => {
+            commands.push(this.excludeChallenge(ctr, club));
+          });
+          // No need to wait.
+          Promise.all(commands);
+        }
         
         if (isAdmin) {
           this.getChallengeAdminValidation(club)
@@ -641,6 +694,7 @@ export class FirebaseService {
         } else {
           resolve(result);
         }
+        
       }, (err) => {reject(err)});
     });
   }
@@ -689,11 +743,11 @@ export class FirebaseService {
       let commands = {};
       // Remove the challenger
       commands[DB_ROOT_CLUB_CHALLENGER + club.getClubKey() 
-      +'/'+ challenge.userChallenger.getUid() +'/'+ challenge.dbKey] = null;
+      +'/'+ challenge.userChallengerId +'/'+ challenge.dbKey] = null;
 
       // Remove the challenged
       commands[DB_ROOT_CLUB_CHALLENGED + club.getClubKey() 
-      +'/'+ challenge.userChallenged.getUid() +'/'+ challenge.dbKey] = null;
+      +'/'+ challenge.userChallengedId +'/'+ challenge.dbKey] = null;
 
       // Remove the event if it is confirmed.
       commands[DB_ROOT_EVENT_CHALLENGES + club.getClubKey() 
@@ -718,6 +772,8 @@ export class FirebaseService {
       if (isAdmin) {
         commands[DB_ROOT_CHALLENGES + club.getClubKey()
         + '/' + challenge.dbKey + '/status'] = ChallengeStatus.COMPLETED;
+        commands[DB_ROOT_CHALLENGES + club.getClubKey()
+        + '/' + challenge.dbKey + '/finishedDate'] = firebase.database.ServerValue.TIMESTAMP;
       } else {
         commands[DB_ROOT_CHALLENGES + club.getClubKey()
         + '/' + challenge.dbKey + '/status'] = ChallengeStatus.ACCOMPLISHED;
@@ -747,6 +803,9 @@ export class FirebaseService {
       let command = {}
       command[DB_ROOT_CHALLENGES + club.getClubKey()
       + '/' + challenge.dbKey + '/status'] = ChallengeStatus.COMPLETED;
+      command[DB_ROOT_CHALLENGES + club.getClubKey()
+      + '/' + challenge.dbKey + '/finishedDate'] = firebase.database.ServerValue.TIMESTAMP;
+      // Because admin can launch result for another members.
       if (isAdmin) {
         command[DB_ROOT_CHALLENGES + club.getClubKey()
         + '/' + challenge.dbKey + '/challengerWins'] = challenge.challengerWins;
@@ -1062,7 +1121,7 @@ export class FirebaseService {
             challenge.challengerWins = snapshot.val().challengerWins;
             challenge.challengedWins = snapshot.val().challengedWins;
             challenge.isResultByChallenger = snapshot.val().isResultByChallenger;
-
+            challenge.finishedDate = snapshot.val().finishedDate;
             challenges.push(challenge);
           });
           resolve(challenges);
@@ -1105,6 +1164,7 @@ export class FirebaseService {
             challenge.challengerWins = snapshot.val().challengerWins;
             challenge.challengedWins = snapshot.val().challengedWins;
             challenge.isResultByChallenger = snapshot.val().isResultByChallenger;
+            challenge.finishedDate = snapshot.val().finishedDate;
             challenges.push(challenge);
           });
           resolve(challenges);
@@ -1147,6 +1207,7 @@ export class FirebaseService {
             challenge.challengerWins = snapshot.val().challengerWins;
             challenge.challengedWins = snapshot.val().challengedWins;
             challenge.isResultByChallenger = snapshot.val().isResultByChallenger;
+            challenge.finishedDate = snapshot.val().finishedDate;
             challenges.push(challenge);
           });
           resolve(challenges);

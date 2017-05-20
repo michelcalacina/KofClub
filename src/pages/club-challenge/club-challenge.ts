@@ -140,7 +140,7 @@ export class ClubChallenge {
       let myChallenges: Array<ChallengeModel> = dataArray[0];
       let otherChallenges = dataArray[1];
       
-      if (this.isAdminLogged) {
+      if (this.isAdminLogged ) {
         dataArray[2].forEach(c => {
           this.challengesAdminValidation.push(c);
         });

@@ -19,11 +19,13 @@ export class ChallengeModel {
     public date: string;
     public status: ChallengeStatus;
     public isResultByChallenger: boolean;
+    public finishedDate: string;
 
     constructor() {
         this.isResultByChallenger = false;
         this.challengedWins = 0;
         this.challengerWins = 0;
+        this.finishedDate = "0";
     }
 
     toJson(): any {
@@ -36,6 +38,7 @@ export class ChallengeModel {
         jcm["isResultByChallenger"] = this.isResultByChallenger;
         jcm["challengerWins"] = this.challengerWins;
         jcm["challengedWins"] = this.challengedWins;
+        jcm["finishedDate"] = this.finishedDate;
 
         return jcm;
     }

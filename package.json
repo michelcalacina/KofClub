@@ -1,7 +1,7 @@
 {
-  "name": "KoFClub",
+  "name": "match",
   "author": "Michnnick",
-  "homepage": "https://github/michelcalaina",
+  "homepage": "https://github/michelcalaina/match",
   "private": true,
   "scripts": {
     "clean": "ionic-app-scripts clean",

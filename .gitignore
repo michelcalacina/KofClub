@@ -231,4 +231,4 @@ plugins
 *.swo
 *.log
 *.log
-.vscode/
+.vscode/typings

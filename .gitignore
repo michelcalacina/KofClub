@@ -232,3 +232,5 @@ plugins
 *.log
 *.log
 .vscode/typings
+
+\.vscode/plugins\.json

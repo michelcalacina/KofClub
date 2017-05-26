@@ -1,0 +1,5 @@
+ionic build android --prod --release
+
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore match-release.jks /Users/michelcalacina/Official-Projects/match/platforms/android/build/outputs/apk/android-release-unsigned.apk match
+
+~/Library/Developer/android-sdk-macosx/build-tools/25.0.2/zipalign -v 4 /Users/michelcalacina/Official-Projects/match/platforms/android/build/outputs/apk/android-release-unsigned.apk /Users/michelcalacina/Official-Projects/match/platforms/android/build/outputs/apk/match.apk}
